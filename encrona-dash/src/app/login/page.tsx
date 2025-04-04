@@ -26,7 +26,7 @@ export default function LoginPage() {
           alt="Image"
           fill
           priority
-          className="absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale"
+          className="absolute inset-0 object-cover dark:brightness-[0.75]"
         />
       </div>
     </div>
