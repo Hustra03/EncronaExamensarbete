@@ -1,0 +1,4 @@
+1. Define custom exception structure, and add custom exceptions to relevant sections of the code
+
+
+2. Confirm if the ordering of modifiers matters, and if so in what way?
