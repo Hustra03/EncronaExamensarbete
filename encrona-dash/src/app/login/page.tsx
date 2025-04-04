@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { Leaf } from "lucide-react";
-import { LoginForm } from "@/components/login-form";
+import Image from 'next/image';
+import { Leaf } from 'lucide-react';
+import { LoginForm } from '@/components/login-form';
 
 export default function LoginPage() {
   return (

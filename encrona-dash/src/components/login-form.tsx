@@ -1,28 +1,28 @@
-"use client";
+'use client';
 
-import { loginAction } from "@/app/login/actions";
-import { cn } from "@/lib/utils";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { useActionState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { loginAction } from '@/app/login/actions';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<"form">) {
+}: React.ComponentProps<'form'>) {
   const [status, formAction] = useActionState(loginAction, null);
 
   const router = useRouter();
 
   useEffect(() => {
-    if (status === "sucess") router.push("/");
+    if (status === 'sucess') router.push('/');
   }, [status, router]);
 
   return (
     <form
-      className={cn("flex flex-col gap-6", className)}
+      className={cn('flex flex-col gap-6', className)}
       {...props}
       action={formAction}
     >
@@ -43,8 +43,8 @@ export function LoginForm({
           <Input id="password" name="password" type="password" required />
         </div>
 
-        {status && status !== "sucess" && (
-          <p className="text-red-500 text-sm text-center">{status}</p>
+        {status && status !== 'sucess' && (
+          <p className="text-center text-sm text-red-500">{status}</p>
         )}
 
         <Button type="submit" className="w-full">

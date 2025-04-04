@@ -1,5 +1,5 @@
-import { hash } from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
+import { hash } from 'bcryptjs';
+import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -9,7 +9,7 @@ export async function POST(request: Request) {
     const { email, password }: { email: string; password: string } = body;
 
     if (!email || !password) {
-      return new Response(JSON.stringify({ message: "Missing fields" }), {
+      return new Response(JSON.stringify({ message: 'Missing fields' }), {
         status: 400,
       });
     }
@@ -19,7 +19,7 @@ export async function POST(request: Request) {
     });
 
     if (existingUser) {
-      return new Response(JSON.stringify({ message: "User already exists" }), {
+      return new Response(JSON.stringify({ message: 'User already exists' }), {
         status: 409,
       });
     }
@@ -30,12 +30,12 @@ export async function POST(request: Request) {
       data: { email, password: hashedPassword },
     });
 
-    return new Response(JSON.stringify({ message: "User created" }), {
+    return new Response(JSON.stringify({ message: 'User created' }), {
       status: 201,
     });
   } catch (error) {
-    console.error("Registration error:", error);
-    return new Response(JSON.stringify({ message: "Internal server error" }), {
+    console.error('Registration error:', error);
+    return new Response(JSON.stringify({ message: 'Internal server error' }), {
       status: 500,
     });
   }
