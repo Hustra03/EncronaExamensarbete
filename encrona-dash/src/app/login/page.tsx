@@ -1,6 +1,6 @@
-import Image from "next/image";
-import { Leaf } from "lucide-react";
-import { LoginForm } from "@/components/login-form";
+import Image from 'next/image';
+import { Leaf } from 'lucide-react';
+import { LoginForm } from '@/components/login-form';
 
 export default function LoginPage() {
   return (
@@ -26,7 +26,7 @@ export default function LoginPage() {
           alt="Image"
           fill
           priority
-          className="absolute inset-0 object-cover dark:brightness-[0.2] dark:grayscale"
+          className="absolute inset-0 object-cover dark:brightness-[0.75]"
         />
       </div>
     </div>

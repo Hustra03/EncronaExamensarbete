@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
 import {
   IconDotsVertical,
   IconLogout,
   IconUserCircle,
-} from "@tabler/icons-react";
+} from '@tabler/icons-react';
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,16 +15,16 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from '@/components/ui/dropdown-menu';
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   useSidebar,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
-import { signOut } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { signOut } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export function NavUser({
   user,
@@ -38,16 +38,16 @@ export function NavUser({
 
   const handleSignOut = async () => {
     await signOut({ redirect: false });
-    router.replace("/login");
+    router.replace('/login');
   };
 
   const nameShortener = (name: string) => {
-    if (!name.trim()) return "";
+    if (!name.trim()) return '';
 
     return name
-      .split(" ")
-      .map((n) => n.charAt(0).toUpperCase())
-      .join("")
+      .split(' ')
+      .map(n => n.charAt(0).toUpperCase())
+      .join('')
       .substring(0, 3);
   };
 
@@ -79,7 +79,7 @@ export function NavUser({
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-(--radix-dropdown-menu-trigger-width) min-w-56 rounded-lg"
-            side={isMobile ? "bottom" : "right"}
+            side={isMobile ? 'bottom' : 'right'}
             align="end"
             sideOffset={4}
           >

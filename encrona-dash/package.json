@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "format": "prettier --write .",
     "prisma": "npx prisma migrate dev"
   },
   "dependencies": {
@@ -60,6 +61,8 @@
     "@types/ws": "^8.18.1",
     "eslint": "^9",
     "eslint-config-next": "15.2.4",
+    "prettier": "^3.5.3",
+    "prettier-plugin-tailwindcss": "^0.6.11",
     "prisma": "^6.5.0",
     "tailwindcss": "^4",
     "typescript": "^5"

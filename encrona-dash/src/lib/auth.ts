@@ -1,13 +1,13 @@
-import NextAuth from "next-auth";
+import NextAuth from 'next-auth';
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import type { JWT } from "next-auth/jwt";
-import Credentials from "next-auth/providers/credentials";
-import { PrismaClient } from "@prisma/client";
-import { compare } from "bcryptjs";
+import type { JWT } from 'next-auth/jwt';
+import Credentials from 'next-auth/providers/credentials';
+import { PrismaClient } from '@prisma/client';
+import { compare } from 'bcryptjs';
 
-export type Role = "USER" | "ADMIN";
+export type Role = 'USER' | 'ADMIN';
 
-declare module "next-auth" {
+declare module 'next-auth' {
   interface Session {
     user: {
       id: string;
@@ -22,7 +22,7 @@ declare module "next-auth" {
   }
 }
 
-declare module "next-auth/jwt" {
+declare module 'next-auth/jwt' {
   /** Returned by the `jwt` callback and `auth`, when using JWT sessions */
   interface JWT {
     id: string;
@@ -35,7 +35,7 @@ const prismaClient = new PrismaClient();
 export const { handlers, auth, signIn, signOut } = NextAuth({
   providers: [
     Credentials({
-      name: "Credentials",
+      name: 'Credentials',
       credentials: {
         email: {},
         password: {},
@@ -85,7 +85,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
   },
   session: {
-    strategy: "jwt",
+    strategy: 'jwt',
   },
   secret: process.env.NEXTAUTH_SECRET,
 });

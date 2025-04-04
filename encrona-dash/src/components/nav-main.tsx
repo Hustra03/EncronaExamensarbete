@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { ChevronRight, type LucideIcon } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { ChevronRight, type LucideIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@/components/ui/collapsible";
+} from '@/components/ui/collapsible';
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -17,7 +17,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@/components/ui/sidebar";
+} from '@/components/ui/sidebar';
 
 export function NavMain({
   navApp,
@@ -48,7 +48,7 @@ export function NavMain({
       <SidebarGroup>
         <SidebarGroupLabel>Applikation</SidebarGroupLabel>
         <SidebarMenu>
-          {navApp.map((item) => (
+          {navApp.map(item => (
             <Collapsible
               key={item.title}
               asChild
@@ -71,7 +71,7 @@ export function NavMain({
                 {item.items && (
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
+                      {item.items?.map(subItem => (
                         <SidebarMenuSubItem key={subItem.title}>
                           <SidebarMenuSubButton asChild>
                             <a href={subItem.url}>
@@ -92,7 +92,7 @@ export function NavMain({
         <SidebarGroup>
           <SidebarGroupLabel>Administrativt</SidebarGroupLabel>
           <SidebarMenu>
-            {navAdmin.map((item) => (
+            {navAdmin.map(item => (
               <SidebarMenuItem key={item.title}>
                 <SidebarMenuButton asChild>
                   <a href={item.url}>

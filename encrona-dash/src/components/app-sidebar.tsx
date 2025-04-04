@@ -1,7 +1,7 @@
-import { auth } from "@/lib/auth";
-import { Sidebar } from "@/components/ui/sidebar";
-import { AppSidebarClient } from "./app-sidebar-client";
-import { Session } from "next-auth";
+import { auth } from '@/lib/auth';
+import { Sidebar } from '@/components/ui/sidebar';
+import { AppSidebarClient } from './app-sidebar-client';
+import { Session } from 'next-auth';
 
 export default async function AppSidebar(
   props: React.ComponentProps<typeof Sidebar>
