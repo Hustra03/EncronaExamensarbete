@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "format": "prettier --write .",
-    "prisma": "npx prisma migrate dev"
+    "prisma": "npx prisma migrate dev && npx prisma generate"
   },
   "dependencies": {
     "@auth/neon-adapter": "^1.8.0",
