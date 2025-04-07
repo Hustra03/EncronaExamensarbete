@@ -1,12 +1,15 @@
 package encrona.components;
 
+/**
+ * This class represents inputs to the system
+ */
 public class input<T> extends componentAbstract<T>{
     
     /**
      * This is a constructor for originalElectricityConsumption 
      * @param currentElectricityValue The current value
      */
-    input(String name, String unit, T value)
+    public input(String name, String unit, T value)
     {   this.setName(name);
         this.setUnit(unit);
         this.setValue(value);
