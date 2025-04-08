@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { Session } from 'next-auth';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { JWT } from 'next-auth/jwt';
 import Credentials from 'next-auth/providers/credentials';
@@ -89,3 +89,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   },
   secret: process.env.NEXTAUTH_SECRET,
 });
+
+export function isAdmin(session: Session | null | undefined): boolean {
+  return session?.user?.role === 'ADMIN';
+}
