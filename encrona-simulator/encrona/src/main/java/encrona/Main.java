@@ -9,6 +9,6 @@ public class Main {
      * @param args The provided command-line argumentss
      */
     public static void main(String[] args) {
-        model.runSimulation();
+        Model.runSimulation();
     }
 }

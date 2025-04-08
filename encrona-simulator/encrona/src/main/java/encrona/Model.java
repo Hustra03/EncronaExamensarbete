@@ -12,7 +12,7 @@ import encrona.components.componentAbstract;
  * The Model class is reponsible holding the simulation itself, and is the
  * "main" class responsible for the simulation
  */
-public class model {
+public class Model {
     static ExecutorService service;
     static DataLoader dataLoader;
     static LinkedHashSet<componentAbstract> executionSet;
