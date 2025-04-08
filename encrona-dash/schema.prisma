@@ -22,3 +22,12 @@ model User {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 }
+
+model Building {
+  id             Int      @id @default(autoincrement())
+  name           String
+  owner          String 
+  installedAt    DateTime 
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
