@@ -142,7 +142,7 @@ public abstract class componentAbstract<T> implements componentInterface<T>, Run
         if (modifiers != null) {
             for (modifierAbstract<T> mod : modifiers) {
                 //TODO below is for testing, remove before using in production
-                System.out.println("Modifier " + mod.getName() + " Applied to " + this.getName());
+                System.out.println(" Modifier " + mod.getName() + " Applied to " + this.getName());
                 setValue(mod.modify(value));
             }
         }

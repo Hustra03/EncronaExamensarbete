@@ -34,7 +34,7 @@ public class changeHeatingSystem extends modifierAbstract<heatingSystem>{
     public heatingSystem modify(heatingSystem value) throws Exception {
 
         if (value.getName().equals(newHeatingSystem.getName())) {
-            throw new Exception("");
+            throw new Exception("Heating system is already " + value.getName());
         }
 
         return newHeatingSystem;

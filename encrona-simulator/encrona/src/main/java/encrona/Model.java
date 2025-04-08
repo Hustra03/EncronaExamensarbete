@@ -55,8 +55,7 @@ public class model {
 
         // This gives the values, for testing purposes
         for (componentAbstract componentAbstract : componentsToCalculate) {
-            System.out.println(componentAbstract.getName() + " equals " + componentAbstract.getValue() + " "
-                    + componentAbstract.getUnit());
+            System.out.println(componentAbstract.getName() + " equals " + componentAbstract.getValue() + " " + componentAbstract.getUnit());
         }
     }
 
