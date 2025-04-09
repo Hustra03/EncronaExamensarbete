@@ -4,7 +4,7 @@ package encrona.domain;
  * This abstract class gives the common structure for improvements which are represented as objects 
  */
 public class improvement extends objectAbstract {
-    private Double kwhPerM2;
+    private Double kwhPerM2; //This is the amount for the entire
     private Double costPerM2;
     private Integer yearsOfService;
     private improvementImpactEnum impactType;
@@ -17,6 +17,12 @@ public class improvement extends objectAbstract {
         this.costPerM2=costPerM2;
         this.yearsOfService=yearsOfService;
         this.impactType=impactType;
+    }
+
+    public String toString()
+    {
+        return this.getName()+ " saves " + kwhPerM2 + " per m2 for the cost "+ costPerM2 + " per m2 over the course of " + yearsOfService +" years for " + impactType.toString();
+        
     }
 
     /**

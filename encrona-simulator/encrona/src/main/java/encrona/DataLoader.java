@@ -8,7 +8,7 @@ import java.util.Map;
 
 import encrona.components.componentAbstract;
 import encrona.components.input;
-import encrona.components.output.finalElectricityConsumptionChange;
+import encrona.components.output.finalElectricityConsumption;
 import encrona.modifiers.modifierAbstract;
 import encrona.modifiers.basicModifiers.multiplicationModifier;
 import encrona.domain.heatingEnergySource;
@@ -58,21 +58,30 @@ public class DataLoader {
     public void createComponents() {
         //We first define the simple value inputs which are always included and then add them to components
         //TODO make the inputs read values from user input
-        input<Double> electricityInput = new input<Double>("electricityConsumptionInput", "kwh", 100.0);
-        input<Integer> aTempInput = new input<Integer>("aTempInput", "m^2", 100);
+        input<Double> electricityInput = new input<Double>("electricityConsumptionInput", "kwh", 5703.0);
+        input<Integer> aTempInput = new input<Integer>("aTempInput", "m^2", 1074);
         input<Double> rentValueInput = new input<Double>("yearlyRent", "%", 2.0);
         input<Double> varianceInput = new input<Double>("variance", "%", 2.0);
+        input<Double> electrictyPriceInput=new input<Double>("electricityPrice","kr/kwh",1.1);
+
 
         components.put(electricityInput.getName(), electricityInput);
         components.put(aTempInput.getName(), aTempInput);
         components.put(rentValueInput.getName(), rentValueInput);
         components.put(varianceInput.getName(), varianceInput);
-
+        components.put(electrictyPriceInput.getName(), electrictyPriceInput);
 
 
         //We then add the improvements which were selected
         //TODO only add the improvements which are a part of input
-        input<List<improvement>> improvementsToImplement= new input<List<improvement>>("improvements", "N/A",new ArrayList<improvement>() ); 
+
+        List<improvement> improvement = new ArrayList<improvement>();
+        improvement.add((improvement)objects.get("EfficentLighting"));
+        input<List<improvement>> improvementsToImplement= new input<List<improvement>>("improvements", "N/A",improvement); 
+
+
+        components.put(improvementsToImplement.getName(), improvementsToImplement);
+
 
         //We then add the different sources of heating energy
         //TODO change to creating energy sources based on their input values
@@ -88,9 +97,9 @@ public class DataLoader {
         
         Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
         electricityOutputDependsOn.put(electricityInput.getName(), electricityInput);
-        List<modifierAbstract<Double>> electricityOutputModifiers= new ArrayList<modifierAbstract<Double>>();
-        electricityOutputModifiers.add(modifiers.get("multiplyBy3"));
-        finalElectricityConsumptionChange electricityOutput = new finalElectricityConsumptionChange("electricityOutput", "kwh", electricityOutputDependsOn,electricityOutputModifiers );
+        electricityOutputDependsOn.put(improvementsToImplement.getName(), improvementsToImplement);
+        electricityOutputDependsOn.put(aTempInput.getName(), aTempInput);
+        finalElectricityConsumption electricityOutput = new finalElectricityConsumption("electricityOutput", "kwh", electricityOutputDependsOn,new ArrayList<modifierAbstract<List<Double>>>());
 
         //We then finally add all of the defined outputs to components
         components.put(electricityOutput.getName(), electricityOutput);
@@ -112,7 +121,7 @@ public class DataLoader {
         improvement ControlSystem = new improvement("ControlSystem", 100.0, 45.0, 10, improvementImpactEnum.BuildingHeating);
         improvement ThermometerReconfiguration = new improvement("ThermometerReconfiguration", 90.0, 50.0, 10, improvementImpactEnum.BuildingHeating);
         improvement EconomicalFlush = new improvement("EconomicalFlush", 100.0, 45.0, 15, improvementImpactEnum.Water);
-        improvement EfficentLighting = new improvement(null, 30.0, 15.0, 15, improvementImpactEnum.Electricity);
+        improvement EfficentLighting = new improvement("EfficentLighting", 30.0, 15.0, 15, improvementImpactEnum.Electricity);
     
         objects.put(BergOrMarkHeating.getName(), BergOrMarkHeating);
         objects.put(FTX.getName(), FTX);
@@ -128,7 +137,8 @@ public class DataLoader {
         objects.put(EfficentLighting.getName(), EfficentLighting);
 
         //We then add the relevant heating sources (currently just district heating)
-        heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0);
+        //TODO get realistic cost for district heating
+        heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,1.25);
         objects.put(districtHeating.getName(), districtHeating);
     }
 

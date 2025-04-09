@@ -2,6 +2,7 @@ package encrona;
 
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -55,7 +56,26 @@ public class Model {
 
         // This gives the values, for testing purposes
         for (componentAbstract componentAbstract : componentsToCalculate) {
-            System.out.println(componentAbstract.getName() + " equals " + componentAbstract.getValue() + " " + componentAbstract.getUnit());
+
+            
+            if (componentAbstract.getValue() instanceof java.util.List) {
+
+                System.out.print(componentAbstract.getName() + " equals : [ ");
+
+                ((List)componentAbstract.getValue()).toString();
+
+                for (Object a : (List)componentAbstract.getValue()) {
+                    System.out.print(" " + a.toString() + " ,");
+                }
+                System.out.println(" ]");
+            }
+            else
+            {
+            System.out.println(componentAbstract.getName() + " equals " + componentAbstract.getValue().toString() + " " + componentAbstract.getUnit());
+
+            }
+            
+
         }
     }
 
