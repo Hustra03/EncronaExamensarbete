@@ -155,7 +155,9 @@ public abstract class componentAbstract<T> implements componentInterface<T>, Run
      */
     public void run() {
         try {
-            calculate();
+            this.calculate();
+            this.applyModifiers();
+            this.complete();
         } catch (Exception e) {
             e.printStackTrace();
         }

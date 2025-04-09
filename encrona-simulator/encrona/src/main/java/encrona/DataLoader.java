@@ -9,6 +9,7 @@ import java.util.Map;
 import encrona.components.componentAbstract;
 import encrona.components.input;
 import encrona.components.output.finalElectricityConsumption;
+import encrona.components.output.finalSavingsFromElectricity;
 import encrona.modifiers.modifierAbstract;
 import encrona.modifiers.basicModifiers.multiplicationModifier;
 import encrona.domain.heatingEnergySource;
@@ -56,20 +57,13 @@ public class DataLoader {
      * This creates the components objects, and adds them to the map
      */
     public void createComponents() {
-        //We first define the simple value inputs which are always included and then add them to components
+        //We first define the simple value inputs which are read from input and used for creating the output
         //TODO make the inputs read values from user input
         input<Double> electricityInput = new input<Double>("electricityConsumptionInput", "kwh", 5703.0);
         input<Integer> aTempInput = new input<Integer>("aTempInput", "m^2", 1074);
         input<Double> rentValueInput = new input<Double>("yearlyRent", "%", 2.0);
         input<Double> varianceInput = new input<Double>("variance", "%", 2.0);
         input<Double> electrictyPriceInput=new input<Double>("electricityPrice","kr/kwh",1.1);
-
-
-        components.put(electricityInput.getName(), electricityInput);
-        components.put(aTempInput.getName(), aTempInput);
-        components.put(rentValueInput.getName(), rentValueInput);
-        components.put(varianceInput.getName(), varianceInput);
-        components.put(electrictyPriceInput.getName(), electrictyPriceInput);
 
 
         //We then add the improvements which were selected
@@ -81,7 +75,6 @@ public class DataLoader {
 
 
         components.put(improvementsToImplement.getName(), improvementsToImplement);
-
 
         //We then add the different sources of heating energy
         //TODO change to creating energy sources based on their input values
@@ -101,8 +94,15 @@ public class DataLoader {
         electricityOutputDependsOn.put(aTempInput.getName(), aTempInput);
         finalElectricityConsumption electricityOutput = new finalElectricityConsumption("electricityOutput", "kwh", electricityOutputDependsOn,new ArrayList<modifierAbstract<List<Double>>>());
 
+        Map<String, componentAbstract> electricitySavingsDependsOn = new HashMap<String, componentAbstract>();
+        electricitySavingsDependsOn.put(electricityInput.getName(), electricityInput);
+        electricitySavingsDependsOn.put(electricityOutput.getName(), electricityOutput);
+        electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
+        finalSavingsFromElectricity electricitySavings = new finalSavingsFromElectricity("electricitySavings", "kr", electricitySavingsDependsOn,new ArrayList<modifierAbstract<List<Double>>>());
+
         //We then finally add all of the defined outputs to components
         components.put(electricityOutput.getName(), electricityOutput);
+        components.put(electricitySavings.getName(), electricitySavings);
     }
 
     /**

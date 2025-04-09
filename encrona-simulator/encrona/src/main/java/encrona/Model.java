@@ -65,13 +65,15 @@ public class Model {
                 ((List)componentAbstract.getValue()).toString();
 
                 for (Object a : (List)componentAbstract.getValue()) {
-                    System.out.print(" " + a.toString() + " ,");
+                    System.out.print(" " + a.toString() + " "+componentAbstract.getUnit()+"  ," );
                 }
                 System.out.println(" ]");
             }
             else
             {
-            System.out.println(componentAbstract.getName() + " equals " + componentAbstract.getValue().toString() + " " + componentAbstract.getUnit());
+            System.out.print(componentAbstract.getName() + " equals ");
+
+            System.out.println(componentAbstract.getValue().toString() + " " + componentAbstract.getUnit());
 
             }
             
@@ -82,25 +84,25 @@ public class Model {
     /**
      * This method recursivly adds components to the execution set, first adding its
      * dependencies before adding itself
-     * TODO Note that we here recursivly run the dependencies, which we may want to
-     * change to multi-threaded?
+     * TODO Note that we here recursivly run the dependencies, which we may want to change to multi-threaded?
      * 
      * @param component The component to add
      */
     public static void recursiveRun(componentAbstract component) {
-        Map<String, componentAbstract> dependsOnMap = component.getDependsOn();
+        Map<String, componentAbstract> dependsOnMap = (Map<String, componentAbstract>)component.getDependsOn();
 
         if (dependsOnMap != null) {
-
-            Collection<componentAbstract> dependsOnCollection = dependsOnMap.values();
-
-            for (componentAbstract dependency : dependsOnCollection) {
+            for (componentAbstract dependency : dependsOnMap.values()) {
                 if (!dependency.getComplete()) {
                     recursiveRun(dependency);
                 }
             }
         }
-        component.run();
+        if (!component.getComplete()) {            
+            System.out.println("running " + component.getName());
+            component.run();
+            return;
+        }
     }
 
 }

@@ -14,7 +14,6 @@ import encrona.modifiers.modifierAbstract;
 
 public class finalElectricityConsumption extends componentAbstract<List<Double>>{
 
-
     /**
      * This is a constructor for finalElectricityConsumptionChange 
      * @param name The name of this output
@@ -32,17 +31,23 @@ public class finalElectricityConsumption extends componentAbstract<List<Double>>
     @Override
     /**
      * This method implements the calculate functionality for finalElectricityConsumptionChange
-     * TODO update the calculation, is currently just input consumption + modifiers
+     * TODO confirm the calculation with Laszlo
      */
     public void calculate() throws Exception {
 
-        Map<String,componentAbstract> dependsOn = getDependsOn();
+        Map<String,componentAbstract> dependsOnMap = getDependsOn();
+        System.out.println("Running output "+getName());
 
-        Integer aTemp = (Integer)dependsOn.get("aTempInput").getValue();
-        Double baseValue = (Double)dependsOn.get("electricityConsumptionInput").getValue();
+        System.out.println(dependsOnMap.size());
 
-        List<improvement> improvements=(List<improvement>)dependsOn.get("improvements").getValue();
+        for (componentAbstract iterable_element : dependsOnMap.values()) {
+            System.out.println(iterable_element.getName() + " "+ iterable_element.getValue());
+        }
+        
+        Integer aTemp = (Integer)dependsOnMap.get("aTempInput").getValue();
+        Double baseValue = (Double)dependsOnMap.get("electricityConsumptionInput").getValue();
 
+        List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();
 
         //https://www.w3schools.com/java/java_lambda.asp 
         //This removes all improvements which do not impact Electricity
@@ -86,12 +91,8 @@ public class finalElectricityConsumption extends componentAbstract<List<Double>>
         for (Double impact : improvementImpactList) {
             electricityConsumptionList.add(baseValue-impact);
         }
-
-        
         this.setValue(electricityConsumptionList);
-
-        this.applyModifiers();
-        this.complete();
     }
+
 
 }
