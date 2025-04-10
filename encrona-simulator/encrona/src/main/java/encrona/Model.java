@@ -73,7 +73,7 @@ public class Model {
                     }
                     else
                     {
-                    System.out.print(" " + a.toString() + " "+componentAbstract.getUnit()+"  ," );
+                    System.out.print(" " + a.toString() + " "+componentAbstract.getUnit()+" ," );
 
                     }
 
@@ -83,8 +83,12 @@ public class Model {
             else
             {
             System.out.print(componentAbstract.getName() + " equals ");
+            System.out.print(componentAbstract.getValue().toString());
 
-            System.out.println(componentAbstract.getValue().toString() + " " + componentAbstract.getUnit());
+            if (!(componentAbstract.getUnit().equals("")||componentAbstract.getUnit()==null)) {
+                System.out.println(" " + componentAbstract.getUnit());
+            }
+
 
             }
             

@@ -13,6 +13,8 @@ import encrona.components.output.finalYearlyBuildingHeatingConsumption;
 import encrona.components.output.finalYearlyBuildingHeatingSavings;
 import encrona.components.output.finalYearlyElectricityConsumption;
 import encrona.components.output.finalYearlySavingsFromElectricity;
+import encrona.components.output.finalYearlyWaterHeatingConsumption;
+import encrona.components.output.finalYearlyWaterHeatingSavings;
 import encrona.components.output.improvementImpact;
 import encrona.components.output.improvementReturnOnInvestement;
 import encrona.modifiers.modifierAbstract;
@@ -78,6 +80,8 @@ public class DataLoader {
         improvement.add((improvement)objects.get("EfficentLighting"));
         improvement.add((improvement)objects.get("BergOrMarkHeating"));
         improvement.add((improvement)objects.get("ThermometerReconfiguration"));
+        improvement.add((improvement)objects.get("IMDWater"));
+
         input<List<improvement>> improvementsToImplement= new input<List<improvement>>("improvements", "",improvement); 
 
         components.put(improvementsToImplement.getName(), improvementsToImplement);
@@ -127,15 +131,26 @@ public class DataLoader {
         heatingSavingsDependsOn.put(heatingOutput.getName(), heatingOutput);
         heatingSavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyBuildingHeatingSavings heatingSavings = new finalYearlyBuildingHeatingSavings("heatingSavings", "kr/year",heatingSavingsDependsOn,null);
+    
+        Map<String, componentAbstract> waterHeatingOutputDependsOn = new HashMap<String, componentAbstract>();
+        waterHeatingOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
+        waterHeatingOutputDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
+        finalYearlyWaterHeatingConsumption waterHeatingOutput = new finalYearlyWaterHeatingConsumption("waterHeatingOutput", "kwh/year", waterHeatingOutputDependsOn, null);
+
+        Map<String, componentAbstract> waterHeatingSavingsDependsOn = new HashMap<String, componentAbstract>();
+        waterHeatingSavingsDependsOn.put(waterHeatingOutput.getName(), waterHeatingOutput);
+        waterHeatingSavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
+        finalYearlyWaterHeatingSavings waterHeatingSavings = new finalYearlyWaterHeatingSavings("waterHeatingSavings", "kr/year",waterHeatingSavingsDependsOn,null);
         
         //We then finally add all of the defined outputs to components
         components.put(improvementImpact.getName(),improvementImpact);
-        components.put(improvementImpact.getName(),improvementReturnOnInvestement);
+        components.put(improvementReturnOnInvestement.getName(),improvementReturnOnInvestement);
         components.put(electricityOutput.getName(), electricityOutput);
         components.put(electricitySavings.getName(), electricitySavings);
         components.put(heatingOutput.getName(), heatingOutput);
         components.put(heatingSavings.getName(), heatingSavings);
-
+        components.put(waterHeatingOutput.getName(), waterHeatingOutput);
+        components.put(waterHeatingSavings.getName(), waterHeatingSavings);
     }
 
     /**

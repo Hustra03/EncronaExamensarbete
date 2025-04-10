@@ -78,7 +78,11 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
             case BuildingHeating:
 
                 yearsToReturnInvestment = totalCost / (improvementImpact * calculateHeatingSourceKwhPrice(heatSources));
-                //TODO add correct cost calculation here, perhaps take weighted average for current heating sources?
+                //TODO maybe update method here?
+                break;
+            case Water:
+                yearsToReturnInvestment = totalCost / (improvementImpact * calculateHeatingWaterSourceKwhPrice(heatSources));
+                //TODO maybe update method here?
                 break;
             default:
                 throw new Exception("Calculate ROI misssing implementation for " + improvement.getImpactType());
@@ -87,9 +91,9 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
     }
 
     /**
-     * This method calculates the weighted average price per kwh for the specified heating sources;
-     * @param heatSources
-     * @return
+     * This method calculates the weighted average price per kwh for the specified heating sources, for heating the building
+     * @param heatSources The heating sources for the current building
+     * @return The weighted average kwh price for heating the building
      */
     private Double calculateHeatingSourceKwhPrice(List<heatingEnergySource> heatSources)
     {
@@ -105,5 +109,23 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
 
         return price/sumKWH;
     }
+    /**
+     * This method calculates the weighted average price per kwh for the specified heating sources, for heating the water
+     * @param heatSources The heating sources for the current building
+     * @return The weighted average kwh price for water the building
+     */
+    private Double calculateHeatingWaterSourceKwhPrice(List<heatingEnergySource> heatSources)
+    {
 
+        Double price=0.0;
+
+        Double sumKWH=0.0;
+
+        for (heatingEnergySource heatingEnergySource : heatSources) {
+            price+=heatingEnergySource.getKwhPerYearHeatingWater()*heatingEnergySource.getCostPerKwh();
+            sumKWH+=heatingEnergySource.getKwhPerYearHeatingWater();
+        }
+
+        return price/sumKWH;
+    }
 }
