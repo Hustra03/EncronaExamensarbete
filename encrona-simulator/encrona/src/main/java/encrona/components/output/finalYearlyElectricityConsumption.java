@@ -39,20 +39,20 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
 
         Map<String,componentAbstract> dependsOnMap = getDependsOn();
 
-        Integer aTemp = (Integer)dependsOnMap.get("aTempInput").getValue();
         Double baseValue = (Double)dependsOnMap.get("electricityConsumptionInput").getValue();
 
-        List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();
+        List<Entry<improvement, Double>> improvementImpacts=(List<Entry<improvement, Double>>)dependsOnMap.get("improvementImpact").getValue();
 
         //https://www.w3schools.com/java/java_lambda.asp 
         //This removes all improvements which do not impact Electricity
-
-        improvements.removeIf((improvement)->{return !(improvement.getImpactType().equals(improvementImpactEnum.Electricity));});
+        //TODO update this if type structure is changed
+        improvementImpacts.removeIf((improvement)->{return !(improvement.getKey().getImpactType().equals(improvementImpactEnum.Electricity));});
 
         //This creates a set of the unique years of service, aka the unique values we need to find electricity for
         Set<Integer> uniqueYearsOfService=new HashSet<Integer>();
-        for (improvement i : improvements) {
-            uniqueYearsOfService.add(i.getYearsOfService());
+
+        for (Entry<improvement, Double> entry : improvementImpacts) {
+            uniqueYearsOfService.add(entry.getKey().getYearsOfService());
         }
 
         int yearsOfService[]=new int[uniqueYearsOfService.size()];
@@ -67,18 +67,17 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
                 min=yearsOfService[i-1];
             }
 
-            for (improvement imp : improvements) {
-                if (imp.getYearsOfService()>min) {
-                    if (imp.getYearsOfService()<currentMin) {
-                        currentMin=imp.getYearsOfService();
+            for (Entry<improvement, Double> entry : improvementImpacts) {
+                if (entry.getKey().getYearsOfService()>min) {
+                    if (entry.getKey().getYearsOfService()<currentMin) {
+                        currentMin=entry.getKey().getYearsOfService();
                     }                        
-                    improvementImpact+=(imp.getKwhPerM2()*aTemp)/imp.getYearsOfService();
+                    improvementImpact+=(entry.getValue());
 
                 }
             }
             yearsOfService[i]=currentMin;
             improvementImpactList.add(improvementImpact);
-
         }
 
         //Note that we use Map.Entry<Double,Double> to represent a pair of doubles, in this case years of service and yearly consumption

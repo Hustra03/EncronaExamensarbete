@@ -21,7 +21,7 @@ public class improvement extends objectAbstract {
 
     public String toString()
     {
-        return this.getName()+ " saves " + kwhPerM2 + " per m2 for the cost "+ costPerM2 + " per m2 over the course of " + yearsOfService +" years for " + impactType.toString();
+        return this.getName()+ " saves " + kwhPerM2 + "kwh per m2 for the cost "+ costPerM2 + " per m2 over the course of " + yearsOfService +" years for " + impactType.toString();
         
     }
 
