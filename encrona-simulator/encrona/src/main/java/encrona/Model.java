@@ -65,7 +65,18 @@ public class Model {
                 ((List)componentAbstract.getValue()).toString();
 
                 for (Object a : (List)componentAbstract.getValue()) {
+                    
+                    //TODO fix this to print if a is a list correctly, add recursive function to handle lists of lists?
+
+                    if (a instanceof java.util.List) {
+                        System.out.println(((List)a).get(0).toString());
+                    }
+                    else
+                    {
                     System.out.print(" " + a.toString() + " "+componentAbstract.getUnit()+"  ," );
+
+                    }
+
                 }
                 System.out.println(" ]");
             }

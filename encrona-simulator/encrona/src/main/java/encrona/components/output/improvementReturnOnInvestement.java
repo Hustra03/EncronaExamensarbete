@@ -73,7 +73,10 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
             case Electricity:
                 yearsToReturnInvestment = totalCost / (improvementImpact * electricityPrice);
                 break;
-
+            case BuildingHeating:
+                yearsToReturnInvestment = totalCost / (improvementImpact * 1.49);
+                //TODO add correct cost calculation here, perhaps take weighted average for current heating sources?
+                break;
             default:
                 throw new Exception("Calculate ROI misssing implementation for " + improvement.getImpactType());
         }

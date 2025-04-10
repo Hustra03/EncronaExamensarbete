@@ -42,7 +42,8 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
         Double baseValue = (Double)dependsOnMap.get("electricityConsumptionInput").getValue();
 
         List<Entry<improvement, Double>> improvementImpacts=(List<Entry<improvement, Double>>)dependsOnMap.get("improvementImpact").getValue();
-
+        //Here we create a shallow copy of improvementImpacts, so the list is cloned but the objects are the same instances as in the origninal
+        improvementImpacts=(List<Entry<improvement, Double>>) ((ArrayList)improvementImpacts).clone();
         //https://www.w3schools.com/java/java_lambda.asp 
         //This removes all improvements which do not impact Electricity
         //TODO update this if type structure is changed

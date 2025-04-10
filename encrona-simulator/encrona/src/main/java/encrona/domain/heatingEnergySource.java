@@ -7,6 +7,14 @@ public class heatingEnergySource extends objectAbstract {
     private Double staticCosts;
     private Double costPerKwh;
 
+    /**
+     * This is a constructor for heatingEnergySource
+     * @param name The name of the heatingEnergySource
+     * @param kwhPerYearHeating The kwh needed for heating of the building, excluding heating water
+     * @param kwhPerYearHeatingWater The kwh needed for heating water specifically
+     * @param staticCost Any costs which do not depend on kwh consumption
+     * @param costPerKwh Kr per kwh
+     */
     public heatingEnergySource(String name, Double kwhPerYearHeating,Double kwhPerYearHeatingWater, Double staticCost,Double costPerKwh)
     {
         this.setName(name);
@@ -14,6 +22,24 @@ public class heatingEnergySource extends objectAbstract {
         this.kwhPerYearHeatingWater=kwhPerYearHeatingWater;
         this.staticCosts=staticCost;
         this.costPerKwh=costPerKwh;
+    }
+
+    /**
+     * This constructor creates an instance with the same values as the provided heatingEnergySource
+     * @param toCopy The heatingEnergySource to copy the values of
+     */
+    public heatingEnergySource(heatingEnergySource toCopy)
+    {
+        this.setName(toCopy.getName());
+        this.kwhPerYearHeating=toCopy.getKwhPerYearHeating();
+        this.kwhPerYearHeatingWater=toCopy.getKwhPerYearHeatingWater();
+        this.staticCosts=toCopy.getStaticCosts();
+        this.costPerKwh=toCopy.getCostPerKwh();
+    }
+
+    public String toString()
+    {
+        return getName() + " provides " + kwhPerYearHeating +" for building heating and " + kwhPerYearHeatingWater +" for water for the cost " + costPerKwh +" per kwh";
     }
 
     /**

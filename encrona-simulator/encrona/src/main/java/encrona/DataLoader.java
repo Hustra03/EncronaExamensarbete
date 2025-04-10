@@ -9,6 +9,7 @@ import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
 import encrona.components.input;
+import encrona.components.output.finalYearlyBuildingHeatingConsumption;
 import encrona.components.output.finalYearlyElectricityConsumption;
 import encrona.components.output.finalYearlySavingsFromElectricity;
 import encrona.components.output.improvementImpact;
@@ -74,6 +75,7 @@ public class DataLoader {
 
         List<improvement> improvement = new ArrayList<improvement>();
         improvement.add((improvement)objects.get("EfficentLighting"));
+        improvement.add((improvement)objects.get("BergOrMarkHeating"));
         input<List<improvement>> improvementsToImplement= new input<List<improvement>>("improvements", "N/A",improvement); 
 
         components.put(improvementsToImplement.getName(), improvementsToImplement);
@@ -101,11 +103,10 @@ public class DataLoader {
         improvementReturnOnInvestementDependsOn.put(improvementImpact.getName(), improvementImpact);
         improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement("improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn,new ArrayList<modifierAbstract<List<Entry<String, Double>>>>());
 
-
         Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
         electricityOutputDependsOn.put(electricityInput.getName(), electricityInput);
         electricityOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
-        finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput", "kwh", electricityOutputDependsOn,new ArrayList<modifierAbstract<List<Entry<Integer, Double>>>>());
+        finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput", "kwh/year", electricityOutputDependsOn,new ArrayList<modifierAbstract<List<Entry<Integer, Double>>>>());
 
         Map<String, componentAbstract> electricitySavingsDependsOn = new HashMap<String, componentAbstract>();
         electricitySavingsDependsOn.put(electricityInput.getName(), electricityInput);
@@ -113,11 +114,18 @@ public class DataLoader {
         electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
         finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity("electricitySavings", "kr", electricitySavingsDependsOn,new ArrayList<modifierAbstract<List<Entry<Integer, Double>>>>());
 
+        Map<String, componentAbstract> heatingOutputDependsOn = new HashMap<String, componentAbstract>();
+        heatingOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
+        heatingOutputDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
+        finalYearlyBuildingHeatingConsumption heatingOutput = new finalYearlyBuildingHeatingConsumption("heatingOutput", "kwh/year", heatingOutputDependsOn, null);
+
         //We then finally add all of the defined outputs to components
         components.put(improvementImpact.getName(),improvementImpact);
         components.put(improvementImpact.getName(),improvementReturnOnInvestement);
         components.put(electricityOutput.getName(), electricityOutput);
         components.put(electricitySavings.getName(), electricitySavings);
+        components.put(heatingOutput.getName(), heatingOutput);
+
     }
 
     /**

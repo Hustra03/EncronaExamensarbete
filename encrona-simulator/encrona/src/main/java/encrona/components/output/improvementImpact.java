@@ -45,7 +45,6 @@ public class improvementImpact extends componentAbstract<List<Map.Entry<improvem
             Entry<improvement,Double> entry = new AbstractMap.SimpleEntry<improvement, Double>((improvement)improvement,impact );
             improvmentImpact.add(entry);
         }
-
         this.setValue(improvmentImpact);
     }
     
