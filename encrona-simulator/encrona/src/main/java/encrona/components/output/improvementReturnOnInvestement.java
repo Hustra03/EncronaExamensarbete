@@ -1,5 +1,83 @@
 package encrona.components.output;
 
-public class improvementReturnOnInvestement {
-    
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import encrona.components.componentAbstract;
+import encrona.domain.improvement;
+import encrona.domain.improvementImpactEnum;
+import encrona.modifiers.modifierAbstract;
+
+public class improvementReturnOnInvestement extends componentAbstract<List<Map.Entry<String, Double>>> {
+
+    /**
+     * This is a constructor for improvementReturnOnInvestement
+     * 
+     * @param name      The name of this output
+     * @param unit      The unit of this output
+     * @param dependsOn the components this component depends on
+     * @param modifiers the modifiers which should be applied to this component
+     */
+    public improvementReturnOnInvestement(String name, String unit, Map<String, componentAbstract> dependsOn,
+            List<modifierAbstract<List<Entry<String, Double>>>> modifiers) {
+        this.setName(name);
+        this.setUnit(unit);
+        this.setDependsOn(dependsOn);
+        this.setModifiers(modifiers);
+    }
+
+    @Override
+    public void calculate() throws Exception {
+
+        Map<String, componentAbstract> dependsOnMap = getDependsOn();
+
+        Integer aTemp = (Integer) dependsOnMap.get("aTempInput").getValue();
+        Double electricityPrice = (Double) dependsOnMap.get("electricityPrice").getValue();
+        List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
+
+        List<Map.Entry<String, Double>> improvementROI = new ArrayList<Map.Entry<String, Double>>();
+
+        for (Entry<improvement, Double> entry : improvementImpacts) {
+
+            Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice);
+            Entry<String, Double> roiEntry = new AbstractMap.SimpleEntry<String, Double>(entry.getKey().getName(),
+                    entryROIValue);
+            improvementROI.add(roiEntry);
+        }
+
+        setValue(improvementROI);
+    }
+
+    /**
+     * This calculates the ROI (The number of years needed to repay the initial
+     * investment)
+     * 
+     * @param aTemp The area of the building
+     * @param improvement The improvement to calculate for
+     * @param improvementImpact The impact of the improvement
+     * @param electrictyPrice The price per kwh 
+     * 
+     * @return The number of years until investment is repayed (assumes all prices rise at the same rate the investment would)
+     * @throws Exception
+     */
+    private Double calculateROI(Integer aTemp, improvement improvement, Double improvementImpact,
+            Double electricityPrice) throws Exception {
+        Double totalCost = improvement.getCostPerM2() * aTemp;
+
+        Double yearsToReturnInvestment = -1.0;
+
+        switch (improvement.getImpactType()) {
+            case Electricity:
+                yearsToReturnInvestment = totalCost / (improvementImpact * electricityPrice);
+                break;
+
+            default:
+                throw new Exception("Calculate ROI misssing implementation for " + improvement.getImpactType());
+        }
+        return yearsToReturnInvestment;
+    }
+
 }

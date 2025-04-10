@@ -12,6 +12,7 @@ import encrona.components.input;
 import encrona.components.output.finalYearlyElectricityConsumption;
 import encrona.components.output.finalYearlySavingsFromElectricity;
 import encrona.components.output.improvementImpact;
+import encrona.components.output.improvementReturnOnInvestement;
 import encrona.modifiers.modifierAbstract;
 import encrona.modifiers.basicModifiers.multiplicationModifier;
 import encrona.domain.heatingEnergySource;
@@ -65,7 +66,7 @@ public class DataLoader {
         input<Integer> aTempInput = new input<Integer>("aTempInput", "m^2", 1074);
         input<Double> rentValueInput = new input<Double>("yearlyRent", "%", 2.0);
         input<Double> varianceInput = new input<Double>("variance", "%", 2.0);
-        input<Double> electrictyPriceInput=new input<Double>("electricityPrice","kr/kwh",1.1);
+        input<Double> electrictyPriceInput=new input<Double>("electricityPrice","kr/kwh",1.49);
 
 
         //We then add the improvements which were selected
@@ -91,8 +92,15 @@ public class DataLoader {
         Map<String, componentAbstract> improvementImpactDependsOn = new HashMap<String, componentAbstract>();
         improvementImpactDependsOn.put(aTempInput.getName(), aTempInput);
         improvementImpactDependsOn.put(improvementsToImplement.getName(), improvementsToImplement);
-
         improvementImpact improvementImpact = new improvementImpact("improvementImpact", "kwh", improvementImpactDependsOn,new ArrayList<modifierAbstract<List<Entry<improvement, Double>>>>());
+
+        //TODO add remaining types of cost for the different energy sources
+        Map<String, componentAbstract> improvementReturnOnInvestementDependsOn = new HashMap<String, componentAbstract>();
+        improvementReturnOnInvestementDependsOn.put(aTempInput.getName(), aTempInput);
+        improvementReturnOnInvestementDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
+        improvementReturnOnInvestementDependsOn.put(improvementImpact.getName(), improvementImpact);
+        improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement("improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn,new ArrayList<modifierAbstract<List<Entry<String, Double>>>>());
+
 
         Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
         electricityOutputDependsOn.put(electricityInput.getName(), electricityInput);
@@ -107,6 +115,7 @@ public class DataLoader {
 
         //We then finally add all of the defined outputs to components
         components.put(improvementImpact.getName(),improvementImpact);
+        components.put(improvementImpact.getName(),improvementReturnOnInvestement);
         components.put(electricityOutput.getName(), electricityOutput);
         components.put(electricitySavings.getName(), electricitySavings);
     }
