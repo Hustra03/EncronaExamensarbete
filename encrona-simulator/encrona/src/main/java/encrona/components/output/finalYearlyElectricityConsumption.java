@@ -64,7 +64,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
             Integer min=0;
             Integer currentMin=Integer.MAX_VALUE;
             Double improvementImpact=0.0;
-            if (i>1) {
+            if (i>0) {
                 min=yearsOfService[i-1];
             }
 

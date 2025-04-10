@@ -16,7 +16,7 @@ import encrona.domain.improvementImpactEnum;
 import encrona.modifiers.modifierAbstract;
 
 public class finalYearlyBuildingHeatingConsumption extends componentAbstract<List<Map.Entry<Integer,List<heatingEnergySource>>>>{
-        /**
+    /**
      * This is a constructor for finalElectricityConsumptionChange 
      * @param name The name of this output
      * @param unit The unit of this output
@@ -41,7 +41,7 @@ public class finalYearlyBuildingHeatingConsumption extends componentAbstract<Lis
 
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
         //We sort heat sources based on their kwh price, since we want to minimize costs
-        baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> h1.getCostPerKwh().compareTo(h2.getCostPerKwh()));
+        baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> -h1.getCostPerKwh().compareTo(h2.getCostPerKwh()));
 
         List<Entry<improvement, Double>> improvementImpacts=(List<Entry<improvement, Double>>)dependsOnMap.get("improvementImpact").getValue();
         //Here we create a shallow copy of improvementImpacts, so the list is cloned but the objects are the same instances as in the origninal
@@ -71,7 +71,7 @@ public class finalYearlyBuildingHeatingConsumption extends componentAbstract<Lis
             Integer currentMin=Integer.MAX_VALUE;
             Double improvementImpact=0.0;
             List<Entry<improvement, Double>> improvementsStillActive = new ArrayList<Entry<improvement, Double>>();
-            if (i>1) {
+            if (i>0) {
                 min=yearsOfService[i-1];
             }
 
@@ -112,7 +112,7 @@ public class finalYearlyBuildingHeatingConsumption extends componentAbstract<Lis
         //We then create a copy of heatSources, which we can modify to represent this specific year ranges values
         List<heatingEnergySource> copyOfHeatSources = new ArrayList<heatingEnergySource>();
         for (heatingEnergySource heatingEnergySource : heatSources) {
-            copyOfHeatSources.add(heatingEnergySource);
+            copyOfHeatSources.add(new heatingEnergySource(heatingEnergySource));
         }
 
         int index=0;

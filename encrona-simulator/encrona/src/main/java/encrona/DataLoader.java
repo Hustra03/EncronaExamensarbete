@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import encrona.components.componentAbstract;
 import encrona.components.input;
 import encrona.components.output.finalYearlyBuildingHeatingConsumption;
+import encrona.components.output.finalYearlyBuildingHeatingSavings;
 import encrona.components.output.finalYearlyElectricityConsumption;
 import encrona.components.output.finalYearlySavingsFromElectricity;
 import encrona.components.output.improvementImpact;
@@ -76,7 +77,8 @@ public class DataLoader {
         List<improvement> improvement = new ArrayList<improvement>();
         improvement.add((improvement)objects.get("EfficentLighting"));
         improvement.add((improvement)objects.get("BergOrMarkHeating"));
-        input<List<improvement>> improvementsToImplement= new input<List<improvement>>("improvements", "N/A",improvement); 
+        improvement.add((improvement)objects.get("ThermometerReconfiguration"));
+        input<List<improvement>> improvementsToImplement= new input<List<improvement>>("improvements", "",improvement); 
 
         components.put(improvementsToImplement.getName(), improvementsToImplement);
 
@@ -84,7 +86,8 @@ public class DataLoader {
         //TODO change to creating energy sources based on their input values
         List<heatingEnergySource> heatingEnergySources= new ArrayList<heatingEnergySource>();
         heatingEnergySources.add((heatingEnergySource)objects.get("districtHeating"));
-        input<List<heatingEnergySource>> heatingSourcesInput= new input<List<heatingEnergySource>>("heatingSources", "N/A",heatingEnergySources); 
+        heatingEnergySources.add((heatingEnergySource)objects.get("gasHeating"));
+        input<List<heatingEnergySource>> heatingSourcesInput= new input<List<heatingEnergySource>>("heatingSources", "",heatingEnergySources); 
 
         //TODO define intermediate values here, perhaps use a function to create unique ones for all of the heating sources
         //We then define the intermediate values
@@ -94,37 +97,43 @@ public class DataLoader {
         Map<String, componentAbstract> improvementImpactDependsOn = new HashMap<String, componentAbstract>();
         improvementImpactDependsOn.put(aTempInput.getName(), aTempInput);
         improvementImpactDependsOn.put(improvementsToImplement.getName(), improvementsToImplement);
-        improvementImpact improvementImpact = new improvementImpact("improvementImpact", "kwh", improvementImpactDependsOn,new ArrayList<modifierAbstract<List<Entry<improvement, Double>>>>());
+        improvementImpact improvementImpact = new improvementImpact("improvementImpact", "kwh", improvementImpactDependsOn,null);
 
         //TODO add remaining types of cost for the different energy sources
         Map<String, componentAbstract> improvementReturnOnInvestementDependsOn = new HashMap<String, componentAbstract>();
         improvementReturnOnInvestementDependsOn.put(aTempInput.getName(), aTempInput);
         improvementReturnOnInvestementDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
         improvementReturnOnInvestementDependsOn.put(improvementImpact.getName(), improvementImpact);
-        improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement("improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn,new ArrayList<modifierAbstract<List<Entry<String, Double>>>>());
+        improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement("improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn,null);
 
         Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
         electricityOutputDependsOn.put(electricityInput.getName(), electricityInput);
         electricityOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
-        finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput", "kwh/year", electricityOutputDependsOn,new ArrayList<modifierAbstract<List<Entry<Integer, Double>>>>());
+        finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput", "kwh/year", electricityOutputDependsOn,null);
 
         Map<String, componentAbstract> electricitySavingsDependsOn = new HashMap<String, componentAbstract>();
         electricitySavingsDependsOn.put(electricityInput.getName(), electricityInput);
         electricitySavingsDependsOn.put(electricityOutput.getName(), electricityOutput);
         electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
-        finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity("electricitySavings", "kr", electricitySavingsDependsOn,new ArrayList<modifierAbstract<List<Entry<Integer, Double>>>>());
+        finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity("electricitySavings", "kr/year", electricitySavingsDependsOn,null);
 
         Map<String, componentAbstract> heatingOutputDependsOn = new HashMap<String, componentAbstract>();
         heatingOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
         heatingOutputDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyBuildingHeatingConsumption heatingOutput = new finalYearlyBuildingHeatingConsumption("heatingOutput", "kwh/year", heatingOutputDependsOn, null);
 
+        Map<String, componentAbstract> heatingSavingsDependsOn = new HashMap<String, componentAbstract>();
+        heatingSavingsDependsOn.put(heatingOutput.getName(), heatingOutput);
+        heatingSavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
+        finalYearlyBuildingHeatingSavings heatingSavings = new finalYearlyBuildingHeatingSavings("heatingSavings", "kr/year",heatingSavingsDependsOn,null);
+        
         //We then finally add all of the defined outputs to components
         components.put(improvementImpact.getName(),improvementImpact);
         components.put(improvementImpact.getName(),improvementReturnOnInvestement);
         components.put(electricityOutput.getName(), electricityOutput);
         components.put(electricitySavings.getName(), electricitySavings);
         components.put(heatingOutput.getName(), heatingOutput);
+        components.put(heatingSavings.getName(), heatingSavings);
 
     }
 
@@ -162,7 +171,11 @@ public class DataLoader {
         //We then add the relevant heating sources (currently just district heating)
         //TODO get realistic cost for district heating
         heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,1.25);
+        heatingEnergySource gasHeating = new heatingEnergySource("gasHeating", 2000.0, 0.0,0.0,30.0);
+
         objects.put(districtHeating.getName(), districtHeating);
+        objects.put(gasHeating.getName(), gasHeating);
+
     }
 
     /**
