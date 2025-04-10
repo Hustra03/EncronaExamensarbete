@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
+import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
 import encrona.modifiers.modifierAbstract;
@@ -37,14 +38,14 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
         Integer aTemp = (Integer) dependsOnMap.get("aTempInput").getValue();
         Double electricityPrice = (Double) dependsOnMap.get("electricityPrice").getValue();
         List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
+        List<heatingEnergySource> heatSources = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
         List<Map.Entry<String, Double>> improvementROI = new ArrayList<Map.Entry<String, Double>>();
 
         for (Entry<improvement, Double> entry : improvementImpacts) {
 
-            Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice);
-            Entry<String, Double> roiEntry = new AbstractMap.SimpleEntry<String, Double>(entry.getKey().getName(),
-                    entryROIValue);
+            Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice,heatSources);
+            Entry<String, Double> roiEntry = new AbstractMap.SimpleEntry<String, Double>(entry.getKey().getName(),entryROIValue);
             improvementROI.add(roiEntry);
         }
 
@@ -59,12 +60,13 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      * @param improvement The improvement to calculate for
      * @param improvementImpact The impact of the improvement
      * @param electrictyPrice The price per kwh 
+     * @param heatSources A list of heat sources for this building
      * 
      * @return The number of years until investment is repayed (assumes all prices rise at the same rate the investment would)
      * @throws Exception
      */
     private Double calculateROI(Integer aTemp, improvement improvement, Double improvementImpact,
-            Double electricityPrice) throws Exception {
+            Double electricityPrice, List<heatingEnergySource> heatSources) throws Exception {
         Double totalCost = improvement.getCostPerM2() * aTemp;
 
         Double yearsToReturnInvestment = -1.0;
@@ -74,13 +76,34 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
                 yearsToReturnInvestment = totalCost / (improvementImpact * electricityPrice);
                 break;
             case BuildingHeating:
-                yearsToReturnInvestment = totalCost / (improvementImpact * 1.49);
+
+                yearsToReturnInvestment = totalCost / (improvementImpact * calculateHeatingSourceKwhPrice(heatSources));
                 //TODO add correct cost calculation here, perhaps take weighted average for current heating sources?
                 break;
             default:
                 throw new Exception("Calculate ROI misssing implementation for " + improvement.getImpactType());
         }
         return yearsToReturnInvestment;
+    }
+
+    /**
+     * This method calculates the weighted average price per kwh for the specified heating sources;
+     * @param heatSources
+     * @return
+     */
+    private Double calculateHeatingSourceKwhPrice(List<heatingEnergySource> heatSources)
+    {
+
+        Double price=0.0;
+
+        Double sumKWH=0.0;
+
+        for (heatingEnergySource heatingEnergySource : heatSources) {
+            price+=heatingEnergySource.getKwhPerYearHeating()*heatingEnergySource.getCostPerKwh();
+            sumKWH+=heatingEnergySource.getKwhPerYearHeating();
+        }
+
+        return price/sumKWH;
     }
 
 }

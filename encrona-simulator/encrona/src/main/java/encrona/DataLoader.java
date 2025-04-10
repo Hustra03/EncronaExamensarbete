@@ -104,6 +104,7 @@ public class DataLoader {
         improvementReturnOnInvestementDependsOn.put(aTempInput.getName(), aTempInput);
         improvementReturnOnInvestementDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
         improvementReturnOnInvestementDependsOn.put(improvementImpact.getName(), improvementImpact);
+        improvementReturnOnInvestementDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement("improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn,null);
 
         Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
