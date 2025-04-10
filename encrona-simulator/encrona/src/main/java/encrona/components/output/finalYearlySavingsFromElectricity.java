@@ -1,14 +1,16 @@
 package encrona.components.output;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
 import encrona.domain.improvement;
 import encrona.modifiers.modifierAbstract;
 
-public class finalSavingsFromElectricity extends componentAbstract<List<Double>>{
+public class finalYearlySavingsFromElectricity extends componentAbstract<List<Map.Entry<Integer,Double>>>{
 
     /**
      * This is a constructor for finalElectricityConsumptionChange 
@@ -17,7 +19,7 @@ public class finalSavingsFromElectricity extends componentAbstract<List<Double>>
      * @param dependsOn the components this component depends on
      * @param modifiers the modifiers which should be applied to this component
      */
-    public finalSavingsFromElectricity(String name, String unit, Map<String,componentAbstract> dependsOn, List<modifierAbstract<List<Double>>> modifiers)
+    public finalYearlySavingsFromElectricity(String name, String unit, Map<String,componentAbstract> dependsOn, List<modifierAbstract<List<Map.Entry<Integer,Double>>>> modifiers)
     {   this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -30,12 +32,14 @@ public class finalSavingsFromElectricity extends componentAbstract<List<Double>>
 
         Double baseValue = (Double)dependsOnMap.get("electricityConsumptionInput").getValue();
         Double electricityPrice = (Double)dependsOnMap.get("electricityPrice").getValue();
-        List<Double> improvements=(List<Double>)dependsOnMap.get("electricityOutput").getValue();
+        List<Map.Entry<Integer,Double>> electricityConsumptionList = (List<Map.Entry<Integer,Double>>)dependsOnMap.get("electricityOutput").getValue();
 
-        List<Double> finalSavings=new ArrayList<>();
 
-        for (Double double1 : improvements) {
-            finalSavings.add((baseValue-double1)*electricityPrice);
+        List<Map.Entry<Integer,Double>> finalSavings=new ArrayList<Map.Entry<Integer,Double>>();
+
+        for (Map.Entry e : electricityConsumptionList) {
+            Entry<Integer,Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer)e.getKey(), (baseValue-(Double)e.getValue())*electricityPrice);
+            finalSavings.add(entry);
         }
 
         this.setValue(finalSavings);

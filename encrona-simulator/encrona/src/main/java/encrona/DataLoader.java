@@ -5,11 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
 import encrona.components.input;
-import encrona.components.output.finalElectricityConsumption;
-import encrona.components.output.finalSavingsFromElectricity;
+import encrona.components.output.finalYearlyElectricityConsumption;
+import encrona.components.output.finalYearlySavingsFromElectricity;
 import encrona.modifiers.modifierAbstract;
 import encrona.modifiers.basicModifiers.multiplicationModifier;
 import encrona.domain.heatingEnergySource;
@@ -92,13 +93,13 @@ public class DataLoader {
         electricityOutputDependsOn.put(electricityInput.getName(), electricityInput);
         electricityOutputDependsOn.put(improvementsToImplement.getName(), improvementsToImplement);
         electricityOutputDependsOn.put(aTempInput.getName(), aTempInput);
-        finalElectricityConsumption electricityOutput = new finalElectricityConsumption("electricityOutput", "kwh", electricityOutputDependsOn,new ArrayList<modifierAbstract<List<Double>>>());
+        finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput", "kwh", electricityOutputDependsOn,new ArrayList<modifierAbstract<List<Entry<Integer, Double>>>>());
 
         Map<String, componentAbstract> electricitySavingsDependsOn = new HashMap<String, componentAbstract>();
         electricitySavingsDependsOn.put(electricityInput.getName(), electricityInput);
         electricitySavingsDependsOn.put(electricityOutput.getName(), electricityOutput);
         electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
-        finalSavingsFromElectricity electricitySavings = new finalSavingsFromElectricity("electricitySavings", "kr", electricitySavingsDependsOn,new ArrayList<modifierAbstract<List<Double>>>());
+        finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity("electricitySavings", "kr", electricitySavingsDependsOn,new ArrayList<modifierAbstract<List<Entry<Integer, Double>>>>());
 
         //We then finally add all of the defined outputs to components
         components.put(electricityOutput.getName(), electricityOutput);

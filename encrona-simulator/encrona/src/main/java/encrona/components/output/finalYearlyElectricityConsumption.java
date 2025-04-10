@@ -1,10 +1,12 @@
 package encrona.components.output;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import encrona.components.componentAbstract;
@@ -12,7 +14,7 @@ import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
 import encrona.modifiers.modifierAbstract;
 
-public class finalElectricityConsumption extends componentAbstract<List<Double>>{
+public class finalYearlyElectricityConsumption extends componentAbstract<List<Map.Entry<Integer,Double>>>{
 
     /**
      * This is a constructor for finalElectricityConsumptionChange 
@@ -21,7 +23,7 @@ public class finalElectricityConsumption extends componentAbstract<List<Double>>
      * @param dependsOn the components this component depends on
      * @param modifiers the modifiers which should be applied to this component
      */
-    public finalElectricityConsumption(String name, String unit, Map<String,componentAbstract> dependsOn, List<modifierAbstract<List<Double>>> modifiers)
+    public finalYearlyElectricityConsumption(String name, String unit, Map<String,componentAbstract> dependsOn, List<modifierAbstract<List<Entry<Integer, Double>>>> modifiers)
     {   this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -36,14 +38,7 @@ public class finalElectricityConsumption extends componentAbstract<List<Double>>
     public void calculate() throws Exception {
 
         Map<String,componentAbstract> dependsOnMap = getDependsOn();
-        System.out.println("Running output "+getName());
 
-        System.out.println(dependsOnMap.size());
-
-        for (componentAbstract iterable_element : dependsOnMap.values()) {
-            System.out.println(iterable_element.getName() + " "+ iterable_element.getValue());
-        }
-        
         Integer aTemp = (Integer)dependsOnMap.get("aTempInput").getValue();
         Double baseValue = (Double)dependsOnMap.get("electricityConsumptionInput").getValue();
 
@@ -86,10 +81,15 @@ public class finalElectricityConsumption extends componentAbstract<List<Double>>
 
         }
 
-        List<Double> electricityConsumptionList = new ArrayList<Double>();
+        //Note that we use Map.Entry<Double,Double> to represent a pair of doubles, in this case years of service and yearly consumption
+        List<Map.Entry<Integer,Double>> electricityConsumptionList = new ArrayList<Map.Entry<Integer,Double>>();
 
+        int i=0;
         for (Double impact : improvementImpactList) {
-            electricityConsumptionList.add(baseValue-impact);
+            // https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html 
+            Entry<Integer,Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(yearsOfService[i], baseValue-impact);
+            electricityConsumptionList.add(entry);
+            i++;
         }
         this.setValue(electricityConsumptionList);
     }
