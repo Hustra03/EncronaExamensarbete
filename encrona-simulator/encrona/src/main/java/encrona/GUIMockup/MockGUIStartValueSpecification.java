@@ -14,7 +14,9 @@ public class MockGUIStartValueSpecification extends JPanel {
     static JTextField electricityConsumptionField;
 
     public MockGUIStartValueSpecification() {
-        super(new GridBagLayout());
+
+        this.setLayout(new GridBagLayout());
+
 
         // We add some basic description text
         JPanel infoPage = new JPanel();
@@ -47,10 +49,11 @@ public class MockGUIStartValueSpecification extends JPanel {
 
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.25;
-        c.weighty = 0.25;
+        c.weighty = 0;
         add(aTempRow, c);
         add(electrictyPriceRow, c);
         add(electricityConsumptionRow, c);
+
     }
 
     // This method collects the current values of the field

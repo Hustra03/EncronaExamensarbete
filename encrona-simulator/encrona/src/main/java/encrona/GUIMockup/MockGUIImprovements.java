@@ -1,6 +1,7 @@
 package encrona.GUIMockup;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -40,9 +41,11 @@ public class MockGUIImprovements extends JPanel {
         improvementSpecificationPage = new JPanel();
         JScrollPane scrollimprovementSpecificationPage = new JScrollPane(improvementSpecificationPage);
         improvementSpecificationPage.setLayout(new BoxLayout(improvementSpecificationPage, BoxLayout.PAGE_AXIS));
-
+        scrollimprovementSpecificationPage.getVerticalScrollBar().setUnitIncrement(10);
+        
         for (improvement improvement : initialImprovements) {
             JPanel improvementPage = createImprovementPage(improvement);
+            improvementPage.setAlignmentX(Component.LEFT_ALIGNMENT);
             improvementSpecificationPage.add(improvementPage);
         }
 
@@ -66,9 +69,10 @@ public class MockGUIImprovements extends JPanel {
 
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 0.10;
+        c.weightx=1.0;
         add(createNewImprovementPage, c);
         c.weighty = 0.90;
-
+        c.weightx=0.9;
         add(scrollimprovementSpecificationPage, c);
     }
 
@@ -122,7 +126,7 @@ public class MockGUIImprovements extends JPanel {
     }
 
     /**
-     * This handles if the button to create a new
+     * This handles if the button to create a new improvement is pressed
      */
     class CreateNewListener implements ActionListener {
         private JTextField createNewNameField;

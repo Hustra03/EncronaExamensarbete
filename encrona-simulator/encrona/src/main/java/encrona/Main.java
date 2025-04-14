@@ -1,5 +1,7 @@
 package encrona;
 
+import encrona.GUIMockup.MockGUIMain;
+
 /**
  * This is the main class, and is what is initially executed when starting the program. 
  */
@@ -9,6 +11,6 @@ public class Main {
      * @param args The provided command-line argumentss
      */
     public static void main(String[] args) {
-        Model.runStaticSimulation();
+        MockGUIMain.main(args);
     }
 }
