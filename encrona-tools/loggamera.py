@@ -1,10 +1,8 @@
 import requests
-import asyncio
 from datetime import datetime, timedelta, timezone
 from dateutil.relativedelta import relativedelta
 from sqlmodel import SQLModel, Field, create_engine, Session, select
 from sqlalchemy import Column, DateTime, func
-import os
 
 API_KEY = ""
 DB_URL = ""
@@ -30,6 +28,7 @@ class BuildingData(SQLModel, table=True):
 
 # ---------------- DB Setup ---------------- #
 
+DB_URL = input("Ange din DB-url: ").strip()
 engine = create_engine(DB_URL)
 SQLModel.metadata.create_all(engine)
 
@@ -144,7 +143,7 @@ def submit_to_sqlmodel(building_id, data_per_month):
 
 # ---------------- Main Logic ---------------- #
 
-async def process_building(orgs, building_org, building_id):
+def process_building(orgs, building_org, building_id):
     print(f"\nBearbetar: {building_org['Name']} (ID: {building_org['Id']})")
 
     all_sub_org_ids = get_all_sub_organizations(orgs, building_org["Id"])
@@ -197,9 +196,9 @@ async def process_building(orgs, building_org, building_id):
 
 # ---------------- Entry Point ---------------- #
 
-async def main():
+def main():
     global API_KEY
-    API_KEY = input("Ange din API-nyckel: ").strip()
+    API_KEY = input("Ange din Loggamera API-nyckel: ").strip()
     all_orgs = get_organizations()
     top_level = get_children(all_orgs, ROOT_PARENT_ID)
 
@@ -214,8 +213,8 @@ async def main():
         return
 
     for building in selected:
-        db_id = int(input(f"Ange för '{building['Name']}': ").strip())
-        await process_building(all_orgs, building, db_id)
+        db_id = int(input(f"Ange id för '{building['Name']}': ").strip())
+        process_building(all_orgs, building, db_id)
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    main()
