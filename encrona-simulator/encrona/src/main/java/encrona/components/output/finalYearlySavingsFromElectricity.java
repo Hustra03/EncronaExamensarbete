@@ -30,8 +30,8 @@ public class finalYearlySavingsFromElectricity extends componentAbstract<List<Ma
     public void calculate() throws Exception {
         Map<String,componentAbstract> dependsOnMap = this.getDependsOn();
 
-        Double baseValue = (Double)dependsOnMap.get("electricityConsumptionInput").getValue();
-        Double electricityPrice = (Double)dependsOnMap.get("electricityPrice").getValue();
+        Double baseValue = (Double)dependsOnMap.get("Electricty consumption").getValue();
+        Double electricityPrice = (Double)dependsOnMap.get("Electricty price").getValue();
         List<Map.Entry<Integer,Double>> electricityConsumptionList = (List<Map.Entry<Integer,Double>>)dependsOnMap.get("electricityOutput").getValue();
 
 

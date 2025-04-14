@@ -98,7 +98,7 @@ public class MockGUIMain extends JPanel{
     }
 
     //This method creates the output tab, along with its contents, based on the input and the results from the simulation
-    public static void createOutputTab(java.util.List<Map.Entry<Map.Entry<String,String>,Double>> listOfNumericalVariables,java.util.List<heatingEnergySource> heatingEnergySources,java.util.List<improvement> improvementsCollected)
+    public static void createOutputTab(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables,java.util.List<heatingEnergySource> heatingEnergySources,java.util.List<improvement> improvementsCollected)
     {
         //This is the tooltip for the heat source page
         String toolTip = new String("<html>This is where the output is shown</html>");
@@ -112,8 +112,9 @@ public class MockGUIMain extends JPanel{
         inputSectionPage.add(new JLabel("Provided input"));
 
         DefaultListModel<String> listModel = new DefaultListModel<String>();
-        for (Entry<Map.Entry<String,String>,Double> entry : listOfNumericalVariables) {
-            listModel.addElement(entry.getKey().getKey() + " was set to " + entry.getValue() + " " + entry.getKey().getValue());
+
+        for (Map.Entry<String,String> entry : mapOfNumericalVariables.keySet()) {
+            listModel.addElement(entry.getKey() + " was set to " + mapOfNumericalVariables.get(entry) + " " + entry.getKey());
         }
 
         for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
@@ -144,12 +145,12 @@ public class MockGUIMain extends JPanel{
         public void actionPerformed(ActionEvent e) {
             removeOutputTab();
 
-            final java.util.List<Map.Entry<Map.Entry<String,String>,Double>> listOfNumericalVariables;
+            final Map<Map.Entry<String,String>,Double> mapOfNumericalVariables;
             final java.util.List<heatingEnergySource> heatingEnergySources;
             final java.util.List<improvement> improvements;
 
             try {
-                listOfNumericalVariables =MockGUIStartValueSpecification.collectFieldValues();
+                mapOfNumericalVariables =MockGUIStartValueSpecification.collectFieldValues();
                 heatingEnergySources=MockGUIHeatingSources.collectFieldValues();
                 improvements=MockGUIImprovements.collectFieldValues();
             } catch (Exception error) {
@@ -158,20 +159,18 @@ public class MockGUIMain extends JPanel{
                 return;
             }
 
-            for (Map.Entry<Map.Entry<String,String>,Double> numericalEntry : listOfNumericalVariables) {
-                System.out.println(numericalEntry.getKey().getKey() + " equals " + numericalEntry.getValue() + " " + numericalEntry.getKey().getValue());
-            }
+
             for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
                 System.out.println(heatingEnergySource.toString());
             }
 
-            createOutputTab(listOfNumericalVariables,heatingEnergySources,improvements);
+            createOutputTab(mapOfNumericalVariables,heatingEnergySources,improvements);
 
             //Schedule a job for the event-dispatching thread:
             //running the simulation specifically in this case
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                java.util.List<String> outputList=Model.runSimulation(improvements, heatingEnergySources);
+                java.util.List<String> outputList=Model.runSimulation(mapOfNumericalVariables,improvements, heatingEnergySources);
                 addSimulatorOutputToOutput(outputList);
             }
             });

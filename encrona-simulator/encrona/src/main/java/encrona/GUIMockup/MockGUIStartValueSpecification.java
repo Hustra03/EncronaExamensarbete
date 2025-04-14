@@ -3,6 +3,7 @@ package encrona.GUIMockup;
 import java.awt.*;
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.*;
@@ -22,6 +23,7 @@ public class MockGUIStartValueSpecification extends JPanel {
         JPanel infoPage = new JPanel();
         infoPage.add(new JLabel("Here you give the values for a number of numeric variables"));
 
+        //Note that the label values must not be modified without changing those in the data loader, since the name is the key for the map!
         JPanel aTempRow = new JPanel();
         aTempRow.add(new JLabel("Atemp"));
         aTempField = new JTextField("1",20);
@@ -57,7 +59,7 @@ public class MockGUIStartValueSpecification extends JPanel {
     }
 
     // This method collects the current values of the field
-    public static java.util.List<Map.Entry<Map.Entry<String,String>,Double>> collectFieldValues() throws Exception {
+    public static Map<Map.Entry<String,String>,Double> collectFieldValues() throws Exception {
         Double aTempValue;
         try {
 
@@ -92,11 +94,12 @@ public class MockGUIStartValueSpecification extends JPanel {
         }
 
         new AbstractMap.SimpleEntry<String, String>("Atemp","m^2");
-        java.util.List<Map.Entry<Map.Entry<String,String>,Double>> listOfNumericalVariables = new ArrayList<Map.Entry<Map.Entry<String,String>,Double>>();
-        listOfNumericalVariables.add(new AbstractMap.SimpleEntry<Map.Entry<String,String>,Double>(new AbstractMap.SimpleEntry<String, String>("Atemp","m^2"), aTempValue));
-        listOfNumericalVariables.add(new AbstractMap.SimpleEntry<Map.Entry<String,String>,Double>(new AbstractMap.SimpleEntry<String, String>("Electricty price","kr/kwh"), electricityPriceValue));
-        listOfNumericalVariables.add(new AbstractMap.SimpleEntry<Map.Entry<String,String>,Double>(new AbstractMap.SimpleEntry<String, String>("Electricty consumption","kwh/year"), electrictyConsumptionValue));
-        return listOfNumericalVariables;
+        Map<Map.Entry<String,String>,Double> map = new HashMap<Map.Entry<String,String>,Double>();
+        map.put(new AbstractMap.SimpleEntry<String, String>("Atemp","m^2"), aTempValue);
+        map.put(new AbstractMap.SimpleEntry<String, String>("Electricty price","kr/kwh"), electricityPriceValue);
+        map.put(new AbstractMap.SimpleEntry<String, String>("Electricty consumption","kwh/year"), electrictyConsumptionValue);
+
+        return map;
     }
 
 }

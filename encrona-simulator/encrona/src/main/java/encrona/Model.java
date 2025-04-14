@@ -31,18 +31,19 @@ public class Model {
      * instantiating relevant data, scheduling tasks, executing tasks and then
      * presenting results
      * 
+     * @param mapOfNumericalVariables A map of numerical variables, in the format <<name,unit>,value>
      * @param improvement          The list of improvements to implement
      * @param heatingEnergySources The list of heat sources
      * @return A list of the different components final values in a standard string
      *         format
      */
-    public static List<String> runSimulation(List<improvement> improvement,
+    public static List<String> runSimulation(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables,List<improvement> improvement,
             List<heatingEnergySource> heatingEnergySources) {
         // We instantiate the data
         // TODO change it so it only loads data relevant for the current simulation, if
         // the data grows sufficently large
 
-        dataLoader = new DataLoader(improvement, heatingEnergySources);
+        dataLoader = new DataLoader(mapOfNumericalVariables,improvement, heatingEnergySources);
 
         Collection<componentAbstract> componentsToCalculate = dataLoader.getAllComponentAbstract();
 

@@ -39,7 +39,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
 
         Map<String,componentAbstract> dependsOnMap = getDependsOn();
 
-        Double baseValue = (Double)dependsOnMap.get("electricityConsumptionInput").getValue();
+        Double baseValue = (Double)dependsOnMap.get("Electricty consumption").getValue();
 
         List<Entry<improvement, Double>> improvementImpacts=(List<Entry<improvement, Double>>)dependsOnMap.get("improvementImpact").getValue();
         //Here we create a shallow copy of improvementImpacts, so the list is cloned but the objects are the same instances as in the origninal

@@ -98,7 +98,6 @@ public class finalYearlyBuildingHeatingConsumption extends componentAbstract<Lis
     private List<heatingEnergySource> distributeImpact(List<heatingEnergySource> heatSources, List<Entry<improvement, Double>> improvementsStillActive)
     {
 
-
         //We first combine the impact of the relevant improvements, to get the total reduction
         Double sumOfHeatingNeedReduction=0.0;
         for (Entry<improvement,Double> entry : improvementsStillActive) {

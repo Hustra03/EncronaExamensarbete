@@ -34,7 +34,7 @@ public class improvementImpact extends componentAbstract<List<Map.Entry<improvem
 
         Map<String,componentAbstract> dependsOnMap = getDependsOn();
 
-        Integer aTemp = (Integer)dependsOnMap.get("aTempInput").getValue();
+        Double aTemp = (Double)dependsOnMap.get("Atemp").getValue();
         List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();
 
         List<Map.Entry<improvement,Double>> improvmentImpact=new ArrayList<Map.Entry<improvement,Double>>();

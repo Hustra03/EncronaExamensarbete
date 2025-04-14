@@ -35,20 +35,22 @@ public class DataLoader {
 
     /**
      * This instantiates the database loader
+     * @param mapOfNumericalVariables A map of numerical variables, in the format <<name,unit>,value>
      * @param improvement The list of improvements to implement
      * @param heatingEnergySources The list of heat sources
      */
-    public DataLoader(List<improvement> improvement, List<heatingEnergySource> heatingEnergySources)
+    public DataLoader(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables,List<improvement> improvement, List<heatingEnergySource> heatingEnergySources)
     {
-        instantiate(improvement,heatingEnergySources);
+        instantiate(mapOfNumericalVariables,improvement,heatingEnergySources);
     }
 
     /**
      * This method is responsible for instantiating the relevant data
+     * @param listOfNumericalVariables A map of numerical variables, in the format <<name,unit>,value>
      * @param improvement The list of improvements to implement
      * @param heatingEnergySources The list of heat sources
      */
-    public void instantiate(List<improvement> improvement, List<heatingEnergySource> heatingEnergySources) {
+    public void instantiate(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables,List<improvement> improvement, List<heatingEnergySource> heatingEnergySources) {
         // We first instantiate the map
         // https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html
         components = new HashMap<String, componentAbstract>();
@@ -56,23 +58,41 @@ public class DataLoader {
 
         // We then fill the maps with relevant data
         createModifiers();        
-        createComponents(improvement,heatingEnergySources);
+        createComponents(mapOfNumericalVariables,improvement,heatingEnergySources);
     }
 
     /**
      * This creates the components objects, and adds them to the map
+     * @param listOfNumericalVariables A list of numerical variables, in the format <<name,unit>,value>
      * @param improvement The list of improvements to implement
      * @param heatingEnergySources The list of heat sources
      */
-    public void createComponents(List<improvement> improvement, List<heatingEnergySource> heatingEnergySources) {
-        //We first define the simple value inputs which are read from input and used for creating the output
-        //TODO make the inputs read values from user input
-        input<Double> electricityInput = new input<Double>("electricityConsumptionInput", "kwh", 5703.0);
-        input<Integer> aTempInput = new input<Integer>("aTempInput", "m^2", 1074);
-        input<Double> rentValueInput = new input<Double>("yearlyRent", "%", 2.0);
-        input<Double> varianceInput = new input<Double>("variance", "%", 2.0);
-        input<Double> electrictyPriceInput=new input<Double>("electricityPrice","kr/kwh",1.49);
+    public void createComponents(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables, List<improvement> improvement, List<heatingEnergySource> heatingEnergySources) {
+        //We first define the numerical inputs which are read from input and used for creating the output
 
+        input<Double> electricityInput=null;
+        input<Double> aTempInput=null;
+        input<Double> electrictyPriceInput=null;
+
+        for (Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
+            System.out.println("Entry name " +entry.getKey());
+            if (entry.getKey().equals("Atemp")) {
+                aTempInput = new input<Double>("Atemp", entry.getValue(), mapOfNumericalVariables.get(entry));
+            }
+            else
+            {
+                if (entry.getKey().equals("Electricty consumption")) {
+                    electricityInput = new input<Double>("Electricty consumption", entry.getValue(), mapOfNumericalVariables.get(entry));
+                }
+                else
+                {
+                    if (entry.getKey().equals("Electricty price")) {
+                        electrictyPriceInput=new input<Double>("Electricty price",entry.getValue(),mapOfNumericalVariables.get(entry));
+                    }
+                }
+            }
+
+        }
 
         //We then add the improvements which were selected
 

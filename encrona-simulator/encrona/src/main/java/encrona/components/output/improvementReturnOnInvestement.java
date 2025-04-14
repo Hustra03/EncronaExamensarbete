@@ -35,8 +35,8 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
 
         Map<String, componentAbstract> dependsOnMap = getDependsOn();
 
-        Integer aTemp = (Integer) dependsOnMap.get("aTempInput").getValue();
-        Double electricityPrice = (Double) dependsOnMap.get("electricityPrice").getValue();
+        Double aTemp = (Double) dependsOnMap.get("Atemp").getValue();
+        Double electricityPrice = (Double) dependsOnMap.get("Electricty price").getValue();
         List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
         List<heatingEnergySource> heatSources = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
@@ -65,7 +65,7 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      * @return The number of years until investment is repayed (assumes all prices rise at the same rate the investment would)
      * @throws Exception
      */
-    private Double calculateROI(Integer aTemp, improvement improvement, Double improvementImpact,
+    private Double calculateROI(Double aTemp, improvement improvement, Double improvementImpact,
             Double electricityPrice, List<heatingEnergySource> heatSources) throws Exception {
         Double totalCost = improvement.getCostPerM2() * aTemp;
 
