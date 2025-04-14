@@ -2,7 +2,6 @@ package encrona.GUIMockup;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -12,7 +11,6 @@ import encrona.DataLoader;
 import encrona.Model;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
-import encrona.domain.improvementImpactEnum;
 
 public class MockGUIMain extends JPanel{
     
@@ -55,6 +53,8 @@ public class MockGUIMain extends JPanel{
         tabbedPane.addTab("Improvements", null, new MockGUIImprovements(DataLoader.createInitialListOfImprovements()), tooltip4);
 
         add(tabbedPane);
+
+        
 
         add(buttonPane, BorderLayout.PAGE_END);
      }
@@ -134,8 +134,9 @@ public class MockGUIMain extends JPanel{
 
         outputPage.add(new JLabel("Output results are shown here"));
         outputPage.add(inputSectionPage);
+        JScrollPane scrollableOutputPage = new JScrollPane(outputPage);
 
-        tabbedPane.addTab("Output",null, outputPage,toolTip);
+        tabbedPane.addTab("Output",null, scrollableOutputPage,toolTip);
     }
 
     //This class is used to handle the runButton, with its method called when the runButton is clicked, and should collect the relevant information and start the simulation with it
@@ -153,6 +154,7 @@ public class MockGUIMain extends JPanel{
                 improvements=MockGUIImprovements.collectFieldValues();
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(theMainFrame,error.getMessage(),"The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
+                System.out.println(error);
                 return;
             }
 
@@ -193,7 +195,10 @@ public class MockGUIMain extends JPanel{
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
 
+        simulatorOutputPage.add(new JLabel("Simultor Output"));
+
         simulatorOutputPage.add(listScrollPane);
+
 
         outputPage.add(simulatorOutputPage);
         outputPage.updateUI();

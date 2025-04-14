@@ -56,8 +56,10 @@ public class Model {
         for (componentAbstract componentAbstract : componentsToCalculate) {
 
             String printString = toStringFunction(componentAbstract);
+            if (printString!="") {
             outputList.add(printString);
             System.out.println(printString);
+            }
         }
         return outputList;
     }
@@ -71,15 +73,16 @@ public class Model {
         String printString = "";
 
         if (componentAbstract.getValue() instanceof java.util.List) {
-
+            if (((List)componentAbstract.getValue()).size()!=0) {
             printString+=(componentAbstract.getName() + " equals : [ ");
 
             ((List) componentAbstract.getValue()).toString();
 
             for (Object a : (List) componentAbstract.getValue()) {
-                printString+=(a.toString());
+                printString+=(a.toString()+", ");
             }
             printString+=(" ]");
+        }
         } else {
             printString+=(componentAbstract.getName() + " equals ");
             printString+=(componentAbstract.getValue().toString());

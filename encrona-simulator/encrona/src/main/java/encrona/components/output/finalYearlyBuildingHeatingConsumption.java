@@ -60,8 +60,6 @@ public class finalYearlyBuildingHeatingConsumption extends componentAbstract<Lis
         }
         int yearsOfService[]=new int[uniqueYearsOfService.size()];
 
-
-
         //Note that we use Map.Entry<Double,Double> to represent a pair of doubles, in this case years of service and yearly consumption
         List<Map.Entry<Integer,List<heatingEnergySource>>> heatingConsumptionList = new ArrayList<Map.Entry<Integer,List<heatingEnergySource>>>();
 
@@ -69,7 +67,6 @@ public class finalYearlyBuildingHeatingConsumption extends componentAbstract<Lis
             
             Integer min=0;
             Integer currentMin=Integer.MAX_VALUE;
-            Double improvementImpact=0.0;
             List<Entry<improvement, Double>> improvementsStillActive = new ArrayList<Entry<improvement, Double>>();
             if (i>0) {
                 min=yearsOfService[i-1];
@@ -80,7 +77,6 @@ public class finalYearlyBuildingHeatingConsumption extends componentAbstract<Lis
                     if (entry.getKey().getYearsOfService()<currentMin) {
                         currentMin=entry.getKey().getYearsOfService();
                     }                        
-                    improvementImpact+=(entry.getValue());
                     improvementsStillActive.add(entry);
                 }
             }

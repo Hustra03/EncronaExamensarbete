@@ -21,10 +21,8 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
-import encrona.components.output.improvementImpact;
 import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
-
 
 public class MockGUIImprovements extends JPanel {
 
@@ -42,7 +40,7 @@ public class MockGUIImprovements extends JPanel {
         JScrollPane scrollimprovementSpecificationPage = new JScrollPane(improvementSpecificationPage);
         improvementSpecificationPage.setLayout(new BoxLayout(improvementSpecificationPage, BoxLayout.PAGE_AXIS));
         scrollimprovementSpecificationPage.getVerticalScrollBar().setUnitIncrement(10);
-        
+
         for (improvement improvement : initialImprovements) {
             JPanel improvementPage = createImprovementPage(improvement);
             improvementPage.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -108,6 +106,7 @@ public class MockGUIImprovements extends JPanel {
 
         for (improvementImpactEnum impactEnum : improvementImpactEnum.values()) {
             JRadioButton radioButton = new JRadioButton(impactEnum.toString());
+            radioButton.setActionCommand(impactEnum.toString());
             impactTypeGroup.add(radioButton);
             if (impactEnum.equals(improvement.getImpactType())) {
                 impactTypeGroup.setSelected(radioButton.getModel(), true);
@@ -188,20 +187,20 @@ public class MockGUIImprovements extends JPanel {
             Double krPerM2;
             Double kwhPerM2;
             Integer yearsOfService;
-            improvementImpactEnum impactType=improvementImpactEnum.Electricity;
+            improvementImpactEnum impactType;
 
-            JPanel heatSourceJPanel = (JPanel) improvementPage;
+            JPanel improvementJPanel = (JPanel) improvementPage;
 
-            JCheckBox selectBox = (JCheckBox) ((JPanel)heatSourceJPanel.getComponent(0)).getComponent(0);
+            JCheckBox selectBox = (JCheckBox) ((JPanel)improvementJPanel.getComponent(0)).getComponent(0);
             Boolean selected = selectBox.isSelected();
 
             // This confirms that the user selected this specific heat source 
             if (selected) {
 
-                JLabel nameField = (JLabel) heatSourceJPanel.getComponent(1);
-                String name = nameField.getText();
+                JLabel nameLabel = (JLabel) improvementJPanel.getComponent(1);
+                String name = nameLabel.getText();
 
-                JPanel krPerM2Page = (JPanel) heatSourceJPanel.getComponent(2);
+                JPanel krPerM2Page = (JPanel) improvementJPanel.getComponent(2);
                 try {
                     kwhPerM2 = Double.parseDouble(((JTextField) krPerM2Page.getComponent(0)).getText());
                 } catch (Exception e) {
@@ -211,7 +210,7 @@ public class MockGUIImprovements extends JPanel {
                     throw new Exception("kwh/m^2 for " + name + " must be greater than 0");
                 }
 
-                JPanel kwhPerM2Page = (JPanel) heatSourceJPanel.getComponent(3);
+                JPanel kwhPerM2Page = (JPanel) improvementJPanel.getComponent(3);
                 try {
                     krPerM2 = Double.parseDouble(((JTextField) kwhPerM2Page.getComponent(0)).getText());
                 } catch (Exception e) {
@@ -221,7 +220,7 @@ public class MockGUIImprovements extends JPanel {
                     throw new Exception("kr/m^2 for " + name + " must be greater than 0");
                 }
 
-                JPanel yearsOfServicePage = (JPanel) heatSourceJPanel.getComponent(4);
+                JPanel yearsOfServicePage = (JPanel) improvementJPanel.getComponent(4);
                 try {
                     yearsOfService = Integer
                             .parseInt(((JTextField) yearsOfServicePage.getComponent(0)).getText());
@@ -232,7 +231,16 @@ public class MockGUIImprovements extends JPanel {
                     throw new Exception("years of service for " + name + " must be greater than 0");
                 }
 
-                improvementsCollected.add(new improvement(nameField.getText(), krPerM2, kwhPerM2,
+                JPanel impactTypePage = (JPanel) improvementJPanel.getComponent(5);
+                try {
+                    String currentlySelected=((JRadioButton)impactTypePage.getComponent(0)).getModel().getGroup().getSelection().getActionCommand();
+                    System.out.println(currentlySelected);
+                    impactType = improvementImpactEnum.valueOf(currentlySelected);
+                } catch (Exception e) {
+                    throw new Exception("No impact type selected for " + name);
+                }
+
+                improvementsCollected.add(new improvement(name, krPerM2, kwhPerM2,
                 yearsOfService, impactType));
             }
         }
