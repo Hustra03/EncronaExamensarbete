@@ -3,20 +3,24 @@ package encrona.GUIMockup;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
+import encrona.components.output.improvementImpact;
 import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
 
@@ -68,6 +72,11 @@ public class MockGUIImprovements extends JPanel {
         add(scrollimprovementSpecificationPage, c);
     }
 
+    /**
+     * This creates an improvement page, based on a provided improvement
+     * @param improvement The improvement this page is for
+     * @return The improvement page component
+     */
     private JPanel createImprovementPage(improvement improvement) {
         JPanel improvementPage = new JPanel();
 
@@ -90,11 +99,25 @@ public class MockGUIImprovements extends JPanel {
         yearsOfServicePage.add(yearsOfServiceField);
         yearsOfServicePage.add(new JLabel("years the improvement is efficent"));
 
+        JPanel impactTypePage = new JPanel(new GridLayout(0, 1));
+        ButtonGroup impactTypeGroup = new ButtonGroup();
+
+        for (improvementImpactEnum impactEnum : improvementImpactEnum.values()) {
+            JRadioButton radioButton = new JRadioButton(impactEnum.toString());
+            impactTypeGroup.add(radioButton);
+            if (impactEnum.equals(improvement.getImpactType())) {
+                impactTypeGroup.setSelected(radioButton.getModel(), true);
+            }
+            impactTypePage.add(radioButton);
+        }
+
         improvementPage.add(selectButtonPage);
         improvementPage.add(new JLabel(improvement.getName()));
         improvementPage.add(krPerM2Page);
         improvementPage.add(kwhPerM2Page);
         improvementPage.add(yearsOfServicePage);
+        improvementPage.add(impactTypePage);
+
         return improvementPage;
     }
 
@@ -180,12 +203,18 @@ public class MockGUIImprovements extends JPanel {
                 } catch (Exception e) {
                     throw new Exception("kwh/m^2 not a valid number for " + name);
                 }
+                if (kwhPerM2<=0.0) {
+                    throw new Exception("kwh/m^2 for " + name + " must be greater than 0");
+                }
 
                 JPanel kwhPerM2Page = (JPanel) heatSourceJPanel.getComponent(3);
                 try {
                     krPerM2 = Double.parseDouble(((JTextField) kwhPerM2Page.getComponent(0)).getText());
                 } catch (Exception e) {
                     throw new Exception("kr/m^2 not a valid number for " + name);
+                }
+                if (krPerM2<=0.0) {
+                    throw new Exception("kr/m^2 for " + name + " must be greater than 0");
                 }
 
                 JPanel yearsOfServicePage = (JPanel) heatSourceJPanel.getComponent(4);
@@ -194,6 +223,9 @@ public class MockGUIImprovements extends JPanel {
                             .parseInt(((JTextField) yearsOfServicePage.getComponent(0)).getText());
                 } catch (Exception e) {
                     throw new Exception("years of service is not a valid number for " + name);
+                }
+                if (yearsOfService<=0) {
+                    throw new Exception("years of service for " + name + " must be greater than 0");
                 }
 
                 improvementsCollected.add(new improvement(nameField.getText(), krPerM2, kwhPerM2,

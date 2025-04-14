@@ -16,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentListener;
 
 import encrona.domain.heatingEnergySource;
 
@@ -177,14 +176,20 @@ public class MockGUIHeatingSources extends JPanel {
                 try {
                     costPerKWH = Double.parseDouble(((JTextField) pricePerKwhPanel.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("Kr/kwh not a valid number for " + name);
+                    throw new Exception("Kr/kwh is not a valid number for " + name);
+                }
+                if (costPerKWH<=0.0) {
+                    throw new Exception("Kr/kwh for " + name + " must be greater than 0");
                 }
 
                 JPanel kwhPerYearPanel = (JPanel) heatSourceJPanel.getComponent(3);
                 try {
                     kwhHeatingPerYear = Double.parseDouble(((JTextField) kwhPerYearPanel.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("Kr/kwh not a valid number for " + name);
+                    throw new Exception("kwh per year for heating is not a valid number for " + name);
+                }
+                if (kwhHeatingPerYear<0.0) {
+                    throw new Exception("kwh per year for heating for " + name + " must not be negative");
                 }
 
                 JPanel kwhPerYearWaterPanel = (JPanel) heatSourceJPanel.getComponent(4);
@@ -192,7 +197,10 @@ public class MockGUIHeatingSources extends JPanel {
                     kwhHeatingWaterPerYear = Double
                             .parseDouble(((JTextField) kwhPerYearWaterPanel.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("Kr/kwh not a valid number for " + name);
+                    throw new Exception("kwh per year for heating water is not a valid number for " + name);
+                }
+                if (kwhHeatingWaterPerYear<0.0) {
+                    throw new Exception("kwh per year for heating water for " + name + " must not be negative");
                 }
 
                 heatSources.add(new heatingEnergySource(nameField.getText(), kwhHeatingPerYear, kwhHeatingWaterPerYear,

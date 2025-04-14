@@ -62,6 +62,9 @@ public class MockGUIStartValueSpecification extends JPanel {
         } catch (Exception e) {
             throw new Exception("Atemp is not a number!");
         }
+        if (aTempValue<=0.0) {
+            throw new Exception("Atemp must be more than 0!");
+        }
         
         Double electricityPriceValue;
         try {
@@ -69,6 +72,9 @@ public class MockGUIStartValueSpecification extends JPanel {
             electricityPriceValue = Double.parseDouble(electrictyPriceField.getText());
         } catch (Exception e) {
             throw new Exception("Electricity price is not a number!");
+        }
+        if (electricityPriceValue<=0.0) {
+            throw new Exception("Electricity price must be greater than 0!");
         }
 
         Double electrictyConsumptionValue;
@@ -78,6 +84,10 @@ public class MockGUIStartValueSpecification extends JPanel {
         } catch (Exception e) {
             throw new Exception("Electricity consumption is not a number!");
         }
+        if (electrictyConsumptionValue<=0.0) {
+            throw new Exception("Electricity consumption must be greater than 0!");
+        }
+
         new AbstractMap.SimpleEntry<String, String>("Atemp","m^2");
         java.util.List<Map.Entry<Map.Entry<String,String>,Double>> listOfNumericalVariables = new ArrayList<Map.Entry<Map.Entry<String,String>,Double>>();
         listOfNumericalVariables.add(new AbstractMap.SimpleEntry<Map.Entry<String,String>,Double>(new AbstractMap.SimpleEntry<String, String>("Atemp","m^2"), aTempValue));

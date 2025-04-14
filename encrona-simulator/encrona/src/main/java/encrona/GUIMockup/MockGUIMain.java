@@ -8,6 +8,8 @@ import java.util.Map.Entry;
 
 import javax.swing.*;
 
+import encrona.DataLoader;
+import encrona.Model;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
@@ -18,6 +20,8 @@ public class MockGUIMain extends JPanel{
      private JButton runButton;
      private static JFrame theMainFrame;
      private static JTabbedPane tabbedPane;
+     private static JPanel outputPage;
+
 
      public MockGUIMain() {
         super(new BorderLayout());
@@ -44,21 +48,11 @@ public class MockGUIMain extends JPanel{
 
         //This adds the the heat source tab
         String toolTip3 = "<html>This is where you specify heat sources</html>";
-        heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,1.25);
-        heatingEnergySource gasHeating = new heatingEnergySource("gasHeating", 2000.0, 0.0,0.0,30.0);
-        java.util.List<heatingEnergySource> heatingEnergySources= new ArrayList<heatingEnergySource>();
-        heatingEnergySources.add(districtHeating);
-        heatingEnergySources.add(gasHeating);
-        tabbedPane.addTab("Heat sources", null, new MockGUIHeatingSources(heatingEnergySources), toolTip3);
+        tabbedPane.addTab("Heat sources", null, new MockGUIHeatingSources(DataLoader.createInitialListOfHeatSources()), toolTip3);
 
         //This adds the improvement tab
         String tooltip4 = "<html>This is where you specify improvements</html>";
-        improvement exampleImprovement1 = new improvement("Improvement 1", 0.0, 0.0, 0, improvementImpactEnum.Electricity);
-        improvement exampleImprovement2 = new improvement("Improvement 2", 0.0, 0.0, 0, improvementImpactEnum.Electricity);
-        java.util.List<improvement> improvements= new ArrayList<improvement>();
-        improvements.add(exampleImprovement1);
-        improvements.add(exampleImprovement2);
-        tabbedPane.addTab("Improvements", null, new MockGUIImprovements(improvements), tooltip4);
+        tabbedPane.addTab("Improvements", null, new MockGUIImprovements(DataLoader.createInitialListOfImprovements()), tooltip4);
 
         add(tabbedPane);
 
@@ -109,7 +103,7 @@ public class MockGUIMain extends JPanel{
         //This is the tooltip for the heat source page
         String toolTip = new String("<html>This is where the output is shown</html>");
 
-        JPanel outputPage = new JPanel();
+        outputPage = new JPanel();
         
         outputPage.setLayout(new BoxLayout(outputPage, BoxLayout.PAGE_AXIS));
 
@@ -149,9 +143,9 @@ public class MockGUIMain extends JPanel{
         public void actionPerformed(ActionEvent e) {
             removeOutputTab();
 
-            java.util.List<Map.Entry<Map.Entry<String,String>,Double>> listOfNumericalVariables=null;
-            java.util.List<heatingEnergySource> heatingEnergySources =null;
-            java.util.List<improvement> improvements =null;
+            final java.util.List<Map.Entry<Map.Entry<String,String>,Double>> listOfNumericalVariables;
+            final java.util.List<heatingEnergySource> heatingEnergySources;
+            final java.util.List<improvement> improvements;
 
             try {
                 listOfNumericalVariables =MockGUIStartValueSpecification.collectFieldValues();
@@ -170,9 +164,42 @@ public class MockGUIMain extends JPanel{
             }
 
             createOutputTab(listOfNumericalVariables,heatingEnergySources,improvements);
-            //TODO run simulation using a asynch function here, and then update the output tab with the results once those are generated 
+
+            //Schedule a job for the event-dispatching thread:
+            //running the simulation specifically in this case
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                java.util.List<String> outputList=Model.runSimulation(improvements, heatingEnergySources);
+                addSimulatorOutputToOutput(outputList);
+            }
+            });
         }
     }
+
+    /**
+     * This adds a section to the output tab with the output from the simulator 
+     * @param outputList
+     */
+    public static void addSimulatorOutputToOutput(java.util.List<String> outputList)
+    {
+        JPanel simulatorOutputPage = new JPanel();
+        
+        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        for (String list : outputList) {
+            listModel.addElement(list);
+        }
+        JList<String> list = new JList<String>(listModel);
+        list.setSelectedIndex(0);
+        list.setVisibleRowCount(5);
+        JScrollPane listScrollPane = new JScrollPane(list);
+
+        simulatorOutputPage.add(listScrollPane);
+
+        outputPage.add(simulatorOutputPage);
+        outputPage.updateUI();
+
+    }
+
 
     
 }

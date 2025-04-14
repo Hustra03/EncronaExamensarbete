@@ -31,39 +31,40 @@ import encrona.domain.objectAbstract;
 public class DataLoader {
 
     private Map<String, componentAbstract> components;
-    private Map<String, objectAbstract> objects;
     private Map<String, modifierAbstract> modifiers;
 
     /**
      * This instantiates the database loader
+     * @param improvement The list of improvements to implement
+     * @param heatingEnergySources The list of heat sources
      */
-    public DataLoader()
+    public DataLoader(List<improvement> improvement, List<heatingEnergySource> heatingEnergySources)
     {
-        instantiate();
+        instantiate(improvement,heatingEnergySources);
     }
 
     /**
      * This method is responsible for instantiating the relevant data
-     * TODO add some parameter, ex output, to determine what to include, currently
-     * loads an example
+     * @param improvement The list of improvements to implement
+     * @param heatingEnergySources The list of heat sources
      */
-    public void instantiate() {
+    public void instantiate(List<improvement> improvement, List<heatingEnergySource> heatingEnergySources) {
         // We first instantiate the map
         // https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html
         components = new HashMap<String, componentAbstract>();
-        objects = new HashMap<String, objectAbstract>();
         modifiers = new HashMap<String, modifierAbstract>();
 
         // We then fill the maps with relevant data
-        createObjects();
         createModifiers();        
-        createComponents();
+        createComponents(improvement,heatingEnergySources);
     }
 
     /**
      * This creates the components objects, and adds them to the map
+     * @param improvement The list of improvements to implement
+     * @param heatingEnergySources The list of heat sources
      */
-    public void createComponents() {
+    public void createComponents(List<improvement> improvement, List<heatingEnergySource> heatingEnergySources) {
         //We first define the simple value inputs which are read from input and used for creating the output
         //TODO make the inputs read values from user input
         input<Double> electricityInput = new input<Double>("electricityConsumptionInput", "kwh", 5703.0);
@@ -74,24 +75,15 @@ public class DataLoader {
 
 
         //We then add the improvements which were selected
-        //TODO only add the improvements which are a part of input
-
-        List<improvement> improvement = new ArrayList<improvement>();
-        improvement.add((improvement)objects.get("EfficentLighting"));
-        improvement.add((improvement)objects.get("BergOrMarkHeating"));
-        improvement.add((improvement)objects.get("ThermometerReconfiguration"));
-        improvement.add((improvement)objects.get("IMDWater"));
 
         input<List<improvement>> improvementsToImplement= new input<List<improvement>>("improvements", "",improvement); 
 
         components.put(improvementsToImplement.getName(), improvementsToImplement);
 
         //We then add the different sources of heating energy
-        //TODO change to creating energy sources based on their input values
-        List<heatingEnergySource> heatingEnergySources= new ArrayList<heatingEnergySource>();
-        heatingEnergySources.add((heatingEnergySource)objects.get("districtHeating"));
-        heatingEnergySources.add((heatingEnergySource)objects.get("gasHeating"));
         input<List<heatingEnergySource>> heatingSourcesInput= new input<List<heatingEnergySource>>("heatingSources", "",heatingEnergySources); 
+
+
 
         //TODO define intermediate values here, perhaps use a function to create unique ones for all of the heating sources
         //We then define the intermediate values
@@ -155,42 +147,54 @@ public class DataLoader {
 
     /**
      * This creates the domain objects, and adds them to the map
+     * @return A list of initial Heat Sources
      */
-    public void createObjects() {
-        //We first create the representation for those improvements which are treated in a "binary" manner, and which are applied, and then add them to the data loader for objects
-        improvement BergOrMarkHeating = new improvement("BergOrMarkHeating", 940.0, 570.0, 15, improvementImpactEnum.BuildingHeating);
-        improvement FTX = new improvement("FTX", 860.0, 620.0, 15, improvementImpactEnum.BuildingHeating);
-        improvement ChangeWindows=new improvement("ChangeWindows", 770.0, 445.0, 40, improvementImpactEnum.BuildingHeating);
-        improvement InsulateFacade=new improvement("InsulateFacade", 620.0, 630.0, 40, improvementImpactEnum.BuildingHeating);
-        improvement FVP = new improvement("FVP", 600.0, 290.0, 20, improvementImpactEnum.BuildingHeating);
-        improvement InsulateAttic = new improvement("InsulateAttic", 330.0, 100.0, 40, improvementImpactEnum.BuildingHeating);
-        improvement SolarPanels = new improvement("SolarPanels", 220.0, 210.0, 15, improvementImpactEnum.Electricity);
-        improvement IMDWater = new improvement("IMDWater", 140.0, 85.0, 10, improvementImpactEnum.Water);
-        improvement ControlSystem = new improvement("ControlSystem", 100.0, 45.0, 10, improvementImpactEnum.BuildingHeating);
-        improvement ThermometerReconfiguration = new improvement("ThermometerReconfiguration", 90.0, 50.0, 10, improvementImpactEnum.BuildingHeating);
-        improvement EconomicalFlush = new improvement("EconomicalFlush", 100.0, 45.0, 15, improvementImpactEnum.Water);
-        improvement EfficentLighting = new improvement("EfficentLighting", 30.0, 15.0, 15, improvementImpactEnum.Electricity);
-    
-        objects.put(BergOrMarkHeating.getName(), BergOrMarkHeating);
-        objects.put(FTX.getName(), FTX);
-        objects.put(ChangeWindows.getName(), ChangeWindows);
-        objects.put(InsulateFacade.getName(), InsulateFacade);
-        objects.put(FVP.getName(), FVP);
-        objects.put(InsulateAttic.getName(), InsulateAttic);
-        objects.put(SolarPanels.getName(), SolarPanels);
-        objects.put(IMDWater.getName(), IMDWater);
-        objects.put(ControlSystem.getName(), ControlSystem);
-        objects.put(ThermometerReconfiguration.getName(), ThermometerReconfiguration);
-        objects.put(EconomicalFlush.getName(), EconomicalFlush);
-        objects.put(EfficentLighting.getName(), EfficentLighting);
+    public static List<heatingEnergySource> createInitialListOfHeatSources() {
 
         //We then add the relevant heating sources (currently just district heating)
         heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,1.25);
         heatingEnergySource gasHeating = new heatingEnergySource("gasHeating", 2000.0, 0.0,0.0,30.0);
+        List<heatingEnergySource> initialListOfHeatSources=new ArrayList<heatingEnergySource>();
+        initialListOfHeatSources.add(districtHeating);
+        initialListOfHeatSources.add(gasHeating);
 
-        objects.put(districtHeating.getName(), districtHeating);
-        objects.put(gasHeating.getName(), gasHeating);
+        return initialListOfHeatSources;
+    }
 
+    /**
+     * This creates the inital list of improvements to display in the GUI
+     * @return A list of improvements to include initially
+     */
+    public static List<improvement> createInitialListOfImprovements()
+    {
+        //We first create the representation for those improvements which are treated in a "binary" manner, and which are applied, and then add them to the data loader for objects
+        improvement BergOrMarkHeating = new improvement("Berg Or Mark Heating", 940.0, 570.0, 15, improvementImpactEnum.BuildingHeating);
+        improvement FTX = new improvement("FTX", 860.0, 620.0, 15, improvementImpactEnum.BuildingHeating);
+        improvement ChangeWindows=new improvement("Change Windows", 770.0, 445.0, 40, improvementImpactEnum.BuildingHeating);
+        improvement InsulateFacade=new improvement("Insulate Facade", 620.0, 630.0, 40, improvementImpactEnum.BuildingHeating);
+        improvement FVP = new improvement("FVP", 600.0, 290.0, 20, improvementImpactEnum.BuildingHeating);
+        improvement InsulateAttic = new improvement("Insulate Attic", 330.0, 100.0, 40, improvementImpactEnum.BuildingHeating);
+        improvement SolarPanels = new improvement("Solar Panels", 220.0, 210.0, 15, improvementImpactEnum.Electricity);
+        improvement IMDWater = new improvement("IMD Water", 140.0, 85.0, 10, improvementImpactEnum.Water);
+        improvement ControlSystem = new improvement("Control System", 100.0, 45.0, 10, improvementImpactEnum.BuildingHeating);
+        improvement ThermometerReconfiguration = new improvement("Thermometer Reconfiguration", 90.0, 50.0, 10, improvementImpactEnum.BuildingHeating);
+        improvement EconomicalFlush = new improvement("Economical Flush", 100.0, 45.0, 15, improvementImpactEnum.Water);
+        improvement EfficentLighting = new improvement("Efficent Lighting", 30.0, 15.0, 15, improvementImpactEnum.Electricity);
+        
+        List<improvement> initialListOfImprovements=new ArrayList<improvement>();
+        initialListOfImprovements.add(BergOrMarkHeating);
+        initialListOfImprovements.add(FTX);
+        initialListOfImprovements.add(ChangeWindows);
+        initialListOfImprovements.add(InsulateFacade);
+        initialListOfImprovements.add(FVP);
+        initialListOfImprovements.add(InsulateAttic);
+        initialListOfImprovements.add(SolarPanels);
+        initialListOfImprovements.add(IMDWater);
+        initialListOfImprovements.add(ControlSystem);
+        initialListOfImprovements.add(ThermometerReconfiguration);
+        initialListOfImprovements.add(EconomicalFlush);
+        initialListOfImprovements.add(EfficentLighting);
+        return initialListOfImprovements;
     }
 
     /**
