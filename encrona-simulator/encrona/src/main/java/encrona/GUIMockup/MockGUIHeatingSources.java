@@ -1,3 +1,5 @@
+package encrona.GUIMockup;
+
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -5,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
@@ -18,6 +19,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentListener;
 
 import encrona.domain.heatingEnergySource;
+
 
 public class MockGUIHeatingSources extends JPanel {
 

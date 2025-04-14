@@ -185,7 +185,6 @@ public class DataLoader {
         objects.put(EfficentLighting.getName(), EfficentLighting);
 
         //We then add the relevant heating sources (currently just district heating)
-        //TODO get realistic cost for district heating
         heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,1.25);
         heatingEnergySource gasHeating = new heatingEnergySource("gasHeating", 2000.0, 0.0,0.0,30.0);
 

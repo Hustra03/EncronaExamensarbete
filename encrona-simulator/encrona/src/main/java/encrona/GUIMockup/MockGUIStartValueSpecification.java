@@ -1,3 +1,5 @@
+package encrona.GUIMockup;
+
 import java.awt.*;
 import java.util.AbstractMap;
 import java.util.ArrayList;
