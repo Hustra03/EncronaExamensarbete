@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,7 +19,7 @@ import javax.swing.event.DocumentListener;
 
 import encrona.domain.heatingEnergySource;
 
-public class MockGUIHeatingSources extends JPanel{
+public class MockGUIHeatingSources extends JPanel {
 
     List<heatingEnergySource> energySources;
     static JPanel heatSourceSpecificationPage;
@@ -28,7 +29,7 @@ public class MockGUIHeatingSources extends JPanel{
 
         JPanel infoPage = new JPanel();
         infoPage.add(new JLabel("Here you give the values for heat sources for the building"));
-        energySources=initialHeatingEnergySources;
+        energySources = initialHeatingEnergySources;
 
         heatSourceSpecificationPage = new JPanel();
         JScrollPane scrollheatSourceSpecificationPage = new JScrollPane(heatSourceSpecificationPage);
@@ -39,7 +40,7 @@ public class MockGUIHeatingSources extends JPanel{
             heatSourceSpecificationPage.add(heatSourcePage);
         }
 
-        JPanel createNewHeatSourcePage =new JPanel();
+        JPanel createNewHeatSourcePage = new JPanel();
 
         JButton createNewButton = new JButton("Create new heat source");
         JTextField createNewNameField = new JTextField(20);
@@ -50,27 +51,27 @@ public class MockGUIHeatingSources extends JPanel{
         createNewHeatSourcePage.add(createNewButton);
         createNewHeatSourcePage.add(createNewNameField);
 
-
         // Add Components to this panel.
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
-        
+
         c.fill = GridBagConstraints.HORIZONTAL;
         add(infoPage, c);
-        
+
         c.fill = GridBagConstraints.BOTH;
-        c.weighty=0.10;
+        c.weighty = 0.10;
         add(createNewHeatSourcePage, c);
-        c.weighty=0.90;
+        c.weighty = 0.90;
 
         add(scrollheatSourceSpecificationPage, c);
     }
-    
 
-    private JPanel createHeatSourcePage(heatingEnergySource source)
-    {            
+    private JPanel createHeatSourcePage(heatingEnergySource source) {
         JPanel heatSourcePage = new JPanel();
-        heatSourcePage.add(new JLabel(source.getName()));
+
+        JPanel selectButtonPage = new JPanel();
+        JCheckBox selectCheckBox = new JCheckBox("Select");
+        selectButtonPage.add(selectCheckBox);
 
         JPanel costPerKWHPage = new JPanel();
         JTextField costPerKWHField = new JTextField(source.getCostPerKwh().toString(), 10);
@@ -87,6 +88,8 @@ public class MockGUIHeatingSources extends JPanel{
         kwhPerYearHeatingWaterPage.add(kwhPerYearHeatingWaterField);
         kwhPerYearHeatingWaterPage.add(new JLabel("kwh/year for heating water"));
 
+        heatSourcePage.add(selectButtonPage);
+        heatSourcePage.add(new JLabel(source.getName()));
         heatSourcePage.add(costPerKWHPage);
         heatSourcePage.add(kwhPerYearHeatingPage);
         heatSourcePage.add(kwhPerYearHeatingWaterPage);
@@ -94,85 +97,109 @@ public class MockGUIHeatingSources extends JPanel{
     }
 
     /**
-     * This handles if the button to create a new 
+     * This handles if the button to create a new
      */
-     class CreateNewListener implements ActionListener {
-         private JTextField createNewNameField;
-  
-         public CreateNewListener(JTextField createNewNameField) {
-             this.createNewNameField=createNewNameField;
-         }
-      
+    class CreateNewListener implements ActionListener {
+        private JTextField createNewNameField;
+
+        public CreateNewListener(JTextField createNewNameField) {
+            this.createNewNameField = createNewNameField;
+        }
+
         @Override
-         public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {
 
             if ("createNew".equals(e.getActionCommand())) {
                 String name = createNewNameField.getText();
                 if (name.equals("")) {
-                    
-                    JOptionPane.showMessageDialog(heatSourceSpecificationPage,"No name was given for the new heating source","The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
-                   return;
+
+                    JOptionPane.showMessageDialog(heatSourceSpecificationPage,
+                            "No name was given for the new heating source", "The provided input is invalid",
+                            JOptionPane.PLAIN_MESSAGE);
+                    return;
                 }
-    
+
                 for (heatingEnergySource heatingEnergySource : energySources) {
                     if (heatingEnergySource.getName().equals(name)) {
                         createNewNameField.setText("");
-                        JOptionPane.showMessageDialog(heatSourceSpecificationPage,"The heating source already exists","The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
+                        JOptionPane.showMessageDialog(heatSourceSpecificationPage, "The heating source already exists",
+                                "The provided input is invalid", JOptionPane.PLAIN_MESSAGE);
 
                         return;
                     }
                 }
-                heatingEnergySource newHeatingEnergySource =new heatingEnergySource(name, 0.0, 0.0, 0.0, 0.0);
+                heatingEnergySource newHeatingEnergySource = new heatingEnergySource(name, 0.0, 0.0, 0.0, 0.0);
                 energySources.add(newHeatingEnergySource);
                 JPanel heatSourcePage = createHeatSourcePage(newHeatingEnergySource);
                 heatSourceSpecificationPage.add(heatSourcePage);
-            } 
+            }
             heatSourceSpecificationPage.updateUI();
         }
-  
-     }
 
-    //This method collects the current values from the heat sources
-    public static java.util.List<heatingEnergySource> collectFieldValues() throws Exception
-    {
+    }
+
+    /**
+     * This method collects the current values from the heat sources which currently
+     * exist in the heat source component
+     * <p>
+     * Note that this depends on the structure of the heatSource page, and the
+     * ordering of its components, so any changes made there will likely break this method
+     * <p>
+     * 
+     * @return A list of heat sources with the provided values
+     * @throws Exception If something goes wrong, with the only expected case being
+     *                   if the values provided are invalid
+     */
+    public static java.util.List<heatingEnergySource> collectFieldValues() throws Exception {
         List<heatingEnergySource> heatSources = new ArrayList<heatingEnergySource>();
 
-        //This iterates over all of the heat source pages, and all of their components, and records
+        // This iterates over all of the heat source pages, and all of their components, to retrive the user provided input
         for (Component heatSourcePage : heatSourceSpecificationPage.getComponents()) {
 
             Double costPerKWH;
             Double kwhHeatingPerYear;
             Double kwhHeatingWaterPerYear;
 
-            JPanel heatSourceJPanel=(JPanel)heatSourcePage;
+            JPanel heatSourceJPanel = (JPanel) heatSourcePage;
 
-            JLabel nameField = (JLabel)heatSourceJPanel.getComponent(0);
-            String name =nameField.getText();
+            JCheckBox selectBox = (JCheckBox) ((JPanel)heatSourceJPanel.getComponent(0)).getComponent(0);
+            Boolean selected = selectBox.isSelected();
 
+            // This confirms that the user selected this specific heat source 
+            if (selected) {
 
-            JPanel pricePerKwhPanel=(JPanel)heatSourceJPanel.getComponent(1);
-            try {
-                costPerKWH=Double.parseDouble(((JTextField)pricePerKwhPanel.getComponent(0)).getText());
-            } catch (Exception e) {
-                throw new Exception("Kr/kwh not a valid number for"+name);
+                JLabel nameField = (JLabel) heatSourceJPanel.getComponent(1);
+                String name = nameField.getText();
+
+                JPanel pricePerKwhPanel = (JPanel) heatSourceJPanel.getComponent(2);
+                try {
+                    costPerKWH = Double.parseDouble(((JTextField) pricePerKwhPanel.getComponent(0)).getText());
+                } catch (Exception e) {
+                    throw new Exception("Kr/kwh not a valid number for " + name);
+                }
+
+                JPanel kwhPerYearPanel = (JPanel) heatSourceJPanel.getComponent(3);
+                try {
+                    kwhHeatingPerYear = Double.parseDouble(((JTextField) kwhPerYearPanel.getComponent(0)).getText());
+                } catch (Exception e) {
+                    throw new Exception("Kr/kwh not a valid number for " + name);
+                }
+
+                JPanel kwhPerYearWaterPanel = (JPanel) heatSourceJPanel.getComponent(4);
+                try {
+                    kwhHeatingWaterPerYear = Double
+                            .parseDouble(((JTextField) kwhPerYearWaterPanel.getComponent(0)).getText());
+                } catch (Exception e) {
+                    throw new Exception("Kr/kwh not a valid number for " + name);
+                }
+
+                heatSources.add(new heatingEnergySource(nameField.getText(), kwhHeatingPerYear, kwhHeatingWaterPerYear,
+                        0.0, costPerKWH));
             }
+        }
 
-            JPanel kwhPerYearPanel=(JPanel)heatSourceJPanel.getComponent(2);
-            try {
-                kwhHeatingPerYear=Double.parseDouble(((JTextField)kwhPerYearPanel.getComponent(0)).getText());
-            } catch (Exception e) {
-                throw new Exception("Kr/kwh not a valid number for"+name);
-            }
-
-            JPanel kwhPerYearWaterPanel=(JPanel)heatSourceJPanel.getComponent(3);
-            try {
-                kwhHeatingWaterPerYear=Double.parseDouble(((JTextField)kwhPerYearWaterPanel.getComponent(0)).getText());
-            } catch (Exception e) {
-                throw new Exception("Kr/kwh not a valid number for"+name);
-            }
-
-            heatSources.add(new heatingEnergySource(nameField.getText(), kwhHeatingPerYear, kwhHeatingWaterPerYear, 0.0, costPerKWH));
-
+        if (heatSources.isEmpty()) {
+            throw new Exception("No heat source selected, please select one or more");
         }
 
         return heatSources;

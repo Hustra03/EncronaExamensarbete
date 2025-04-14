@@ -39,7 +39,7 @@ public class MockGUIMain extends JPanel{
         String toolTip2 = new String("<html>This is where you specify numeric values</html>");
         tabbedPane.addTab("Numeric variables", null, new MockGUIStartValueSpecification(), toolTip2);
 
-        //This adds the value specification page
+        //This adds the tooltip to the heat source page
         String toolTip3 = new String("<html>This is where you specify heat sources</html>");
 
         heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,1.25);
@@ -96,7 +96,11 @@ public class MockGUIMain extends JPanel{
     //This method creates the output tab, along with its contents, based on the input and the results from the simulation
     public static void createOutputTab(java.util.List<Map.Entry<Map.Entry<String,String>,Double>> listOfNumericalVariables,java.util.List<heatingEnergySource> heatingEnergySources)
     {
+        //This is the tooltip for the heat source page
+        String toolTip = new String("<html>This is where the output is shown</html>");
+
         JPanel outputPage = new JPanel();
+        
         outputPage.setLayout(new BoxLayout(outputPage, BoxLayout.PAGE_AXIS));
 
         JPanel inputSectionPage = new JPanel();
@@ -124,7 +128,7 @@ public class MockGUIMain extends JPanel{
         outputPage.add(new JLabel("Output results are shown here"));
         outputPage.add(inputSectionPage);
 
-        tabbedPane.addTab("Output", outputPage);
+        tabbedPane.addTab("Output",null, outputPage,toolTip);
     }
 
     //This class is used to handle the runButton, with its method called when the runButton is clicked, and should collect the relevant information and start the simulation with it
