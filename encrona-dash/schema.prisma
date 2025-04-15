@@ -13,6 +13,11 @@ enum Role {
   USER
 }
 
+enum BuildingDataType {
+  ESTIMATE
+  ACTUAL
+}
+
 model User {
   id             Int      @id @default(autoincrement())
   name           String
@@ -28,6 +33,35 @@ model Building {
   name           String
   owner          String 
   installedAt    DateTime 
+
+  mivoId         String? @unique
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+  
+  dataPoints  BuildingData[]
+}
+
+model BuildingData {
+  id          Int        @id @default(autoincrement())
+  building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  buildingId  Int
+  type        BuildingDataType
+  date        DateTime      
+
+  totalEnergykWh        Float?   
+  spaceHeatingkWh       Float?
+  waterHeatingkWh       Float?  
+  electricitykWh        Float?
+  totalWaterM3          Float?
+
+  totalEnergyCost       Float?
+  spaceHeatingCost      Float?
+  waterHeatingCost      Float?
+  electricityCost       Float?
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([buildingId, type, date])
 }
