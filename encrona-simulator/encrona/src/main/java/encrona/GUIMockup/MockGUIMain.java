@@ -3,7 +3,6 @@ package encrona.GUIMockup;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.swing.*;
 
@@ -66,7 +65,7 @@ public class MockGUIMain extends JPanel{
       */
       private static void createAndShowGUI() {
         //Create and set up the window.
-        theMainFrame = new JFrame("MockGUI");
+        theMainFrame = new JFrame("Encrona Simulator");
         theMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
  
         //Create and set up the content pane.

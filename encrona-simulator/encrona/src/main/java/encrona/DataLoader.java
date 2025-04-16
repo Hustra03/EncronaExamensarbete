@@ -172,7 +172,7 @@ public class DataLoader {
     public static List<heatingEnergySource> createInitialListOfHeatSources() {
 
         //We then add the relevant heating sources (currently just district heating)
-        heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,1.25);
+        heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0,0.0,0.9);
         heatingEnergySource gasHeating = new heatingEnergySource("gasHeating", 2000.0, 0.0,0.0,30.0);
         List<heatingEnergySource> initialListOfHeatSources=new ArrayList<heatingEnergySource>();
         initialListOfHeatSources.add(districtHeating);
