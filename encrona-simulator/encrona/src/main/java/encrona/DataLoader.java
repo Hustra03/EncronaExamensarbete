@@ -73,6 +73,9 @@ public class DataLoader {
         input<Double> electricityInput=null;
         input<Double> aTempInput=null;
         input<Double> electrictyPriceInput=null;
+        input<Double> waterConsumptionInput=null;
+        input<Double> waterPriceInput=null;
+
 
         for (Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
             System.out.println("Entry name " +entry.getKey());
@@ -89,9 +92,20 @@ public class DataLoader {
                     if (entry.getKey().equals("Electricty price")) {
                         electrictyPriceInput=new input<Double>("Electricty price",entry.getValue(),mapOfNumericalVariables.get(entry));
                     }
+                    else
+                    {
+                        if (entry.getKey().equals("Water consumption")) {
+                            waterConsumptionInput=new input<Double>("Water consumption",entry.getValue(),mapOfNumericalVariables.get(entry));
+                        }
+                        else
+                        {
+                            if (entry.getKey().equals("Water price")) {
+                                waterPriceInput=new input<Double>("Water price",entry.getValue(),mapOfNumericalVariables.get(entry));
+                            }
+                        }
+                    }
                 }
             }
-
         }
 
         //We then add the improvements which were selected
@@ -102,8 +116,6 @@ public class DataLoader {
 
         //We then add the different sources of heating energy
         input<List<heatingEnergySource>> heatingSourcesInput= new input<List<heatingEnergySource>>("heatingSources", "",heatingEnergySources); 
-
-
 
         //TODO define intermediate values here, perhaps use a function to create unique ones for all of the heating sources
         //We then define the intermediate values
@@ -126,12 +138,14 @@ public class DataLoader {
         Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
         electricityOutputDependsOn.put(electricityInput.getName(), electricityInput);
         electricityOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
+        electricityOutputDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput", "kwh/year", electricityOutputDependsOn,null);
 
         Map<String, componentAbstract> electricitySavingsDependsOn = new HashMap<String, componentAbstract>();
         electricitySavingsDependsOn.put(electricityInput.getName(), electricityInput);
         electricitySavingsDependsOn.put(electricityOutput.getName(), electricityOutput);
         electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
+        electricitySavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity("electricitySavings", "kr/year", electricitySavingsDependsOn,null);
 
         Map<String, componentAbstract> heatingOutputDependsOn = new HashMap<String, componentAbstract>();
@@ -163,6 +177,18 @@ public class DataLoader {
         components.put(heatingSavings.getName(), heatingSavings);
         components.put(waterHeatingOutput.getName(), waterHeatingOutput);
         components.put(waterHeatingSavings.getName(), waterHeatingSavings);
+        
+        //TODO add water calculations, currently just returns input since no improvement data implemented for water yet
+        components.put(waterConsumptionInput.getName(), waterConsumptionInput);
+        components.put(waterPriceInput.getName(), waterPriceInput);
+
+        //TODO note below is where the hard-coded ranges are defined, and will need to be removed if it should be changed
+        Double[] electricityCurve={ (1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0)};
+        components.put("electricityCurve", new input<Double[]>("electricityCurve","%",electricityCurve));
+        Double[] heatingCurve={(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0),(1.0/12.0)};
+        components.put("heatingCurve", new input<Double[]>("heatingCurve","%",heatingCurve));
+        Double[] waterCurve={0.14,0.14,0.14,(3.0/70.0),(3.0/70.0),(3.0/70.0),(3.0/70.0),(3.0/70.0),(3.0/70.0),(3.0/70.0),0.14,0.14};
+        components.put("waterCurve", new input<Double[]>("waterCurve","%",waterCurve));
     }
 
     /**

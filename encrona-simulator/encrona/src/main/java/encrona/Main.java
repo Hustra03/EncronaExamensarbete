@@ -12,8 +12,8 @@ public class Main {
      * @param args The provided command-line argumentss
      */
     public static void main(String[] args) {
-        //MockGUIMain.main(args);
-        new ReasoningEngine().recommendations();
+        MockGUIMain.main(args);
+        //new ReasoningEngine().recommendations();
     }
 
 

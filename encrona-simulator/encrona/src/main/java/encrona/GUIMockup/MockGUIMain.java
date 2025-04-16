@@ -150,8 +150,18 @@ public class MockGUIMain extends JPanel{
 
             try {
                 mapOfNumericalVariables =MockGUIStartValueSpecification.collectFieldValues();
+
+                Double aTemp=1.0;
+                for (Map.Entry<String,String> entry : mapOfNumericalVariables.keySet()) {
+
+                    if (entry.getKey().equals("Atemp")) {
+                        aTemp=mapOfNumericalVariables.get(entry);
+                    }
+
+                }
+
                 heatingEnergySources=MockGUIHeatingSources.collectFieldValues();
-                improvements=MockGUIImprovements.collectFieldValues();
+                improvements=MockGUIImprovements.collectFieldValues(aTemp);
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(theMainFrame,error.getMessage(),"The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
                 System.out.println(error);

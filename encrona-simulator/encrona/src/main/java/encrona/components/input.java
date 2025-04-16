@@ -17,8 +17,6 @@ public class input<T> extends componentAbstract<T>{
         this.setValue(value);
     }
 
-    
-
     /**
      * This is the calculate method for input, it applies any modifiers and then completes the input
      * @throws Exception if something goes wrong

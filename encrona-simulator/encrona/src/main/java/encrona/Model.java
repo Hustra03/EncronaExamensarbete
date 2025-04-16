@@ -1,6 +1,8 @@
 package encrona;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -18,13 +20,6 @@ import encrona.domain.improvement;
  */
 public class Model {
     static DataLoader dataLoader;
-
-    /**
-     * This runs the simulation with default values
-     */
-    public static void runStaticSimulation() {
-
-    }
 
     /**
      * This method is responsible for running the simulation, which consists of
@@ -85,13 +80,27 @@ public class Model {
             printString+=(" ]");
         }
         } else {
+
+            if (componentAbstract.getValue() instanceof Object[]) {
+                printString+=(componentAbstract.getName() + " equals : [ ");
+
+                for (int i = 0; i < ((Object[])componentAbstract.getValue()).length; i++) {
+                    printString+=(((Object[])componentAbstract.getValue())[i].toString()+", ");
+                }
+                printString+=(" ]");
+
+            }
+            else
+            {
+
+            
             printString+=(componentAbstract.getName() + " equals ");
             printString+=(componentAbstract.getValue().toString());
 
             if (!(componentAbstract.getUnit().equals("") || componentAbstract.getUnit() == null)) {
                 printString+=(" " + componentAbstract.getUnit());
             }
-
+            }
         }
 
         return printString;

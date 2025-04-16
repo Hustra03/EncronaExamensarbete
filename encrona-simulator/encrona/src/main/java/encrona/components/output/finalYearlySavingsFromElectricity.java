@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
+import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 import encrona.modifiers.modifierAbstract;
 
@@ -33,8 +34,12 @@ public class finalYearlySavingsFromElectricity extends componentAbstract<List<Ma
         Double baseValue = (Double)dependsOnMap.get("Electricty consumption").getValue();
         Double electricityPrice = (Double)dependsOnMap.get("Electricty price").getValue();
         List<Map.Entry<Integer,Double>> electricityConsumptionList = (List<Map.Entry<Integer,Double>>)dependsOnMap.get("electricityOutput").getValue();
+        List<heatingEnergySource> heatSources = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
-
+        //We add the electricity from heating sources
+        for (heatingEnergySource heatingEnergySource : heatSources) {
+            baseValue+=heatingEnergySource.getKwhPerYearInElectricity();
+        }
         List<Map.Entry<Integer,Double>> finalSavings=new ArrayList<Map.Entry<Integer,Double>>();
 
         for (Map.Entry e : electricityConsumptionList) {
