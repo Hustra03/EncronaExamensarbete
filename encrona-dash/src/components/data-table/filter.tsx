@@ -11,7 +11,7 @@ export function DataTableFilter<TData>({ table }: DataTableFilterProps<TData>) {
   return (
     <div className="flex items-center py-4">
       <Input
-        placeholder="Filtrera användare..."
+        placeholder="Sök baserat på namn..."
         value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
         onChange={event => {
           const value = event.target.value;

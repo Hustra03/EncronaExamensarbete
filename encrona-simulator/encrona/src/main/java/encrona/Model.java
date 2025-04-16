@@ -1,62 +1,100 @@
 package encrona;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import encrona.components.componentAbstract;
+import encrona.domain.heatingEnergySource;
+import encrona.domain.improvement;
 
 /**
  * The Model class is reponsible holding the simulation itself, and is the
  * "main" class responsible for the simulation
  */
-public class model {
-    static ExecutorService service;
+public class Model {
     static DataLoader dataLoader;
-    static LinkedHashSet<componentAbstract> executionSet;
+
+    /**
+     * This runs the simulation with default values
+     */
+    public static void runStaticSimulation() {
+
+    }
 
     /**
      * This method is responsible for running the simulation, which consists of
      * instantiating relevant data, scheduling tasks, executing tasks and then
      * presenting results
-     * Relevant links:
-     * https://stackoverflow.com/questions/8767527/how-to-use-thread-pool-concept-in-java
-     * https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html
-     * https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/ThreadPoolExecutor.html
+     * 
+     * @param mapOfNumericalVariables A map of numerical variables, in the format <<name,unit>,value>
+     * @param improvement          The list of improvements to implement
+     * @param heatingEnergySources The list of heat sources
+     * @return A list of the different components final values in a standard string
+     *         format
      */
-    public static void runSimulation() {
+    public static List<String> runSimulation(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables,List<improvement> improvement,
+            List<heatingEnergySource> heatingEnergySources) {
         // We instantiate the data
         // TODO change it so it only loads data relevant for the current simulation, if
         // the data grows sufficently large
 
-        dataLoader = new DataLoader();
-
-        // We create the thread pool
-        // TODO change to paralell execution if that is faster, issues with dependencies
-        // however since we would need to order execution, single-threaded may be faster
-        // depending on the size of the tasks
-        // service = Executors.newFixedThreadPool(4); //This creates the thread pool,
-        // which is responsible for handling the execution
-
-        // We then create the execution ordering
-        // Note that we use a LinkedHashSet to both ensure insertion order and that only
-        // unique elements are added
-        // This allows us to recursivly add elements, adding dependencies when needed,
-        // without risking running elements twice
+        dataLoader = new DataLoader(mapOfNumericalVariables,improvement, heatingEnergySources);
 
         Collection<componentAbstract> componentsToCalculate = dataLoader.getAllComponentAbstract();
 
-        executionSet = new LinkedHashSet<componentAbstract>();
         for (componentAbstract component : componentsToCalculate) {
             recursiveRun(component);
         }
 
+        List<String> outputList = new ArrayList<String>();
+
         // This gives the values, for testing purposes
         for (componentAbstract componentAbstract : componentsToCalculate) {
-            System.out.println(componentAbstract.getName() + " equals " + componentAbstract.getValue() + " " + componentAbstract.getUnit());
+
+            String printString = toStringFunction(componentAbstract);
+            if (printString!="") {
+            outputList.add(printString);
+            System.out.println(printString);
+            }
         }
+        return outputList;
+    }
+
+    /**
+     * This method creates a string for the value of an componentAbstract, whose value consists of a list or values to a string
+     * @param componentAbstract The component to generate a value string for
+     * @return The components value string
+     */
+    public static String toStringFunction(componentAbstract componentAbstract) {
+        String printString = "";
+
+        if (componentAbstract.getValue() instanceof java.util.List) {
+            if (((List)componentAbstract.getValue()).size()!=0) {
+            printString+=(componentAbstract.getName() + " equals : [ ");
+
+            ((List) componentAbstract.getValue()).toString();
+
+            for (Object a : (List) componentAbstract.getValue()) {
+                printString+=(a.toString()+", ");
+            }
+            printString+=(" ]");
+        }
+        } else {
+            printString+=(componentAbstract.getName() + " equals ");
+            printString+=(componentAbstract.getValue().toString());
+
+            if (!(componentAbstract.getUnit().equals("") || componentAbstract.getUnit() == null)) {
+                printString+=(" " + componentAbstract.getUnit());
+            }
+
+        }
+
+        return printString;
     }
 
     /**
@@ -68,19 +106,19 @@ public class model {
      * @param component The component to add
      */
     public static void recursiveRun(componentAbstract component) {
-        Map<String, componentAbstract> dependsOnMap = component.getDependsOn();
+        Map<String, componentAbstract> dependsOnMap = (Map<String, componentAbstract>) component.getDependsOn();
 
         if (dependsOnMap != null) {
-
-            Collection<componentAbstract> dependsOnCollection = dependsOnMap.values();
-
-            for (componentAbstract dependency : dependsOnCollection) {
+            for (componentAbstract dependency : dependsOnMap.values()) {
                 if (!dependency.getComplete()) {
                     recursiveRun(dependency);
                 }
             }
         }
-        component.run();
+        if (!component.getComplete()) {
+            component.run();
+            return;
+        }
     }
 
 }

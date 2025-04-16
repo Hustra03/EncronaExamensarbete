@@ -22,6 +22,10 @@ Domain classes represent the domain-specific data types, as in the specific thin
 
 These generally extend the abstract class objectAbstract, which provides some common values and methods. 
 
+## GUI
+
+This will store the classes related to the simulator GUI (Graphic User Interface), with this using the Swing library to implement a basic user interface to allow a user of the simulator to specify relevant parameters for the simulation, and to view the simulation results in a more user-friendly manner (when compared with the raw output generated for use by the real time estimation system).
+
 ## Modifiers
 
 Modifier classes represent the part of the system that impacts another part, specifically one or more components. 
