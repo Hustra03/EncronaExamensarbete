@@ -9,7 +9,14 @@ public class improvement extends objectAbstract {
     private Integer yearsOfService;
     private improvementImpactEnum impactType;
 
-
+    /**
+     * This is the constructor for the improvemnt class
+     * @param name The name of this improvement
+     * @param kwhPerM2 The effect this improvement has in energy consumption per m2
+     * @param costPerM2 The cost of this improvement per m2
+     * @param yearsOfService How long this improvement is effective
+     * @param impactType What this improvement effects
+     */
     public improvement(String name, Double kwhPerM2, Double costPerM2,Integer yearsOfService, improvementImpactEnum impactType)
     {
         this.setName(name);
@@ -19,6 +26,9 @@ public class improvement extends objectAbstract {
         this.impactType=impactType;
     }
 
+    /**
+     * Creates a string for this improvement
+     */
     public String toString()
     {
         return this.getName()+ " saves " + kwhPerM2 + "kwh per m2 for the cost "+ costPerM2 + " per m2 over the course of " + yearsOfService +" years for " + impactType.toString();

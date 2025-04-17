@@ -9,23 +9,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import encrona.domain.heatingEnergySource;
 import encrona.components.componentAbstract;
+import encrona.modifiers.modifierAbstract;
 import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
-import encrona.modifiers.modifierAbstract;
 
-public class finalYearlyElectricityConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>> {
 
+public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>>{
+    
     /**
-     * This is a constructor for finalElectricityConsumptionChange
+     * This is a constructor for fullOriginalElectricityConsumption
      * 
      * @param name      The name of this output
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      * @param modifiers the modifiers which should be applied to this component
      */
-    public finalYearlyElectricityConsumption(String name, String unit, Map<String, componentAbstract> dependsOn,
-            List<modifierAbstract<List<Entry<Integer, Double>>>> modifiers) {
+    public finalYearlyWaterConsumption(String name, String unit, Map<String, componentAbstract> dependsOn,
+            List<modifierAbstract<List<Map.Entry<Integer, Double>>>> modifiers) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -33,42 +35,35 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
     }
 
     @Override
-    /**
-     * This method implements the calculate functionality for
-     * finalElectricityConsumptionChange
-     * TODO confirm the calculation with Laszlo
-     */
     public void calculate() throws Exception {
-
         Map<String, componentAbstract> dependsOnMap = getDependsOn();
 
-        Double baseValue = (Double) dependsOnMap.get("originalElectricityConsumption").getValue();
+        Double baseValue = (Double) dependsOnMap.get("Water consumption").getValue();
 
-        List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
+        List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();
         // Here we create a shallow copy of improvementImpacts, so the list is cloned
         // but the objects are the same instances as in the origninal
-        improvementImpacts = (List<Entry<improvement, Double>>) ((ArrayList) improvementImpacts).clone();
+        improvements = (List<improvement>) ((ArrayList) improvements).clone();
         // https://www.w3schools.com/java/java_lambda.asp
-        // This removes all improvements which do not impact Electricity
-        // TODO update this if type structure is changed
-        improvementImpacts.removeIf((improvement) -> {
-            return !(improvement.getKey().getImpactType().equals(improvementImpactEnum.Electricity));
+        // This removes all improvements which do not impact Water
+        improvements.removeIf((improvement) -> {
+            return !(improvement.getImpactType().equals(improvementImpactEnum.Water));
         });
 
         // Note that we use Map.Entry<Double,Double> to represent a pair of doubles, in
         // this case years of service and yearly consumption
-        List<Map.Entry<Integer, Double>> electricityConsumptionList = new ArrayList<Map.Entry<Integer, Double>>();
+        List<Map.Entry<Integer, Double>> waterConsumptionList = new ArrayList<Map.Entry<Integer, Double>>();
 
         //We check if there are any improvements affecting electricity, if so we calculate the impact of improvements in ranges in the format <year this range ends,impact value>
         //Otherwise we re-use the original values with <0,original value>
-        if (improvementImpacts.size() > 0) {
+        if (improvements.size() > 0) {
 
             // This creates a set of the unique years of service, aka the unique values we
             // need to find electricity for
             Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
 
-            for (Entry<improvement, Double> entry : improvementImpacts) {
-                uniqueYearsOfService.add(entry.getKey().getYearsOfService());
+            for (improvement entry : improvements) {
+                uniqueYearsOfService.add(entry.getYearsOfService());
             }
 
             int yearsOfService[] = new int[uniqueYearsOfService.size()];
@@ -83,13 +78,12 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
                     min = yearsOfService[i - 1];
                 }
 
-                for (Entry<improvement, Double> entry : improvementImpacts) {
-                    if (entry.getKey().getYearsOfService() > min) {
-                        if (entry.getKey().getYearsOfService() < currentMin) {
-                            currentMin = entry.getKey().getYearsOfService();
+                for (improvement entry : improvements) {
+                    if (entry.getYearsOfService() > min) {
+                        if (entry.getYearsOfService() < currentMin) {
+                            currentMin = entry.getYearsOfService();
                         }
-                        improvementImpact += (entry.getValue());
-
+                        improvementImpact += (1); //TODO add improvement impact for water here, if that is implemented
                     }
                 }
                 yearsOfService[i] = currentMin;
@@ -101,17 +95,19 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
                 // https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html
                 Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(yearsOfService[i],
                         baseValue - impact);
-                electricityConsumptionList.add(entry);
+                        waterConsumptionList.add(entry);
                 i++;
             }
         }
         else
         {
             Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(0,baseValue);
-            electricityConsumptionList.add(entry);
-
+            waterConsumptionList.add(entry);
         }
-        this.setValue(electricityConsumptionList);
+        this.setValue(waterConsumptionList);
+
+
+
     }
 
 }

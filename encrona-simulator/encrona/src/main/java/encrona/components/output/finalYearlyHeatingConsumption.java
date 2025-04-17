@@ -3,6 +3,7 @@ package encrona.components.output;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -14,17 +15,16 @@ import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
 import encrona.modifiers.modifierAbstract;
 
-public class finalYearlyWaterHeatingConsumption
-        extends componentAbstract<List<Map.Entry<Integer, List<heatingEnergySource>>>> {
+public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.Entry<Integer, List<heatingEnergySource>>>> {
     /**
-     * This is a constructor for finalYearlyWaterHeatingConsumption
+     * This is a constructor for finalElectricityConsumptionChange
      * 
      * @param name      The name of this output
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      * @param modifiers the modifiers which should be applied to this component
      */
-    public finalYearlyWaterHeatingConsumption(String name, String unit, Map<String, componentAbstract> dependsOn,
+    public finalYearlyHeatingConsumption(String name, String unit, Map<String, componentAbstract> dependsOn,
             List<modifierAbstract<List<Entry<Integer, List<heatingEnergySource>>>>> modifiers) {
         this.setName(name);
         this.setUnit(unit);
@@ -42,15 +42,12 @@ public class finalYearlyWaterHeatingConsumption
 
         Map<String, componentAbstract> dependsOnMap = getDependsOn();
 
-        List<heatingEnergySource> baseValues = (List<heatingEnergySource>) dependsOnMap.get("heatingSources")
-                .getValue();
+        List<heatingEnergySource> baseValues = (List<heatingEnergySource>) dependsOnMap.get("heatingSources").getValue();
         // We sort heat sources based on their kwh price, since we want to minimize
         // costs
-        baseValues.sort(
-                (heatingEnergySource h1, heatingEnergySource h2) -> -h1.getCostPerKwh().compareTo(h2.getCostPerKwh()));
+        baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> -h1.getCostPerKwh().compareTo(h2.getCostPerKwh()));
 
-        List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap
-                .get("improvementImpact").getValue();
+        List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
         // Here we create a shallow copy of improvementImpacts, so the list is cloned
         // but the objects are the same instances as in the origninal
         improvementImpacts = (List<Entry<improvement, Double>>) ((ArrayList) improvementImpacts).clone();
@@ -59,11 +56,11 @@ public class finalYearlyWaterHeatingConsumption
         // This removes all improvements which do not impact Electricity
         // TODO update this if type structure is changed
         improvementImpacts.removeIf((improvement) -> {
-            return !(improvement.getKey().getImpactType().equals(improvementImpactEnum.Water));
+            return !(
+                improvement.getKey().getImpactType().equals(improvementImpactEnum.BuildingHeating) || improvement.getKey().getImpactType().equals(improvementImpactEnum.Water));
         });
 
-        // Note that we use Map.Entry<Integer,List<heatingEnergySource>> to represent a
-        // ranges and heat sources
+        // Note that we use Map.Entry<Integer,List<heatingEnergySource>> to represent a ranges and heat sources
         List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = new ArrayList<Map.Entry<Integer, List<heatingEnergySource>>>();
 
         // We check if there are any improvements affecting heating, if so we calculate
@@ -72,20 +69,19 @@ public class finalYearlyWaterHeatingConsumption
         // Otherwise we re-use the original values with <0,heat source list>
         if (improvementImpacts.size() > 0) {
 
-            // This creates a set of the unique years of service, aka the unique values we
-            // need to find electricity for
-            Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
+        // This creates a set of the unique years of service, aka the unique values we
+        // need to find electricity for
+        Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
 
-            for (Entry<improvement, Double> entry : improvementImpacts) {
-                uniqueYearsOfService.add(entry.getKey().getYearsOfService());
-            }
-            int yearsOfService[] = new int[uniqueYearsOfService.size()];
+        for (Entry<improvement, Double> entry : improvementImpacts) {
+            uniqueYearsOfService.add(entry.getKey().getYearsOfService());
+        }
+        int yearsOfService[] = new int[uniqueYearsOfService.size()];
 
             for (int i = 0; i < yearsOfService.length; i++) {
 
                 Integer min = 0;
                 Integer currentMin = Integer.MAX_VALUE;
-                Double improvementImpact = 0.0;
                 List<Entry<improvement, Double>> improvementsStillActive = new ArrayList<Entry<improvement, Double>>();
                 if (i > 0) {
                     min = yearsOfService[i - 1];
@@ -96,7 +92,6 @@ public class finalYearlyWaterHeatingConsumption
                         if (entry.getKey().getYearsOfService() < currentMin) {
                             currentMin = entry.getKey().getYearsOfService();
                         }
-                        improvementImpact += (entry.getValue());
                         improvementsStillActive.add(entry);
                     }
                 }
@@ -107,7 +102,8 @@ public class finalYearlyWaterHeatingConsumption
                 heatingConsumptionList.add(entry);
             }
         } else {
-            Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<Integer, List<heatingEnergySource>>(0, baseValues);
+            Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<Integer, List<heatingEnergySource>>(
+                    0, baseValues);
             heatingConsumptionList.add(entry);
         }
 
@@ -127,10 +123,20 @@ public class finalYearlyWaterHeatingConsumption
             List<Entry<improvement, Double>> improvementsStillActive) {
 
         // We first combine the impact of the relevant improvements, to get the total
-        // reduction
-        Double sumOfHeatingNeedReduction = 0.0;
+        // reduction for building and water heating
+        Double sumOfHeatingNeedReduction = 0.0;        
+        Double sumOfWaterHeatingNeedReduction = 0.0;
+
         for (Entry<improvement, Double> entry : improvementsStillActive) {
-            sumOfHeatingNeedReduction += entry.getValue();
+            if (entry.getKey().getImpactType().equals(improvementImpactEnum.BuildingHeating)) {
+                sumOfHeatingNeedReduction += entry.getValue();
+            }
+            else
+            {
+                if (entry.getKey().getImpactType().equals(improvementImpactEnum.Water)) {
+                    sumOfWaterHeatingNeedReduction += entry.getValue();
+                }
+            }
         }
 
         // We then create a copy of heatSources, which we can modify to represent this
@@ -147,13 +153,24 @@ public class finalYearlyWaterHeatingConsumption
 
             heatingEnergySource source = copyOfHeatSources.get(index);
 
-            Double reduceBy = Double.min(sumOfHeatingNeedReduction, source.getKwhPerYearHeatingWater());
-            source.setKwhPerYearHeatingWater(source.getKwhPerYearHeatingWater() - reduceBy);
+            Double reduceBy = Double.min(sumOfHeatingNeedReduction, source.getKwhPerYearHeating());
+            source.setKwhPerYearHeating(source.getKwhPerYearHeating() - reduceBy);
             sumOfHeatingNeedReduction -= reduceBy;
             index += 1;
         }
 
+        //We then do the same for sumOfWaterHeatingNeedReduction
+        index = 0;
+        while (sumOfWaterHeatingNeedReduction > 0.0) {
+            heatingEnergySource source = copyOfHeatSources.get(index);
+            Double reduceBy = Double.min(sumOfWaterHeatingNeedReduction, source.getKwhPerYearHeatingWater());
+            source.setKwhPerYearHeating(source.getKwhPerYearHeating() - reduceBy);
+            sumOfWaterHeatingNeedReduction -= reduceBy;
+            index += 1;
+        }       
+
         return copyOfHeatSources;
 
     }
+
 }
