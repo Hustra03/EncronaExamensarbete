@@ -53,14 +53,16 @@ public class dashboardFormattedString extends componentAbstract<String>{
         JSONArray electricityConsumptionArray = new JSONArray();
             for (Map.Entry<Integer, Double> position : electricityConsumptionAfterImprovements) {
                 JSONObject electricityConsumptionPosition = new JSONObject();
-                electricityConsumptionPosition.put(position.getKey().toString(), position.getValue());
+                electricityConsumptionPosition.put("year",position.getKey());
+                electricityConsumptionPosition.put("electricityValue", position.getValue());
                 electricityConsumptionArray.put(electricityConsumptionPosition);
             }
         object.put("electricityConsumption", electricityConsumptionArray);
         JSONArray electricitySavingsArray = new JSONArray();
         for (Map.Entry<Integer, Double> position : electricityConsumptionAfterImprovements) {
             JSONObject electricityConsumptionPosition = new JSONObject();
-            electricityConsumptionPosition.put(position.getKey().toString(), originalElectricityConsumption-position.getValue());
+            electricityConsumptionPosition.put("year",position.getKey());
+            electricityConsumptionPosition.put("electricityValue", originalElectricityConsumption-position.getValue());
             electricitySavingsArray.put(electricityConsumptionPosition);
         }
         object.put("electricitySavings", electricitySavingsArray);
@@ -68,7 +70,8 @@ public class dashboardFormattedString extends componentAbstract<String>{
         JSONArray waterConsumptionArray = new JSONArray();
         for (Map.Entry<Integer, Double> position : waterConsumptionAfterImprovements) {
             JSONObject waterConsumptionPosition = new JSONObject();
-            waterConsumptionPosition.put(position.getKey().toString(), position.getValue());
+            waterConsumptionPosition.put("year",position.getKey());
+            waterConsumptionPosition.put("waterValue", position.getValue());
             waterConsumptionArray.put(waterConsumptionPosition);
         }
         object.put("waterConsumption", waterConsumptionArray);
@@ -76,11 +79,44 @@ public class dashboardFormattedString extends componentAbstract<String>{
         JSONArray waterSavingsArray = new JSONArray();
         for (Map.Entry<Integer, Double> position : waterConsumptionAfterImprovements) {
             JSONObject waterSavingsPosition = new JSONObject();
-            waterSavingsPosition.put(position.getKey().toString(), waterConsumption-position.getValue());
+            waterSavingsPosition.put("year",position.getKey());
+            waterSavingsPosition.put("waterValue", waterConsumption-position.getValue());
             waterSavingsArray.put(waterSavingsPosition);
         }
         object.put("waterSavings", waterSavingsArray);
         
+        
+
+        JSONArray heatSourcesOverTimeArray=new JSONArray();
+
+        for (Map.Entry<Integer, List<heatingEnergySource>> sourceEntriesAtPointInTime : heatSourcesAfterConsumption) {
+            
+            JSONObject heatSourceAtPointInTime=new JSONObject();
+
+            JSONArray heatSourceInfoAtPointInTimeArray = new JSONArray();
+            for (heatingEnergySource source : sourceEntriesAtPointInTime.getValue()) {
+
+                heatingEnergySource originalSource=null;
+                for (heatingEnergySource source2 : originalHeatingEnergySources) {
+                    if (source2.getName().equals(source.getName())) {
+                        originalSource=source2;
+                    }
+                }
+
+                JSONObject heatSource=new JSONObject();
+                heatSource.put("name", source.getName());
+                heatSource.put("buildingHeatingConsumption", source.getKwhPerYearHeating());
+                heatSource.put("buildingHeatingSavings", originalSource.getKwhPerYearHeating()-source.getKwhPerYearHeating());
+                heatSource.put("waterHeatingConsumption", source.getKwhPerYearHeatingWater());
+                heatSource.put("waterHeatingSavings", originalSource.getKwhPerYearHeatingWater()-source.getKwhPerYearHeatingWater());
+                heatSourceInfoAtPointInTimeArray.put(heatSource);
+            }
+            heatSourceAtPointInTime.put("year",sourceEntriesAtPointInTime.getKey());
+            heatSourceAtPointInTime.put("heatSource", heatSourceInfoAtPointInTimeArray);
+            heatSourcesOverTimeArray.put(heatSourceAtPointInTime);
+        }
+        object.put("heatSources", heatSourcesOverTimeArray);
+
         setValue(object.toString());
         System.out.println(object.toString());
     }

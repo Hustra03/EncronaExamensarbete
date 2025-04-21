@@ -9,6 +9,7 @@ import {
   HousePlus,
   Building,
   Eye,
+  ComputerIcon,
 } from 'lucide-react';
 
 import {
@@ -59,6 +60,11 @@ const sidebar = {
       title: 'Fastigheter',
       url: 'buildings',
       icon: HousePlus,
+    },
+    {
+      title: 'Simulation',
+      url: 'simulationInput',
+      icon: ComputerIcon,
     },
   ],
   navSecondary: [

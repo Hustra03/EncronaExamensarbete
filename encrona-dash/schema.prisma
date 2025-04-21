@@ -24,10 +24,55 @@ model User {
 }
 
 model Building {
-  id             Int      @id @default(autoincrement())
+  building_id    Int      @id @default(autoincrement())
+  simulation     BuildingSimulation? @relation("building")
   name           String
   owner          String 
   installedAt    DateTime 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+model Curve{
+  id Int @id @default(autoincrement())
+  curve Int[]
+  simulationCurveIsUsedInAsHeatCurve BuildingSimulation[] @relation("HeatCurve")
+  simulationCurveIsUsedInAsWaterCurve BuildingSimulation[] @relation("WaterCurve")
+  simulationCurveIsUsedInAsElectricityCurve BuildingSimulation[] @relation("ElectricityCurve")
+}
+
+model ConsumptionEstimation{
+  id Int @id @default(autoincrement())
+  year Int
+  consumption Decimal
+  savings Decimal
+  simulationThisIsUsedInForElectricity BuildingSimulation[] @relation("electricityEstimation")
+  simulationThisIsUsedInForWater BuildingSimulation[] @relation("waterEstimation")
+}
+
+model HeatSourceEstimation{
+  id Int @id @default(autoincrement())
+  simulationId Int
+  simulationThisIsUsedIn BuildingSimulation? @relation("HeatSourceEstimation", fields: [simulationId], references: [id])
+  year Int
+  name String
+  buildingHeatingConsumption Decimal
+  buildingHeatingSavings Decimal
+  waterHeatingConsumption Decimal
+  waterHeatingSavings Decimal
+}
+
+model BuildingSimulation{
+  id Int @id @default(autoincrement())
+  buildingId Int @unique
+  building Building @relation("building", fields: [buildingId], references: [building_id])
+  heatCurveId Int
+  heatCurve Curve @relation("HeatCurve", fields: [heatCurveId], references: [id])
+  waterCurveId Int
+  waterCurve Curve @relation("WaterCurve", fields: [waterCurveId], references: [id])
+  electricityId Int
+  electricityCurve Curve @relation("ElectricityCurve", fields: [electricityId], references: [id])
+  electricityEstimation ConsumptionEstimation[] @relation("electricityEstimation")
+  waterEstimation ConsumptionEstimation[] @relation("waterEstimation")
+  HeatSourceEstimation HeatSourceEstimation[] @relation("HeatSourceEstimation")
 }

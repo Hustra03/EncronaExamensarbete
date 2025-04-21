@@ -196,12 +196,14 @@ public class DataLoader {
                 (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0) };
         input<Double[]> electricityCurveInput = new input<Double[]>("electricityCurve", "%", electricityCurve);
         components.put(electricityCurveInput.getName(), electricityCurveInput);
-        Double[] heatingCurve = { (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0),
-                (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0) };
+
+        Double[] heatingCurve = { 0.14, 0.14, 0.14, (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0),
+                (3.0 / 70.0), (3.0 / 70.0), 0.14, 0.14 };
         input<Double[]> heatingCurveInput = new input<Double[]>("heatingCurve", "%", heatingCurve);
         components.put(heatingCurveInput.getName(), heatingCurveInput);
-        Double[] waterCurve = { 0.14, 0.14, 0.14, (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0),
-                (3.0 / 70.0), (3.0 / 70.0), 0.14, 0.14 };
+
+        Double[] waterCurve = { (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0),
+                (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0) };
         input<Double[]> waterCurveInput = new input<Double[]>("waterCurve", "%", waterCurve);
         components.put(waterCurveInput.getName(), waterCurveInput);
 
