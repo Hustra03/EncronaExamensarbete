@@ -3,6 +3,12 @@ import { auth, isAdmin } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
+interface Estimation {
+  year: number;
+  consumption: number;
+  savings: number;
+}
+
 export async function POST(request: Request) {
   const session = await auth();
 
@@ -36,13 +42,13 @@ export async function POST(request: Request) {
     );
   }
 
-  //Here we could add some additional parsing of the json, to ensure the formatting is correct (This could be skipped, since it is also done by prisma, but it is good to confirm this manually so that correct error messages can be given)
+  //Here we could add some additional parsing of the json, to ensure the formatting is correct (This could be skipped, but would require changes to the later component creation)
 
   //We first test the 3 curves, that they exist and that they are the correct length (12)
-  let heatingCurve;
+  let heatCurve;
   try {
-    heatingCurve = parsedSimulationResults.heatingCurve;
-    if (heatingCurve.length != 12) {
+    heatCurve = parsedSimulationResults.heatingCurve;
+    if (heatCurve.length != 12) {
       return new Response(
         JSON.stringify({ message: 'heatingCurve does not have 12 elements' }),
         { status: 400 }
@@ -390,45 +396,64 @@ export async function POST(request: Request) {
     );
   }
 
+  let electricityEstimation: Estimation[] = [];
+
+  parsedElectricityConsumption.forEach(
+    (consumption: { year: number; electricityValue: number }) => {
+      parsedElectricitySavings.forEach(
+        (saving: { year: number; electricityValue: number }) => {
+          if ((saving.year = consumption.year)) {
+            var Estimation = {
+              year: consumption.year,
+              consumption: consumption.electricityValue,
+              savings: saving.electricityValue,
+            };
+            electricityEstimation.push(Estimation);
+          }
+        }
+      );
+    }
+  );
+
+
+  let waterEstimation: Estimation[] = [];
+
+  parsedWaterConsumption.forEach(
+    (consumption: { year: number; waterValue: number }) => {
+      parsedWaterSavings.forEach(
+        (saving: { year: number; waterValue: number }) => {
+          if ((saving.year = consumption.year)) {
+            var Estimation = {
+              year: consumption.year,
+              consumption: consumption.waterValue,
+              savings: saving.waterValue,
+            };
+            electricityEstimation.push(Estimation);
+          }
+        }
+      );
+    }
+  );
+
   //Here we then store the newly created building simulation
   try {
+    //We then create the simulation object
 
-    //We first create the electricityEstimation, waterEstimation, HeatSourceEstimation 
-
-    const electricityEstimation = await prisma.ConsumptionEstimation.createManyAndReturn({
-      data: [
-        { name: 'Alice', email: 'alice@prisma.io' },
-        { name: 'Bob', email: 'bob@prisma.io' },
-      ],
-    })
-
-    const waterEstimation = await prisma.ConsumptionEstimation.createManyAndReturn({
-      data: [
-        { name: 'Alice', email: 'alice@prisma.io' },
-        { name: 'Bob', email: 'bob@prisma.io' },
-      ],
-    })
-
-    const HeatSourceEstimation = await prisma.HeatSourceEstimation.createManyAndReturn({
-      data: [
-        { name: 'Alice', email: 'alice@prisma.io' },
-        { name: 'Bob', email: 'bob@prisma.io' },
-      ],
-    })
+    console.log(id)
 
     await prisma.buildingSimulation.create({
       data: {
-        building:{
+        building: {
           connect: {
-            id: parsedSimulationResults.id,
+            id: id,
           },
         },
-        heatingCurve,
-        waterCurve,
-        electricityCurve,
-        electricityEstimation,
-        waterEstimation,
-        HeatSourceEstimation,
+        heatCurve: { create: {curve:heatCurve} },
+        waterCurve: { create: {curve:waterCurve} },
+        electricityCurve: { create: {curve:electricityCurve} },
+        electricityEstimation: { create: electricityEstimation },
+        waterEstimation: { create: waterEstimation },
+        HeatSourceEstimation: { create: parsedHeatSources },
       },
     });
 

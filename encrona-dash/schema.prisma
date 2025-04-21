@@ -29,7 +29,7 @@ model User {
 }
 
 model Building {
-  building_id    Int      @id @default(autoincrement())
+  id    Int      @id @default(autoincrement())
   simulation     BuildingSimulation? @relation("building")
   name           String
   owner          String 
@@ -45,7 +45,7 @@ model Building {
 
 model BuildingData {
   id          Int        @id @default(autoincrement())
-  building    Building   @relation(fields: [buildingId], references: [building_id], onDelete: Cascade)
+  building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
   buildingId  Int
   type        BuildingDataType
   date        DateTime      
@@ -99,7 +99,7 @@ model HeatSourceEstimation{
 model BuildingSimulation{
   id Int @id @default(autoincrement())
   buildingId Int @unique
-  building Building @relation("building", fields: [buildingId], references: [building_id])
+  building Building @relation("building", fields: [buildingId], references: [id])
   heatCurveId Int
   heatCurve Curve @relation("HeatCurve", fields: [heatCurveId], references: [id])
   waterCurveId Int
