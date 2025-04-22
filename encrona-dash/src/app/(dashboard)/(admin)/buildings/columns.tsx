@@ -3,6 +3,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -62,6 +63,7 @@ export const columns: ColumnDef<Building>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const building = row.original;
+      const router = useRouter();
       return (
         <AlertDialog>
           <DropdownMenu>
@@ -71,6 +73,13 @@ export const columns: ColumnDef<Building>[] = [
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
+              <DropdownMenuItem
+                onClick={() => {
+                  router.push(`/building/${building.id}`);
+                }}
+              >
+                Visa
+              </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
                   window.dispatchEvent(
