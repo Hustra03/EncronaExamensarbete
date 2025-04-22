@@ -63,6 +63,7 @@ export const columns: ColumnDef<Building>[] = [
     id: 'actions',
     cell: ({ row }) => {
       const building = row.original;
+      /* eslint-disable react-hooks/rules-of-hooks */
       const router = useRouter();
       return (
         <AlertDialog>

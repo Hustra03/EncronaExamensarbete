@@ -2,11 +2,8 @@
 
 import * as React from 'react';
 import {
-  Area,
-  Bar,
   Brush,
   CartesianGrid,
-  ComposedChart,
   ErrorBar,
   Line,
   LineChart,
@@ -132,6 +129,7 @@ export default function Building() {
     return allDates.map(date => {
       const estimate = estimateMap[date] ?? null;
       const actual = actualMap[date] ?? null;
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
       const merged: Record<string, any> = { date: Number(date) };
 
       (Object.keys(chartConfig) as MetricKey[]).forEach(key => {

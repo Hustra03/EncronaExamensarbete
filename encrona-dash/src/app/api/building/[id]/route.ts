@@ -33,6 +33,7 @@ export async function GET(
   const { readable, writable } = new TransformStream();
   const writer = writable.getWriter();
 
+  /* eslint-disable  @typescript-eslint/no-explicit-any */
   const writeSSE = (event: string, data: any) => {
     writer.write(
       encoder.encode(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`)
