@@ -9,6 +9,11 @@ interface Estimation {
   savings: number;
 }
 
+/**
+ * This function is used to submit the simulation results
+ * @param request The API request, which is inspected to confirm that the user has access (using auth()) and to retrive the provided data
+ * @returns A response, with status code 204 if the request was accepted, or 40* if something went wrong (if so a short error message is included)
+ */
 export async function POST(request: Request) {
   const session = await auth();
 
@@ -193,7 +198,6 @@ export async function POST(request: Request) {
   }
 
   //We then parse electricity and water consumption + savings
-
   let parsedElectricitySavings;
   try {
     parsedElectricitySavings = parsedSimulationResults.electricitySavings;

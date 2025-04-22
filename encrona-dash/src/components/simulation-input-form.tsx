@@ -14,9 +14,7 @@ import {
 import { useActionState, useEffect, useState } from 'react';
 
 export function SimulationInputForm({}: React.ComponentProps<'form'>) {
-  const [buildings, setBuildings] = useState<{ id: number; name: string }[]>(
-    []
-  );
+  const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
   const [functionReturnValue, formAction] = useActionState(handleSubmit, null);
 
@@ -38,7 +36,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   }
 
   const selectOptions = buildings.map(building => (
-    <SelectItem key={building['id']} value={building['id'].toString()}>
+    <SelectItem key={building['id']} value={Number.parseInt(building['id']).toString()}>
       {building['name']}
     </SelectItem>
   ));
