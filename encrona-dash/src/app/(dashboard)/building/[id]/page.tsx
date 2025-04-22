@@ -143,10 +143,6 @@ export default function Building() {
 
         if (estimateValue != null) {
           merged[`${key}EstimateError`] = estimateValue * 0.1;
-          merged[`${key}EstimateMinMax`] = [
-            estimateValue - estimateValue * 0.1,
-            estimateValue + estimateValue * 0.1,
-          ];
         }
       });
 
