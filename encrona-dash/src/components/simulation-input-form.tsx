@@ -18,6 +18,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
     []
   );
   const [loading, setLoading] = useState(true);
+  const [functionReturnValue, formAction] = useActionState(handleSubmit, null);
 
   async function fetchBuildings() {
     const res = await fetch('/api/buildings');
@@ -28,8 +29,6 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
     setLoading(false);
   }
 
-  const [submitFunction, formAction] = useActionState(handleSubmit, null);
-
   useEffect(() => {
     fetchBuildings();
   }, []);
@@ -38,13 +37,12 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
     return <div>Laddar byggnader</div>;
   }
 
-  const selectOptions = buildings.map((building, index) => (
+  const selectOptions = buildings.map(building => (
     <SelectItem key={building['id']} value={building['id'].toString()}>
       {building['name']}
     </SelectItem>
   ));
 
-  
   return (
     <form method="post" action={formAction}>
       <div className="grid gap-3">
@@ -68,6 +66,11 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
         />
       </div>
       <hr />
+      {functionReturnValue && functionReturnValue !== 'ok' && (
+        <p className="text-center text-sm text-red-500">
+          {functionReturnValue}
+        </p>
+      )}
       <button type="submit">Submit</button>
     </form>
   );

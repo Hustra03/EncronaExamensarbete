@@ -401,12 +401,12 @@ export async function POST(request: Request) {
     (consumption: { year: number; electricityValue: number }) => {
       parsedElectricitySavings.forEach(
         (saving: { year: number; electricityValue: number }) => {
-          if ((saving.year == consumption.year)) {
-            let Estimation = {
+          if (saving.year == consumption.year) {
+            const Estimation = {
               year: consumption.year,
               consumption: consumption.electricityValue,
               savings: saving.electricityValue,
-            }; 
+            };
             electricityEstimation.push(Estimation);
           }
         }
@@ -414,14 +414,13 @@ export async function POST(request: Request) {
     }
   );
 
-
   const waterEstimation: Estimation[] = [];
 
   parsedWaterConsumption.forEach(
     (consumption: { year: number; waterValue: number }) => {
       parsedWaterSavings.forEach(
         (saving: { year: number; waterValue: number }) => {
-          if ((saving.year == consumption.year)) {
+          if (saving.year == consumption.year) {
             waterEstimation.push({
               year: consumption.year,
               consumption: consumption.waterValue,
@@ -435,30 +434,26 @@ export async function POST(request: Request) {
 
   //Here we then store the newly created building simulation
   try {
-
     //We first create the estimations, since these consist of many different records, which should be created individually
 
-   const electricityEstimationItem=await prisma.consumptionEstimation.createManyAndReturn(
-    {
-      data:electricityEstimation
-    }
-   )
+    const electricityEstimationItem =
+      await prisma.consumptionEstimation.createManyAndReturn({
+        data: electricityEstimation,
+      });
 
-   const waterEstimationItem= await prisma.consumptionEstimation.createManyAndReturn(
-    {
-      data:waterEstimation
-    }
-   )
+    const waterEstimationItem =
+      await prisma.consumptionEstimation.createManyAndReturn({
+        data: waterEstimation,
+      });
 
-   console.log(parsedHeatSources)
+    console.log(parsedHeatSources);
 
-   const heatSourceEstimationItem= await prisma.heatSourceEstimation.createManyAndReturn(
-    {
-      data:parsedHeatSources
-    }
-   )
+    const heatSourceEstimationItem =
+      await prisma.heatSourceEstimation.createManyAndReturn({
+        data: parsedHeatSources,
+      });
 
-   /** 
+    /** 
    await prisma.heatSourceEstimation.create({
     data:{
       year: parsedHeatSources[0].heatSource[0].year,
@@ -481,26 +476,32 @@ export async function POST(request: Request) {
         heatCurve: {
           create: {
             curve: heatCurve,
-           }
           },
+        },
         waterCurve: {
           create: {
             curve: waterCurve,
-           }
           },
+        },
         electricityCurve: {
           create: {
             curve: electricityCurve,
-           }
           },
+        },
         electricityEstimation: {
-          connect:electricityEstimationItem.map(estimation => ({ id: estimation.id })), // https://github.com/prisma/prisma/discussions/4709
+          connect: electricityEstimationItem.map(estimation => ({
+            id: estimation.id,
+          })), // https://github.com/prisma/prisma/discussions/4709
         },
         waterEstimation: {
-          connect: waterEstimationItem.map(estimation => ({ id: estimation.id })),
+          connect: waterEstimationItem.map(estimation => ({
+            id: estimation.id,
+          })),
         },
         HeatSourceEstimation: {
-          connect: heatSourceEstimationItem.map(estimation => ({ id: estimation.id })),
+          connect: heatSourceEstimationItem.map(estimation => ({
+            id: estimation.id,
+          })),
         },
       },
     });

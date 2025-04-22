@@ -69,7 +69,7 @@ model BuildingData {
 
 model Curve{
   id Int @id @default(autoincrement())
-  curve Decimal[]
+  curve Int[]
   simulationCurveIsUsedInAsHeatCurve BuildingSimulation[] @relation("HeatCurve")
   simulationCurveIsUsedInAsWaterCurve BuildingSimulation[] @relation("WaterCurve")
   simulationCurveIsUsedInAsElectricityCurve BuildingSimulation[] @relation("ElectricityCurve")
@@ -86,8 +86,7 @@ model ConsumptionEstimation{
 
 model HeatSourceEstimation{
   id Int @id @default(autoincrement())
-  simulationId Int?
-  simulationThisIsUsedIn BuildingSimulation? @relation("HeatSourceEstimation", fields: [simulationId], references: [id])
+  simulationThisIsUsedIn BuildingSimulation[] @relation("HeatSourceEstimation")
   year Int
   name String
   buildingHeatingConsumption Decimal
