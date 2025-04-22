@@ -1,5 +1,6 @@
 'use client';
 
+import { handleSubmit } from '@/app/(dashboard)/(admin)/simulationInput/actions';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -27,20 +28,6 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
     setLoading(false);
   }
 
-  function handleSubmit(_: unknown, formData: FormData) {
-    const index = formData.get('selectBuildings') as string;
-    const building = buildings[Number.parseInt(index)];
-    const id = building.id;
-    const simulationResults = formData.get('simulationResults') as string;
-    console.log(id);
-    console.log(simulationResults);
-
-    fetch('/api/simulationResults', {
-      method: 'Post',
-      body: JSON.stringify({ id, simulationResults }),
-    });
-  }
-
   const [submitFunction, formAction] = useActionState(handleSubmit, null);
 
   useEffect(() => {
@@ -52,11 +39,12 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   }
 
   const selectOptions = buildings.map((building, index) => (
-    <SelectItem key={building['id']} value={index.toString()}>
+    <SelectItem key={building['id']} value={building['id'].toString()}>
       {building['name']}
     </SelectItem>
   ));
 
+  
   return (
     <form method="post" action={formAction}>
       <div className="grid gap-3">

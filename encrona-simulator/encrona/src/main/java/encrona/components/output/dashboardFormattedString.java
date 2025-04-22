@@ -104,16 +104,14 @@ public class dashboardFormattedString extends componentAbstract<String>{
                 }
 
                 JSONObject heatSource=new JSONObject();
+                heatSource.put("year",sourceEntriesAtPointInTime.getKey());
                 heatSource.put("name", source.getName());
                 heatSource.put("buildingHeatingConsumption", source.getKwhPerYearHeating());
                 heatSource.put("buildingHeatingSavings", originalSource.getKwhPerYearHeating()-source.getKwhPerYearHeating());
                 heatSource.put("waterHeatingConsumption", source.getKwhPerYearHeatingWater());
                 heatSource.put("waterHeatingSavings", originalSource.getKwhPerYearHeatingWater()-source.getKwhPerYearHeatingWater());
-                heatSourceInfoAtPointInTimeArray.put(heatSource);
+                heatSourcesOverTimeArray.put(heatSource);
             }
-            heatSourceAtPointInTime.put("year",sourceEntriesAtPointInTime.getKey());
-            heatSourceAtPointInTime.put("heatSource", heatSourceInfoAtPointInTimeArray);
-            heatSourcesOverTimeArray.put(heatSourceAtPointInTime);
         }
         object.put("heatSources", heatSourcesOverTimeArray);
 
