@@ -66,7 +66,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         // We check if there are any improvements affecting heating, if so we calculate
         // the impact of improvements in ranges in the format <year this range ends,heat
         // source list after impact is distributed>
-        // Otherwise we re-use the original values with <0,heat source list>
+        // We also re-use the original values with <-1,heat source list>, for the dashboard
         if (improvementImpacts.size() > 0) {
 
         // This creates a set of the unique years of service, aka the unique values we
@@ -101,12 +101,10 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
                         yearsOfService[i], updatedHeatingSources);
                 heatingConsumptionList.add(entry);
             }
-        } else {
-            Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<Integer, List<heatingEnergySource>>(
-                    0, baseValues);
-            heatingConsumptionList.add(entry);
         }
-
+        Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<Integer, List<heatingEnergySource>>(
+            -1, baseValues);
+    heatingConsumptionList.add(entry);
         this.setValue(heatingConsumptionList);
     }
 

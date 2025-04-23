@@ -36,7 +36,10 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   }
 
   const selectOptions = buildings.map(building => (
-    <SelectItem key={building['id']} value={Number.parseInt(building['id']).toString()}>
+    <SelectItem
+      key={building['id']}
+      value={Number.parseInt(building['id']).toString()}
+    >
       {building['name']}
     </SelectItem>
   ));

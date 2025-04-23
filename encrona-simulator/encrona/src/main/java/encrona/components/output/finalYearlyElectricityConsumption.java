@@ -60,7 +60,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
         List<Map.Entry<Integer, Double>> electricityConsumptionList = new ArrayList<Map.Entry<Integer, Double>>();
 
         //We check if there are any improvements affecting electricity, if so we calculate the impact of improvements in ranges in the format <year this range ends,impact value>
-        //Otherwise we re-use the original values with <0,original value>
+        //We always re-use the original values with <-1,original value> (So that we store the orignal values for transfer to the simulator)
         if (improvementImpacts.size() > 0) {
 
             // This creates a set of the unique years of service, aka the unique values we
@@ -105,12 +105,9 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
                 i++;
             }
         }
-        else
-        {
-            Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(0,baseValue);
-            electricityConsumptionList.add(entry);
+        Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(-1,baseValue);
+        electricityConsumptionList.add(entry);
 
-        }
         this.setValue(electricityConsumptionList);
     }
 

@@ -15,9 +15,8 @@ import encrona.modifiers.modifierAbstract;
 import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
 
+public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>> {
 
-public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>>{
-    
     /**
      * This is a constructor for fullOriginalElectricityConsumption
      * 
@@ -40,7 +39,7 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
 
         Double baseValue = (Double) dependsOnMap.get("Water consumption").getValue();
 
-        List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();
+        List<improvement> improvements = (List<improvement>) dependsOnMap.get("improvements").getValue();
         // Here we create a shallow copy of improvementImpacts, so the list is cloned
         // but the objects are the same instances as in the origninal
         improvements = (List<improvement>) ((ArrayList) improvements).clone();
@@ -54,8 +53,12 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
         // this case years of service and yearly consumption
         List<Map.Entry<Integer, Double>> waterConsumptionList = new ArrayList<Map.Entry<Integer, Double>>();
 
-        //We check if there are any improvements affecting electricity, if so we calculate the impact of improvements in ranges in the format <year this range ends,impact value>
-        //Otherwise we re-use the original values with <0,original value>
+        // We check if there are any improvements affecting electricity, if so we
+        // calculate the impact of improvements in ranges in the format <year this range
+        // ends,impact value>
+        // We re-use the original values with <-1,original value>
+        Entry<Integer, Double> alwaysIncludedEntry = new AbstractMap.SimpleEntry<Integer, Double>(-1, baseValue);
+        waterConsumptionList.add(alwaysIncludedEntry);
         if (improvements.size() > 0) {
 
             // This creates a set of the unique years of service, aka the unique values we
@@ -83,7 +86,7 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
                         if (entry.getYearsOfService() < currentMin) {
                             currentMin = entry.getYearsOfService();
                         }
-                        improvementImpact += (1); //TODO add improvement impact for water here, if that is implemented
+                        improvementImpact += (1); // TODO add improvement impact for water here, if that is implemented
                     }
                 }
                 yearsOfService[i] = currentMin;
@@ -95,18 +98,11 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
                 // https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html
                 Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(yearsOfService[i],
                         baseValue - impact);
-                        waterConsumptionList.add(entry);
+                waterConsumptionList.add(entry);
                 i++;
             }
         }
-        else
-        {
-            Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(0,baseValue);
-            waterConsumptionList.add(entry);
-        }
         this.setValue(waterConsumptionList);
-
-
 
     }
 

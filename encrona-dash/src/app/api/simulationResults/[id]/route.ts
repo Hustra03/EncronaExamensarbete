@@ -6,35 +6,31 @@ const prisma = new PrismaClient();
 
 /**
  * This GET endpoint is used to request the generation of new estimations for a specific building
- * @param id is the request param, and is the building id for which  
- * @returns 
+ * @param id is the request param, and is the building id for which
+ * @returns
  */
 
 interface EstimateInterface {
-    building:{
-        connect: {
-          id: number,
-        },
-      },
-    type:BuildingDataType,
-    date:Date,      
-  
-    totalEnergykWh:Decimal, 
-    spaceHeatingkWh:Decimal,
-    waterHeatingkWh:Decimal,
-    electricitykWh:Decimal,
-    totalWaterM3:Decimal,
+  buildingId:number,
+  type: BuildingDataType;
+  date: Date;
 
-    totalEnergyCost:Decimal,
-    spaceHeatingCost:Decimal,
-    waterHeatingCost:Decimal,
-    electricityCost:Decimal
-  }
+  totalEnergykWh: number;
+  spaceHeatingkWh: number;
+  waterHeatingkWh: number;
+  electricitykWh: number;
+  totalWaterM3: number;
+
+  totalEnergyCost: number;
+  spaceHeatingCost: number;
+  waterHeatingCost: number;
+  electricityCost: number;
+}
 
 export async function GET(
-    request: Request,
-    { params }: { params: { id: string } }
-  ) {
+  request: Request,
+  { params }: { params: { id: string } }
+) {
   const session = await auth();
 
   if (!isAdmin(session)) {
@@ -61,20 +57,18 @@ export async function GET(
 
   //We retrive the simulation information for this building
   const simulationResults = await prisma.buildingSimulation.findFirst({
-    where:{
-        buildingId:buildingId
+    where: {
+      buildingId: buildingId,
     },
     include: {
-        heatCurve: true,
-        electricityCurve: true,
-        waterCurve: true,
-        HeatSourceEstimation: true,
-        electricityEstimation: true,
-        waterEstimation: true,
-      },
-  })
-
-  console.log(simulationResults);
+      heatCurve: true,
+      electricityCurve: true,
+      waterCurve: true,
+      HeatSourceEstimation: true,
+      electricityEstimation: true,
+      waterEstimation: true,
+    },
+  });
 
   if (!simulationResults) {
     return new Response('Building has no simulation results', { status: 404 });
@@ -85,90 +79,169 @@ export async function GET(
     where: {
       buildingId,
       type: 'ESTIMATE',
-      date: {gt:new Date()}, //This retrives entries with date some time in the future
-      updatedAt: {lt:new Date()} //This retrives entries with updatedAt some time in the past
+      date: { gt: new Date() }, //This retrives entries with date some time in the future
+      updatedAt: { lt: new Date() }, //This retrives entries with updatedAt some time in the past
     },
     orderBy: { date: 'desc' },
   });
 
-  if (estimate.length>6) {
-    return new Response('There are already more than 6 future estimates for this building', { status: 404 });
+  if (estimate.length > 6) {
+    return new Response(
+      'There are already more than 6 future estimates for this building',
+      { status: 404 }
+    );
   }
 
   //TODO add checks for if the dates are continous?
 
   //This is the latest date for which there exists an estimate
-  const latestDate  = estimate[0].date;
-  
+  const latestDate = estimate[0].date;
+
   const buildingEstimation: EstimateInterface[] = [];
 
-  let yearsSinceInstallation=latestDate.getFullYear()-building.installedAt.getFullYear();
+  let yearsSinceInstallation =
+    latestDate.getFullYear() - building.installedAt.getFullYear();
+  let electricityIndex = 0; //This is used to ensure we are using the correct value
+  let waterIndex = 0; // -||-
+
+  //Since there are multiple heat sources, we construct an array of unique names,
+  //then use this to construct an array of arrays,
+  // with each one being for each of the heat sources in the same way as electricity and water (with an accompanying array of indexes)
+
+  const uniqueHeatSourceNames: string[] = [];
+  simulationResults.HeatSourceEstimation.forEach(heatSource => {
+    if (!uniqueHeatSourceNames.includes(heatSource.name)) {
+      uniqueHeatSourceNames.push(heatSource.name);
+    }
+  });
+
+  const heatSourceIndexes: number[] = [];
+  const heatSourceArrayOfArrays = [];
+  for (let index = 0; index < uniqueHeatSourceNames.length; index++) {
+    heatSourceIndexes.push(0);
+    heatSourceArrayOfArrays.push(
+      simulationResults.HeatSourceEstimation.filter(
+        heatSource => heatSource.name == uniqueHeatSourceNames[index]
+      )
+    );
+  }
 
   //We then create estimates until there are 6 futures ones (this can be modified)
-  for (let index = 0; index < 6-estimate.length; index++) {
+  for (let index = 0; index < 6 - estimate.length; index++) {
+    //This increments the month, but if it is December it wraps around
+    if (latestDate.getMonth() != 11) {
+      latestDate.setMonth(latestDate.getMonth() + 1);
+    } else {
+      latestDate.setFullYear(latestDate.getFullYear() + 1);
+      yearsSinceInstallation += 1;
 
-      //This increments the month, but if it is December it wraps around 
-  if(latestDate.getMonth()!=11)
-    {  latestDate.setMonth(latestDate.getMonth()+1);}
-  else
-  {
-    latestDate.setMonth(0);
-    latestDate.setFullYear(latestDate.getFullYear()+1);
-    yearsSinceInstallation+=1;
-  }
+      //We confirm that the year ranges for electricity, heat and water are still correct, if not we handle them
 
-  //We then calculate the current consumption values
-  
-  const currentElectricityCurveValue=simulationResults.electricityCurve.curve[latestDate.getMonth()];
-  const electricitykWh=(Decimal.mul(simulationResults.electricityEstimation[0].consumption,currentElectricityCurveValue));
+      //We first test that there are more electricity entries
 
-  let waterHeatingkWh=simulationResults.HeatSourceEstimation[0].waterHeatingConsumption;
-  let spaceHeatingkWh=simulationResults.HeatSourceEstimation[0].buildingHeatingConsumption;
-  for (let index = 1; index < simulationResults.HeatSourceEstimation.length; index++) {
-    const HeatSourceEstimate = simulationResults.HeatSourceEstimation[index];
-    waterHeatingkWh=Decimal.add(waterHeatingkWh,HeatSourceEstimate.waterHeatingConsumption);
-    spaceHeatingkWh=Decimal.add(spaceHeatingkWh,HeatSourceEstimate.buildingHeatingConsumption);
-  }
+      if (
+        electricityIndex + 1 <
+        simulationResults.electricityEstimation.length
+      ) {
+        //And then that the current entry is out of date (the last entry should have year : -1, and is for after the improvements stop having a noticable effect)
+        if (
+          simulationResults.electricityEstimation[electricityIndex].year <
+            yearsSinceInstallation ||
+          electricityIndex < simulationResults.electricityEstimation.length
+        ) {
+          electricityIndex += 1;
+        }
+      }
+      //We first test that there are more water entries
 
-  const currentHeatingCurveValue=simulationResults.heatCurve.curve[latestDate.getMonth()];
+      if (waterIndex + 1 < simulationResults.waterEstimation.length) {
+        //And then that the current entry is out of date (the last entry should have year : -1, and is for after the improvements stop having a noticable effect)
+        if (
+          simulationResults.waterEstimation[waterIndex].year <
+            yearsSinceInstallation ||
+          waterIndex < simulationResults.waterEstimation.length
+        ) {
+          waterIndex += 1;
+        }
+      }
 
-  waterHeatingkWh=Decimal.mul(waterHeatingkWh,currentHeatingCurveValue);
-  spaceHeatingkWh=Decimal.mul(waterHeatingkWh,currentHeatingCurveValue);
+      //We then do something similar for the heat sources, but with the uniqueHeatingSourcesYears array instead and for each heat source
+      heatSourceArrayOfArrays.forEach((element, localIndexHere) => {
+        if (heatSourceIndexes[localIndexHere] + 1 < element.length) {
+          //And then that the current entry is out of date (the last entry should have year : -1, and is for after the improvements stop having a noticable effect)
+          if (
+            element[localIndexHere].year < yearsSinceInstallation ||
+            waterIndex < element.length
+          ) {
+            heatSourceIndexes[localIndexHere] += 1;
+          }
+        }
+      });
+    }
 
-  const totalEnergykWh=Decimal.add(Decimal.add(waterHeatingkWh,spaceHeatingkWh),electricitykWh);
+    //We then calculate the current consumption values
 
-  const currentWaterCurveValue=simulationResults.waterCurve.curve[latestDate.getMonth()];
-  const totalWaterM3=Decimal.mul(simulationResults.waterEstimation[0].consumption,currentWaterCurveValue);
+    const currentElectricityCurveValue =simulationResults.electricityCurve.curve[latestDate.getMonth()];
+    const electricitykWh = simulationResults.electricityEstimation[electricityIndex].consumption.toNumber()*currentElectricityCurveValue.toNumber();
 
-//TODO add cost calculation here, based on above values, once cost is calculatable
+    let waterHeatingkWh=0;
+    let spaceHeatingkWh=0;
+
+    for (
+      let heatForIndex = 0;
+      heatForIndex < heatSourceArrayOfArrays.length;
+      heatForIndex++
+    ) {
+      //console.log(heatSourceArrayOfArrays[index][heatSourceIndexes[heatForIndex]])
+
+      const HeatSourceEstimate =
+        heatSourceArrayOfArrays[heatForIndex][heatSourceIndexes[heatForIndex]];
+
+      //This ensures that we only retrive heat source entries for the currently relevant range
+      waterHeatingkWh += HeatSourceEstimate.waterHeatingConsumption.toNumber();
+      spaceHeatingkWh +=HeatSourceEstimate.buildingHeatingConsumption.toNumber();
+
+    }
+
+    const currentHeatingCurveValue = simulationResults.heatCurve.curve[latestDate.getMonth()];
+
+    waterHeatingkWh = waterHeatingkWh*currentHeatingCurveValue.toNumber();
+    spaceHeatingkWh = waterHeatingkWh*currentHeatingCurveValue.toNumber();
+
+    const totalEnergykWh = waterHeatingkWh+ spaceHeatingkWh+electricitykWh;
+
+    const currentWaterCurveValue = simulationResults.waterCurve.curve[latestDate.getMonth()];
+    const totalWaterM3 =  simulationResults.waterEstimation[waterIndex].consumption.toNumber()*currentWaterCurveValue.toNumber();
+
+    //TODO add cost calculation here, based on above values, once cost is calculatable
 
     buildingEstimation.push({
-        building:{
-            connect: {
-              id: buildingId,
-            },
-          },
-        type:BuildingDataType.ESTIMATE,
-        date:new Date(latestDate.getDate()),      
-      
-        totalEnergykWh, 
-        spaceHeatingkWh,
-        waterHeatingkWh,
-        electricitykWh,
-        totalWaterM3,
-    
-        //TODO add cost calculation, based on above values, once cost is calculatable
-        totalEnergyCost:new Decimal(0.0),
-        spaceHeatingCost:new Decimal(0.0),
-        waterHeatingCost:new Decimal(0.0),
-        electricityCost:new Decimal(0.0)
+      buildingId:buildingId,
+      type: BuildingDataType.ESTIMATE,
+      date: new Date(latestDate.toISOString()),
 
-    })
+      totalEnergykWh,
+      spaceHeatingkWh,
+      waterHeatingkWh,
+      electricitykWh,
+      totalWaterM3,
+
+      //TODO add cost calculation, based on above values, once cost is calculatable (currently just set to 0 since it needs to have a value here to work correctly)
+      totalEnergyCost: 0,
+      spaceHeatingCost: 0,
+      waterHeatingCost: 0,
+      electricityCost: 0,
+    });
   }
 
   //We finally store the newly created estimates and return 200 ok
 
-
+  //TODO store the new estimate entries
+  
+  await prisma.buildingData.createMany({
+    data: buildingEstimation
+  });
+  
   return new Response(
     JSON.stringify({
       ...buildingEstimation,
