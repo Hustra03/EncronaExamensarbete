@@ -1,7 +1,6 @@
 'use client';
 
 import { handleSubmit } from '@/app/(dashboard)/(admin)/simulationInput/actions';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -12,6 +11,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useActionState, useEffect, useState } from 'react';
+import { Textarea } from './ui/text-area';
 
 export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   const [buildings, setBuildings] = useState([]);
@@ -45,7 +45,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   ));
 
   return (
-    <form method="post" action={formAction}>
+    <form method="post" id="simulationForm" action={formAction}>
       <div className="grid gap-3">
         <Label htmlFor="selectBuildings">Välj Byggnad : </Label>
         <Select name="selectBuildings">
@@ -59,12 +59,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
       </div>
       <div className="grid gap-3">
         <Label htmlFor="simulationResults">Simulationsresultatet</Label>
-        <Input
-          id="simulationResults"
-          name="simulationResults"
-          type="text"
-          required
-        />
+        <Textarea id="simulationResults" name="simulationResults" required />
       </div>
       <hr />
       {functionReturnValue && functionReturnValue !== 'ok' && (

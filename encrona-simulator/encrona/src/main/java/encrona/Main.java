@@ -13,7 +13,7 @@ public class Main {
      */
     public static void main(String[] args) {
         MockGUIMain.main(args);
-        //new ReasoningEngine().recommendations();
+        //new ReasoningEngine().recommendations(); //This is for testing the expert system directly, with an empty model
     }
 
 

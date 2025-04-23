@@ -1,6 +1,5 @@
 import { auth, isAdmin } from '@/lib/auth';
 import { BuildingDataType, PrismaClient } from '@prisma/client';
-import { Decimal } from '@prisma/client/runtime/library';
 
 const prisma = new PrismaClient();
 
@@ -11,7 +10,7 @@ const prisma = new PrismaClient();
  */
 
 interface EstimateInterface {
-  buildingId:number,
+  buildingId: number;
   type: BuildingDataType;
   date: Date;
 
@@ -181,11 +180,15 @@ export async function GET(
 
     //We then calculate the current consumption values
 
-    const currentElectricityCurveValue =simulationResults.electricityCurve.curve[latestDate.getMonth()];
-    const electricitykWh = simulationResults.electricityEstimation[electricityIndex].consumption.toNumber()*currentElectricityCurveValue.toNumber();
+    const currentElectricityCurveValue =
+      simulationResults.electricityCurve.curve[latestDate.getMonth()];
+    const electricitykWh =
+      simulationResults.electricityEstimation[
+        electricityIndex
+      ].consumption.toNumber() * currentElectricityCurveValue.toNumber();
 
-    let waterHeatingkWh=0;
-    let spaceHeatingkWh=0;
+    let waterHeatingkWh = 0;
+    let spaceHeatingkWh = 0;
 
     for (
       let heatForIndex = 0;
@@ -199,24 +202,28 @@ export async function GET(
 
       //This ensures that we only retrive heat source entries for the currently relevant range
       waterHeatingkWh += HeatSourceEstimate.waterHeatingConsumption.toNumber();
-      spaceHeatingkWh +=HeatSourceEstimate.buildingHeatingConsumption.toNumber();
-
+      spaceHeatingkWh +=
+        HeatSourceEstimate.buildingHeatingConsumption.toNumber();
     }
 
-    const currentHeatingCurveValue = simulationResults.heatCurve.curve[latestDate.getMonth()];
+    const currentHeatingCurveValue =
+      simulationResults.heatCurve.curve[latestDate.getMonth()];
 
-    waterHeatingkWh = waterHeatingkWh*currentHeatingCurveValue.toNumber();
-    spaceHeatingkWh = waterHeatingkWh*currentHeatingCurveValue.toNumber();
+    waterHeatingkWh = waterHeatingkWh * currentHeatingCurveValue.toNumber();
+    spaceHeatingkWh = waterHeatingkWh * currentHeatingCurveValue.toNumber();
 
-    const totalEnergykWh = waterHeatingkWh+ spaceHeatingkWh+electricitykWh;
+    const totalEnergykWh = waterHeatingkWh + spaceHeatingkWh + electricitykWh;
 
-    const currentWaterCurveValue = simulationResults.waterCurve.curve[latestDate.getMonth()];
-    const totalWaterM3 =  simulationResults.waterEstimation[waterIndex].consumption.toNumber()*currentWaterCurveValue.toNumber();
+    const currentWaterCurveValue =
+      simulationResults.waterCurve.curve[latestDate.getMonth()];
+    const totalWaterM3 =
+      simulationResults.waterEstimation[waterIndex].consumption.toNumber() *
+      currentWaterCurveValue.toNumber();
 
     //TODO add cost calculation here, based on above values, once cost is calculatable
 
     buildingEstimation.push({
-      buildingId:buildingId,
+      buildingId: buildingId,
       type: BuildingDataType.ESTIMATE,
       date: new Date(latestDate.toISOString()),
 
@@ -237,11 +244,11 @@ export async function GET(
   //We finally store the newly created estimates and return 200 ok
 
   //TODO store the new estimate entries
-  
+
   await prisma.buildingData.createMany({
-    data: buildingEstimation
+    data: buildingEstimation,
   });
-  
+
   return new Response(
     JSON.stringify({
       ...buildingEstimation,

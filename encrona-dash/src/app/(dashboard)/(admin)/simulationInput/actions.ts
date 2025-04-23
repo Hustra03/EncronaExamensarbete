@@ -1,6 +1,10 @@
+'use client';
+
 export async function handleSubmit(_: unknown, formData: FormData) {
   const id = formData.get('selectBuildings') as string;
   const simulationResults = formData.get('simulationResults') as string;
+
+  console.log(id);
 
   const response = await fetch('/api/simulationResults', {
     method: 'Post',

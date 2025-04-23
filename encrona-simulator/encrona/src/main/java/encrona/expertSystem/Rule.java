@@ -6,6 +6,7 @@ package encrona.expertSystem;
 public class Rule {
     
     private String name;
+    private String description;
     private Condition condition;
     private PostCondition postConditionIfCondition;
     private PostCondition postConditionIfNotCondition; 
@@ -13,13 +14,15 @@ public class Rule {
     /**
      * This is the constructor
      * @param name The name of the rule, so that it can be identified
+     * @param description A short description of what this rule is meant to represent, it is used in the GUI for the rule
      * @param condition This is checked, to confirm if the rule should be triggered or not
      * @param postConditionIfCondition This is triggered if condition is true, may not be null
      * @param postConditionIfNotCondition This is triggered if condition is false, may be null if no else statement exists
      */
-    public Rule(String name,Condition condition,PostCondition postConditionIfCondition,PostCondition postConditionIfNotCondition)
+    public Rule(String name, String description,Condition condition,PostCondition postConditionIfCondition,PostCondition postConditionIfNotCondition)
     {
         this.name=name;
+        this.description=description;
         this.condition=condition;
         this.postConditionIfCondition=postConditionIfCondition;
         this.postConditionIfNotCondition=postConditionIfNotCondition;
@@ -46,4 +49,8 @@ public class Rule {
         return false;
     }
 
+    public String toString()
+    {
+        return name+" : " + description;
+    }
 }

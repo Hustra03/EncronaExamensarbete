@@ -450,8 +450,6 @@ export async function POST(request: Request) {
         data: waterEstimation,
       });
 
-    console.log(parsedHeatSources);
-
     const heatSourceEstimationItem =
       await prisma.heatSourceEstimation.createManyAndReturn({
         data: parsedHeatSources,

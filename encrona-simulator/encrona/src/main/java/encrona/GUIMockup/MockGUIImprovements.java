@@ -59,7 +59,7 @@ public class MockGUIImprovements extends JPanel {
         createNewImprovementPage.add(createNewButton);
         createNewImprovementPage.add(createNewNameField);
 
-        // Add Components to this panel.
+        // Add Components to this panel with specific constraints on their layout
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
 

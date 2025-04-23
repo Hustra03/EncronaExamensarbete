@@ -13,6 +13,7 @@ public class ReasoningEngine {
     
     private ExpertSystemModel model;
     private List<Rule> rules;
+    private List<Rule> triggeredRules;
 
     public ReasoningEngine()
     {
@@ -40,24 +41,39 @@ public class ReasoningEngine {
 
             });
         };
-        Rule exampleRule = new Rule("First condition", firstCondition, firstPostCondition, null);
+        Rule exampleRule = new Rule("Basic static rule","It decreases the priority of Berg or Mark Heatings", firstCondition, firstPostCondition, null);
         rules.add(exampleRule);
     }
 
-    public String recommendations()
+    /**
+     * This method is called to start the expert system execution, and will return a sorted list of improvements (which is the current recommendation)
+     * @return A a sorted list of improvements as a list
+     */
+    public List<String> recommendations()
     {
 
-        String recommendationString="";
+        List<String> recommendationStringList=new ArrayList<String>();
 
+        triggeredRules=new ArrayList<Rule>();
         for (Rule rule : rules) {
-            rule.testRule(model);
+            if (rule.testRule(model)) {
+                triggeredRules.add(rule);
+            }
         }
-
         for (Entry<improvement,Integer> queueValue : model.getSortedListOfImprovementsToConsider()) {
-            recommendationString+=" " +queueValue.getKey().toString()+" = " +queueValue.getValue() +" score." +System.lineSeparator(); 
+            recommendationStringList.add(" " +queueValue.getKey().toString()+" = " +queueValue.getValue() +" score."); 
+            
         }        
-        System.out.println(recommendationString);
+        System.out.println(recommendationStringList.toString());
 
-        return recommendationString;
+        return recommendationStringList;
+    }
+
+    /**
+     * A basic getter for the triggered rule attribute
+     */
+    public List<Rule> getTriggeredRules()
+    {
+        return this.triggeredRules;
     }
 }
