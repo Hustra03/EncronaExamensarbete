@@ -53,12 +53,12 @@ const sidebar = {
   navAdmin: [
     {
       title: 'Användare',
-      url: 'accounts',
+      url: '/accounts',
       icon: UserPen,
     },
     {
       title: 'Fastigheter',
-      url: 'buildings',
+      url: '/buildings',
       icon: HousePlus,
     },
     {
