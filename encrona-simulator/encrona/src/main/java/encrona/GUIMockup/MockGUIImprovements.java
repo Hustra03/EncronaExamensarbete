@@ -90,7 +90,7 @@ public class MockGUIImprovements extends JPanel {
         JPanel krPerM2Page = new JPanel();
         JTextField kwhPerYearHeatingField = new JTextField(improvement.getCostPerM2().toString(), 10);
         krPerM2Page.add(kwhPerYearHeatingField);
-        krPerM2Page.add(new JLabel("kr/m^2 per year"));
+        krPerM2Page.add(new JLabel("kr/m^2 over the improvements lifetime"));
 
         JPanel kwhPerM2Page = new JPanel();
         JTextField kwhPerM2TextField = new JTextField(improvement.getKwhPerM2().toString(), 10);
@@ -243,7 +243,7 @@ public class MockGUIImprovements extends JPanel {
                 } catch (Exception e) {
                     throw new Exception("improvement kwh not a valid number for " + name);
                 }
-                if (krPerM2<=0.0) {
+                if (kwhPerM2<=0.0) {
                     throw new Exception("kwh for " + name + " must be greater than 0");
                 }
 

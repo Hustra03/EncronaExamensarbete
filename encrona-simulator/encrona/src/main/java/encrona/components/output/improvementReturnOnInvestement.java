@@ -76,7 +76,6 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
                 yearsToReturnInvestment = totalCost / (improvementImpact * electricityPrice);
                 break;
             case BuildingHeating:
-
                 yearsToReturnInvestment = totalCost / (improvementImpact * calculateHeatingSourceKwhPrice(heatSources));
                 //TODO maybe update method here?
                 break;

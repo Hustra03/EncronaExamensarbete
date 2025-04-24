@@ -131,7 +131,7 @@ public class MockGUIMain extends JPanel {
 
         for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
             listModel.addElement(
-                    entry.getKey() + " was set to " + mapOfNumericalVariables.get(entry) + " " + entry.getKey());
+                    entry.getKey() + " was set to " + mapOfNumericalVariables.get(entry) + " " + entry.getValue());
         }
 
         for (heatingEnergySource heatingEnergySource : heatingEnergySources) {

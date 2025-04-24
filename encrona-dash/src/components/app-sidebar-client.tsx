@@ -63,7 +63,7 @@ const sidebar = {
     },
     {
       title: 'Simulation',
-      url: 'simulationInput',
+      url: '/simulationInput',
       icon: ComputerIcon,
     },
   ],

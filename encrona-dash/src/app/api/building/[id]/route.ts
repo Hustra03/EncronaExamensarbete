@@ -67,7 +67,6 @@ export async function GET(
   Do recalculations here if missing months or outside of range
   */
   }
-
   writeSSE('estimate', estimate);
   writer.close();
 
@@ -75,7 +74,7 @@ export async function GET(
     headers: {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
+      'Connection':'close'
     },
   });
 }
