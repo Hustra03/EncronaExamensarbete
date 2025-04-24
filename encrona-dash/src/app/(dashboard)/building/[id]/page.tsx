@@ -7,11 +7,14 @@ import {
   ErrorBar,
   Line,
   LineChart,
+  BarChart,
+  Bar,
   ReferenceLine,
   XAxis,
   YAxis,
 } from 'recharts';
 
+import { Switch } from '@/components/ui/switch';
 import {
   Card,
   CardContent,
@@ -20,7 +23,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import {
-  ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
@@ -36,7 +38,7 @@ type DataPoint = {
   electricitykWh?: number;
   totalWaterM3?: number;
   totalEnergyCost?: number;
-  buildingHeatingCost?: number;
+  spaceHeatingCost?: number;
   waterHeatingCost?: number;
   electricityCost?: number;
 };
@@ -65,17 +67,35 @@ const chartConfig = {
   totalWaterM3: {
     label: 'Vattenförbrukning',
   },
-} satisfies ChartConfig;
+};
 
-// Type for metrics
-type MetricKey = keyof typeof chartConfig;
+type EnergyMetricKey = keyof typeof chartConfig;
+
+type AllMetricKey =
+  | EnergyMetricKey
+  | 'totalEnergyCost'
+  | 'spaceHeatingCost'
+  | 'waterHeatingCost'
+  | 'electricityCost';
 
 export default function Building() {
   const [data, setData] = useState<BuildingData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeChart, setActiveChart] =
-    useState<keyof typeof chartConfig>('electricitykWh');
+    useState<AllMetricKey>('electricitykWh');
 
+  const chartMetricToggleMap: Record<string, AllMetricKey> = {
+    electricitykWh: 'electricityCost',
+    electricityCost: 'electricitykWh',
+    spaceHeatingkWh: 'spaceHeatingCost',
+    spaceHeatingCost: 'spaceHeatingkWh',
+    waterHeatingkWh: 'waterHeatingCost',
+    waterHeatingCost: 'waterHeatingkWh',
+    totalEnergykWh: 'totalEnergyCost',
+    totalEnergyCost: 'totalEnergykWh',
+  };
+
+  const isCost = activeChart.toLowerCase().includes('cost');
   const { id } = useParams();
 
   useEffect(() => {
@@ -117,7 +137,6 @@ export default function Building() {
     const estimateMap = Object.fromEntries(
       (data.estimate ?? []).map(entry => [entry.date, entry])
     );
-
     const actualMap = Object.fromEntries(
       (data.actual ?? []).map(entry => [entry.date, entry])
     );
@@ -126,18 +145,36 @@ export default function Building() {
       new Set([...Object.keys(estimateMap), ...Object.keys(actualMap)])
     ).sort((a, b) => Number(a) - Number(b));
 
+    const allMetrics: AllMetricKey[] = [
+      'totalEnergykWh',
+      'spaceHeatingkWh',
+      'waterHeatingkWh',
+      'electricitykWh',
+      'totalWaterM3',
+      'totalEnergyCost',
+      'spaceHeatingCost',
+      'waterHeatingCost',
+      'electricityCost',
+    ];
+
     return allDates.map(date => {
       const estimate = estimateMap[date] ?? null;
       const actual = actualMap[date] ?? null;
-      /* eslint-disable  @typescript-eslint/no-explicit-any */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const merged: Record<string, any> = { date: Number(date) };
 
-      (Object.keys(chartConfig) as MetricKey[]).forEach(key => {
+      allMetrics.forEach(key => {
         const estimateValue = estimate?.[key] ?? null;
         const actualValue = actual?.[key] ?? null;
 
+        const absDiff =
+          actualValue != null && estimateValue != null
+            ? Math.abs(actualValue - estimateValue)
+            : null;
+
         merged[`${key}Estimate`] = estimateValue;
         merged[`${key}Actual`] = actualValue;
+        merged[`${key}Diff`] = absDiff;
 
         if (estimateValue != null) {
           merged[`${key}EstimateError`] = estimateValue * 0.1;
@@ -151,18 +188,10 @@ export default function Building() {
   const estimateColor = '#6ee7b7';
   const actualColor = '#16a34a';
 
-  const unitMap: Record<MetricKey, string> = {
-    totalEnergykWh: 'kWh',
-    spaceHeatingkWh: 'kWh',
-    waterHeatingkWh: 'kWh',
-    electricitykWh: 'kWh',
-    totalWaterM3: 'm³',
-  };
-
   if (loading) return <div>Laddar byggnad...</div>;
 
-  {
-    return (
+  return (
+    <>
       <Card>
         <CardHeader className="flex flex-col border-b p-0 sm:items-center sm:justify-between lg:flex-row">
           <div className="flex flex-col gap-1 px-6 py-5 sm:py-6">
@@ -170,34 +199,34 @@ export default function Building() {
               {data?.name}
             </CardTitle>
             <CardDescription className="text-muted-foreground text-sm">
-              {chartConfig[activeChart].label +
-                ' (' +
-                unitMap[activeChart] +
-                ')'}
+              {chartMetricToggleMap[activeChart] && (
+                <div className="flex items-center gap-2">
+                  <span className="text-xs">Visa kostnad</span>
+                  <Switch
+                    checked={isCost}
+                    onCheckedChange={() =>
+                      setActiveChart(
+                        chartMetricToggleMap[activeChart] as AllMetricKey
+                      )
+                    }
+                  />
+                </div>
+              )}
             </CardDescription>
           </div>
           <div className="grid grid-cols-3 px-6 lg:flex">
-            {[
-              'totalEnergykWh',
-              'electricitykWh',
-              'spaceHeatingkWh',
-              'waterHeatingkWh',
-              'totalWaterM3',
-            ].map(key => {
-              const chart = key as keyof typeof chartConfig;
-              return (
-                <button
-                  key={chart}
-                  data-active={activeChart === chart}
-                  className="data-[active=true]:bg-muted/50 hover:bg-muted flex flex-col justify-center gap-1 px-6 py-4 text-left transition-colors sm:px-5 sm:py-3"
-                  onClick={() => setActiveChart(chart)}
-                >
-                  <span className="text-muted-foreground text-xs font-medium lg:text-xl">
-                    {chartConfig[chart].label}
-                  </span>
-                </button>
-              );
-            })}
+            {Object.keys(chartConfig).map(key => (
+              <button
+                key={key}
+                data-active={activeChart === key}
+                className="data-[active=true]:bg-muted/50 hover:bg-muted flex flex-col justify-center gap-1 px-6 py-4 text-left transition-colors sm:px-5 sm:py-3"
+                onClick={() => setActiveChart(key as AllMetricKey)}
+              >
+                <span className="text-muted-foreground text-xs font-medium lg:text-xl">
+                  {chartConfig[key as keyof typeof chartConfig].label}
+                </span>
+              </button>
+            ))}
           </div>
         </CardHeader>
 
@@ -213,23 +242,15 @@ export default function Building() {
                 type="number"
                 scale="time"
                 domain={['auto', 'auto']}
-                tickLine={true}
-                axisLine={false}
                 tickMargin={8}
-                tickFormatter={value => {
-                  const formatted = new Date(Number(value)).toLocaleDateString(
-                    'sv-SE',
-                    {
-                      month: 'short',
-                      year: 'numeric',
-                    }
-                  );
-                  return formatted.charAt(0).toUpperCase() + formatted.slice(1);
-                }}
+                tickFormatter={value =>
+                  new Date(Number(value)).toLocaleDateString('sv-SE', {
+                    month: 'short',
+                    year: 'numeric',
+                  })
+                }
               />
               <YAxis
-                tickLine={false}
-                axisLine={false}
                 tickMargin={8}
                 domain={([min, max]) => [Math.floor(min * 0.9), max]}
                 allowDecimals={false}
@@ -244,7 +265,6 @@ export default function Building() {
                 stroke={estimateColor}
                 strokeWidth={2}
                 name="Prognos"
-                dot={false}
                 strokeDasharray="4 2"
               >
                 <ErrorBar
@@ -258,7 +278,6 @@ export default function Building() {
                 stroke={actualColor}
                 strokeWidth={2}
                 name="Faktisk"
-                dot={false}
               />
               {data?.installedAt && (
                 <ReferenceLine
@@ -279,6 +298,49 @@ export default function Building() {
           </ChartContainer>
         </CardContent>
       </Card>
-    );
-  }
+
+      <Card className="mt-8">
+        <CardContent className="px-2 sm:p-6">
+          <h4 className="text-muted-foreground mb-2 text-sm font-medium">
+            Absolut skillnad mellan prognos och faktiskt värde
+          </h4>
+          <ChartContainer
+            config={chartConfig}
+            className="aspect-auto h-[200px] w-full"
+          >
+            <BarChart data={chartData}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="date"
+                type="number"
+                scale="time"
+                domain={['auto', 'auto']}
+                tickMargin={8}
+                tickFormatter={value =>
+                  new Date(Number(value)).toLocaleDateString('sv-SE', {
+                    month: 'short',
+                    year: 'numeric',
+                  })
+                }
+              />
+              <YAxis tickMargin={8} />
+              <ChartTooltip
+                content={
+                  <ChartTooltipContent
+                    className="w-[160px]"
+                    hideLabel={false}
+                  />
+                }
+              />
+              <Bar
+                dataKey={`${activeChart}Diff`}
+                fill="#60a5fa"
+                name="Absolut skillnad"
+              />
+            </BarChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+    </>
+  );
 }
