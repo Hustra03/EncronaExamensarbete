@@ -27,6 +27,7 @@ import {
 } from '@/components/ui/chart';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 type DataPoint = {
   date: number;
@@ -148,6 +149,13 @@ export default function Building() {
     });
   }, [data]);
 
+  async function requestNewEstimates()
+  {
+    const result=await fetch(`/api/simulationResults/${id}`);
+    console.log(result);
+
+  }
+
   const estimateColor = '#6ee7b7';
   const actualColor = '#16a34a';
 
@@ -175,6 +183,7 @@ export default function Building() {
                 unitMap[activeChart] +
                 ')'}
             </CardDescription>
+            <Button onClick={requestNewEstimates}>Flera skattningar</Button>
           </div>
           <div className="grid grid-cols-3 px-6 lg:flex">
             {[

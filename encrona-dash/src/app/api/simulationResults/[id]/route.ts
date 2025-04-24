@@ -91,10 +91,20 @@ export async function GET(
     );
   }
 
+  let latestDate;
+  if(estimate.length<=0)
+  {
+    latestDate=building.installedAt;
+  }
+  else
+  {
+      latestDate = estimate[0].date;
+
+  }
+
   //TODO add checks for if the dates are continous?
 
   //This is the latest date for which there exists an estimate
-  const latestDate = estimate[0].date;
 
   const buildingEstimation: EstimateInterface[] = [];
 
