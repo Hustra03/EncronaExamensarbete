@@ -5,7 +5,6 @@ import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -16,6 +15,9 @@ import { Textarea } from './ui/text-area';
 export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   const [buildings, setBuildings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBuildingValue, setSelectedBuildingValue] = useState('4');
+  const [textArea, setTextArea] = useState('');
+
   const [functionReturnValue, formAction] = useActionState(handleSubmit, null);
 
   async function fetchBuildings() {
@@ -23,6 +25,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
     if (res.ok) {
       const data = await res.json();
       setBuildings(data);
+      setSelectedBuildingValue(Number.parseInt(data[0]['id']).toString());
     }
     setLoading(false);
   }
@@ -44,22 +47,40 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
     </SelectItem>
   ));
 
+  function handleTextAreaChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setTextArea(e.target.value);
+  }
+
   return (
     <form method="post" id="simulationForm" action={formAction}>
       <div className="grid gap-3">
         <Label htmlFor="selectBuildings">Välj Byggnad : </Label>
-        <Select name="selectBuildings">
+        <Select
+          key={selectedBuildingValue}
+          name="selectBuildings"
+          value={selectedBuildingValue}
+          onValueChange={newValue => {
+            setSelectedBuildingValue(newValue);
+          }}
+        >
           <SelectTrigger>
-            <SelectValue placeholder="Select a building…" />
+            <SelectValue
+              aria-label={selectedBuildingValue}
+              placeholder="Select a building…"
+            />
           </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>{selectOptions}</SelectGroup>
-          </SelectContent>
+          <SelectContent>{selectOptions}</SelectContent>
         </Select>
       </div>
       <div className="grid gap-3">
         <Label htmlFor="simulationResults">Simulationsresultatet</Label>
-        <Textarea id="simulationResults" name="simulationResults" required />
+        <Textarea
+          id="simulationResults"
+          name="simulationResults"
+          required
+          value={textArea}
+          onChange={handleTextAreaChange}
+        />
       </div>
       <hr />
       {functionReturnValue && functionReturnValue !== 'ok' && (
