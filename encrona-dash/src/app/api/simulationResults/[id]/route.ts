@@ -32,6 +32,7 @@ export async function GET(
 ) {
   const session = await auth();
 
+  //TODO Add check here so that a signed-in user can access this if they have access to this specific building
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
