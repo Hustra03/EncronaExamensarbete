@@ -3,12 +3,6 @@ import { BuildingDataType, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-/**
- * This GET endpoint is used to request the generation of new estimations for a specific building
- * @param id is the request param, and is the building id for which
- * @returns
- */
-
 interface EstimateInterface {
   buildingId: number;
   type: BuildingDataType;
@@ -25,7 +19,11 @@ interface EstimateInterface {
   waterHeatingCost: number;
   electricityCost: number;
 }
-
+/**
+ * This GET endpoint is used to request that the generation of new estimations for a specific building is checked, and if needed performed
+ * @param id is the request param, and is the building id for which
+ * @returns
+ */
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
@@ -85,22 +83,15 @@ export async function GET(
     orderBy: { date: 'desc' },
   });
 
-  if (estimate.length > 6) {
-    return new Response(
-      'There are already more than 6 future estimates for this building',
-      { status: 404 }
-    );
+  if (estimate.length >= 6) {
+    return new Response(null, { status: 204 });
   }
 
   let latestDate;
-  if(estimate.length<=0)
-  {
-    latestDate=building.installedAt;
-  }
-  else
-  {
-      latestDate = estimate[0].date;
-
+  if (estimate.length <= 0) {
+    latestDate = building.installedAt;
+  } else {
+    latestDate = estimate[0].date;
   }
 
   //TODO add checks for if the dates are continous?
@@ -262,8 +253,7 @@ export async function GET(
 
   return new Response(
     JSON.stringify({
-      ...buildingEstimation,
-      estimate,
+      newEstimates: buildingEstimation,
     }),
     { status: 200 }
   );
