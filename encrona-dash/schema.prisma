@@ -25,7 +25,19 @@ model User {
   password       String
   role           Role     @default(USER)
   createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  updatedAt      DateTime @updatedAt  
+  
+  companyId Int?
+  company Company? @relation("userCompany", fields: [companyId], references: [id])
+}
+
+model Company{
+  id             Int      @id @default(autoincrement())
+  name           String   @unique 
+  owner          String
+  createdAt      DateTime @default(now())
+  users          User[] @relation("userCompany")
+  buildings      Building[] @relation("buildingCompany")
 }
 
 model Building {
@@ -41,6 +53,7 @@ model Building {
   updatedAt      DateTime @updatedAt
   
   dataPoints  BuildingData[]
+  companiesWithAccess Company[] @relation("buildingCompany")
 }
 
 model BuildingData {

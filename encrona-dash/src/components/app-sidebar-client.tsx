@@ -10,6 +10,7 @@ import {
   Building,
   Eye,
   ComputerIcon,
+  Building2Icon,
 } from 'lucide-react';
 
 import {
@@ -65,6 +66,11 @@ const sidebar = {
       title: 'Simulation',
       url: '/simulationInput',
       icon: ComputerIcon,
+    },
+    {
+      title: 'Företag',
+      url: '/company',
+      icon: Building2Icon,
     },
   ],
   navSecondary: [

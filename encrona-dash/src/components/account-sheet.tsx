@@ -16,6 +16,9 @@ import { Label } from '@/components/ui/label';
 import { useState } from 'react';
 import { Session } from 'next-auth';
 import { Role } from '@/lib/auth';
+import { Company } from '@/app/(dashboard)/(admin)/company/columns';
+import { Select, SelectContent, SelectItem, SelectTrigger } from './ui/select';
+import { SelectValue } from '@radix-ui/react-select';
 
 interface AccountsSheetProps {
   hideTrigger?: boolean;
@@ -23,16 +26,19 @@ interface AccountsSheetProps {
   title?: string;
   description?: string;
   confirmLabel?: string;
+  companies?: Company[];
   defaultValues?: {
     name?: string;
     email?: string;
     role?: Role;
+    companyId?: number;
   };
   onSubmit: (formData: {
     name: string;
     email: string;
     password: string;
     role?: Role;
+    companyId?: number;
   }) => void;
   session: Session | null;
   open?: boolean;
@@ -48,6 +54,7 @@ export function AccountSheet({
   defaultValues = {},
   onSubmit,
   session,
+  companies,
   open,
   onOpenChange,
 }: AccountsSheetProps) {
@@ -55,9 +62,11 @@ export function AccountSheet({
   const [email, setEmail] = useState(defaultValues.email ?? '');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState<Role>(defaultValues.role ?? 'USER');
+  const [companyId, setCompanyId] = useState(
+    defaultValues.companyId ?? undefined
+  );
 
   const isFormValid = name && email && password;
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
@@ -67,10 +76,31 @@ export function AccountSheet({
       email,
       password,
       role: session?.user.role === 'ADMIN' ? role : undefined,
+      companyId: companyId,
     });
 
     setPassword('');
   };
+
+  function selectOptions() {
+    if (companies != undefined) {
+      console.log(companies);
+      return companies.map(company => (
+        <SelectItem
+          key={company['id']}
+          value={Number.parseInt(company['id']).toString()}
+        >
+          {company['name']}
+        </SelectItem>
+      ));
+    } else {
+      return (
+        <SelectItem key={-1} value={''}>
+          {'Hämtar företag...'}
+        </SelectItem>
+      );
+    }
+  }
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
@@ -128,6 +158,27 @@ export function AccountSheet({
                   className="col-span-3"
                   required
                 />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="role" className="text-right">
+                  Företag
+                </Label>
+                <Select
+                  key={companyId}
+                  name="selectBuildings"
+                  value={companyId?.toLocaleString()}
+                  onValueChange={(newValue: string) => {
+                    setCompanyId(Number.parseInt(newValue));
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue
+                      aria-label={companyId?.toLocaleString()}
+                      placeholder="Välj ett företag"
+                    />
+                  </SelectTrigger>
+                  <SelectContent>{selectOptions()}</SelectContent>
+                </Select>
               </div>
 
               {session?.user.role === 'ADMIN' && (

@@ -4,6 +4,39 @@ import { auth, isAdmin } from '@/lib/auth';
 
 const prisma = new PrismaClient();
 
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  const session = await auth();
+  await params;
+  const id = parseInt(params.id);
+
+  if (!isAdmin(session)) {
+    return new Response('Unauthorized', { status: 401 });
+  }
+
+  const users = await prisma.user.findMany({
+    where: {
+      companyId: id,
+    },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      role: true,
+      company: {
+        select: {
+          name: true,
+        },
+      },
+      createdAt: true,
+    },
+  });
+
+  return new Response(JSON.stringify(users), { status: 200 });
+}
+
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }

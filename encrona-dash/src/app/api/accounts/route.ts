@@ -17,6 +17,11 @@ export async function GET() {
       name: true,
       email: true,
       role: true,
+      company: {
+        select: {
+          name: true,
+        },
+      },
       createdAt: true,
     },
   });
@@ -31,7 +36,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const { email, password, name, role } = await request.json();
+    const { email, password, name, role, companyId } = await request.json();
 
     if (!email || !password || !name || !role) {
       return new Response(JSON.stringify({ message: 'Missing fields' }), {
@@ -48,14 +53,26 @@ export async function POST(request: Request) {
 
     const hashedPassword = await hash(password, 10);
 
-    await prisma.user.create({
-      data: {
-        email,
-        password: hashedPassword,
-        name,
-        role: role,
-      },
-    });
+    if (companyId) {
+      await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name,
+          role: role,
+          company: { connect: { id: companyId } },
+        },
+      });
+    } else {
+      await prisma.user.create({
+        data: {
+          email,
+          password: hashedPassword,
+          name,
+          role: role,
+        },
+      });
+    }
 
     return new Response(null, { status: 204 });
   } catch (err) {

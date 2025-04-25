@@ -1,11 +1,10 @@
 'use client';
 
-import { Role } from '@/lib/auth';
 import { ColumnDef } from '@tanstack/react-table';
 import { format } from 'date-fns';
 
+import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,66 +23,39 @@ import {
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
-import { Company } from '../company/columns';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
-export type User = {
+export type Company = {
   id: string;
   name: string;
-  email: string;
-  role: Role;
-  company: string;
-  createdAt: Date;
+  owner: string;
 };
 
-export const columns: ColumnDef<User>[] = [
+export const columns: ColumnDef<Company>[] = [
   {
     accessorKey: 'name',
     header: 'Namn',
   },
   {
-    accessorKey: 'email',
-    header: 'Email',
-  },
-  {
-    accessorKey: 'role',
-    header: 'Roll',
-    cell: ({ row }) => {
-      const role: Role = row.getValue('role');
-      return (
-        <Badge variant={role === 'ADMIN' ? 'destructive' : 'secondary'}>
-          {role === 'ADMIN' ? 'Administratör' : 'Användare'}
-        </Badge>
-      );
-    },
-  },
-  {
-    accessorKey: 'company',
-    header: 'Företag',
-    cell: ({ row }) => {
-      const formatted: Company = row.getValue('company');
-
-      if (formatted) {
-        return <div>{formatted.name}</div>;
-      } else {
-        return <div></div>;
-      }
-    },
+    accessorKey: 'owner',
+    header: 'Ägare',
   },
   {
     accessorKey: 'createdAt',
-    header: 'Skapad',
+    header: 'Registrerad',
     cell: ({ row }) => {
       const formatted = format(row.getValue('createdAt'), 'yyyy-MM-dd');
       return <div>{formatted}</div>;
     },
   },
+
   {
     id: 'actions',
     cell: ({ row }) => {
-      const user = row.original;
-
+      const company = row.original;
+      /* eslint-disable react-hooks/rules-of-hooks */
+      const router = useRouter();
       return (
         <AlertDialog>
           <DropdownMenu>
@@ -95,8 +67,15 @@ export const columns: ColumnDef<User>[] = [
             <DropdownMenuContent>
               <DropdownMenuItem
                 onClick={() => {
+                  router.push(`/company/${company.id}`);
+                }}
+              >
+                Visa
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
                   window.dispatchEvent(
-                    new CustomEvent('edit-user', { detail: user })
+                    new CustomEvent('edit-company', { detail: company })
                   );
                 }}
               >
@@ -112,16 +91,18 @@ export const columns: ColumnDef<User>[] = [
             <AlertDialogHeader>
               <AlertDialogTitle>Är du säker?</AlertDialogTitle>
               <AlertDialogDescription>
-                Detta kommer att ta bort användaren <strong>{user.name}</strong>
-                . Åtgärden går inte att ångra.
+                Detta kommer att ta bort företaget{' '}
+                <strong>{company.name}</strong>. Åtgärden går inte att ångra.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel>Avbryt</AlertDialogCancel>
               <AlertDialogAction
                 onClick={async () => {
-                  await fetch(`/api/accounts/${user.id}`, { method: 'DELETE' });
-                  window.dispatchEvent(new Event('refresh-users'));
+                  await fetch(`/api/company/${company.id}`, {
+                    method: 'DELETE',
+                  });
+                  window.dispatchEvent(new Event('refresh-company'));
                 }}
               >
                 Ta bort

@@ -1,17 +1,19 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { columns } from './columns';
-import { DataTable } from './data-table';
-import type { User } from './columns';
-import { Company } from '../company/columns';
+import { columns } from '../../accounts/columns';
+import { DataTable } from '../../accounts/data-table';
+import { useParams } from 'next/navigation';
+import { Company } from '../columns';
+import type { User } from '../../accounts/columns';
 
-export default function AccountsTable() {
+export default function CompanyAccountsTable() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  const { id } = useParams();
 
   async function fetchUsers() {
-    const res = await fetch('/api/accounts');
+    const res = await fetch('/api/companyAccounts/' + id);
     if (res.ok) {
       const data = await res.json();
       setUsers(data);

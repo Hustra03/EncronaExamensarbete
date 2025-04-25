@@ -14,28 +14,25 @@ import {
 import { DataTableFilter } from '@/components/data-table/filter';
 import { DataTablePagination } from '@/components/data-table/pagination';
 import { DataTableCore } from '@/components/data-table/table';
-import { AccountSheet } from '@/components/account-sheet';
-import type { User } from './columns';
-import { Company } from '../company/columns';
+import { CompanySheet } from '@/components/company-sheet';
+import type { Company } from './columns';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
-  companies: Company[];
   onRefresh: () => void;
 }
 
-export function DataTable<TData extends User, TValue>({
+export function DataTable<TData extends Company, TValue>({
   columns,
   data,
-  companies,
   onRefresh,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const { data: session } = useSession();
 
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [editingUserOpen, setEditingUserOpen] = useState(false);
+  const [editingCompany, setEditingCompany] = useState<Company | null>(null);
+  const [editingCompanyOpen, setEditingCompanyOpen] = useState(false);
 
   const table = useReactTable({
     data,
@@ -52,42 +49,41 @@ export function DataTable<TData extends User, TValue>({
   // Used to listen for events emitted from the columns
   useEffect(() => {
     const handleEdit = (e: Event) => {
-      const customEvent = e as CustomEvent<User>;
-      setEditingUser(customEvent.detail);
-      setEditingUserOpen(true);
+      const customEvent = e as CustomEvent<Company>;
+      setEditingCompany(customEvent.detail);
+      setEditingCompanyOpen(true);
     };
 
     const handleRefresh = () => onRefresh();
 
-    window.addEventListener('edit-user', handleEdit);
-    window.addEventListener('refresh-users', handleRefresh);
+    window.addEventListener('edit-company', handleEdit);
+    window.addEventListener('refresh-company', handleRefresh);
 
     return () => {
-      window.removeEventListener('edit-user', handleEdit);
-      window.removeEventListener('refresh-users', handleRefresh);
+      window.removeEventListener('edit-company', handleEdit);
+      window.removeEventListener('refresh-company', handleRefresh);
     };
   }, [onRefresh]);
 
   // To clear the state when closing, otherwise the sheet will not be rerendered with correct data later on
   useEffect(() => {
-    if (editingUserOpen === false) {
+    if (editingCompanyOpen === false) {
       const timeout = setTimeout(() => {
-        setEditingUser(null);
+        setEditingCompany(null);
       }, 200);
 
       return () => clearTimeout(timeout);
     }
-  }, [editingUserOpen]);
+  }, [editingCompanyOpen]);
 
   return (
     <div className="space-y-4">
       <div className="flex w-full items-center justify-between">
         <DataTableFilter table={table} />
-        <AccountSheet
+        <CompanySheet
           session={session}
-          companies={companies}
           onSubmit={async data => {
-            await fetch('/api/accounts', {
+            await fetch('/api/company', {
               method: 'POST',
               body: JSON.stringify(data),
               headers: { 'Content-Type': 'application/json' },
@@ -97,31 +93,30 @@ export function DataTable<TData extends User, TValue>({
         />
       </div>
 
-      {editingUser && (
-        <AccountSheet
+      {editingCompany && (
+        <CompanySheet
           hideTrigger
           session={session}
-          companies={companies}
-          open={editingUserOpen}
-          onOpenChange={setEditingUserOpen}
-          title="Redigera användare"
+          open={editingCompanyOpen}
+          onOpenChange={setEditingCompanyOpen}
+          title="Redigera företag"
           description="Uppdatera informationen nedan."
           confirmLabel="Spara ändringar"
-          defaultValues={editingUser}
+          defaultValues={editingCompany}
           onSubmit={async formData => {
-            await fetch(`/api/accounts/${editingUser.id}`, {
+            await fetch(`/api/company/${editingCompany.id}`, {
               method: 'PUT',
               body: JSON.stringify(formData),
               headers: { 'Content-Type': 'application/json' },
             });
-            setEditingUser(null);
+            setEditingCompany(null);
             onRefresh();
           }}
         />
       )}
 
       <DataTableCore table={table} columns={columns} />
-      <DataTablePagination table={table} units={'Användare'} />
+      <DataTablePagination table={table} units={'Företag'} />
     </div>
   );
 }
