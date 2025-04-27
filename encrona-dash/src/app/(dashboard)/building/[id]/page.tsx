@@ -52,25 +52,14 @@ type BuildingData = {
 };
 
 const chartConfig = {
-  totalEnergykWh: {
-    label: 'Total energi',
-  },
-  spaceHeatingkWh: {
-    label: 'Uppvärmning',
-  },
-  waterHeatingkWh: {
-    label: 'Tappvarmvatten',
-  },
-  electricitykWh: {
-    label: 'El',
-  },
-  totalWaterM3: {
-    label: 'Vattenförbrukning',
-  },
+  totalEnergykWh: { label: 'Total energi' },
+  spaceHeatingkWh: { label: 'Uppvärmning' },
+  waterHeatingkWh: { label: 'Tappvarmvatten' },
+  electricitykWh: { label: 'El' },
+  totalWaterM3: { label: 'Vattenförbrukning' },
 };
 
 type EnergyMetricKey = keyof typeof chartConfig;
-
 type AllMetricKey =
   | EnergyMetricKey
   | 'totalEnergyCost'
@@ -83,6 +72,7 @@ export default function Building() {
   const [loading, setLoading] = useState(true);
   const [activeChart, setActiveChart] =
     useState<AllMetricKey>('electricitykWh');
+  const { id } = useParams();
 
   const chartMetricToggleMap: Record<string, AllMetricKey> = {
     electricitykWh: 'electricityCost',
@@ -96,7 +86,6 @@ export default function Building() {
   };
 
   const isCost = activeChart.toLowerCase().includes('cost');
-  const { id } = useParams();
 
   useEffect(() => {
     const source = new EventSource(`/api/building/${id}`);
@@ -167,14 +156,20 @@ export default function Building() {
         const estimateValue = estimate?.[key] ?? null;
         const actualValue = actual?.[key] ?? null;
 
-        const absDiff =
+        const diff =
           actualValue != null && estimateValue != null
-            ? Math.abs(actualValue - estimateValue)
+            ? estimateValue - actualValue
+            : null;
+
+        const relativeError =
+          actualValue != null && estimateValue != null && actualValue !== 0
+            ? (estimateValue - actualValue) / actualValue
             : null;
 
         merged[`${key}Estimate`] = estimateValue;
         merged[`${key}Actual`] = actualValue;
-        merged[`${key}Diff`] = absDiff;
+        merged[`${key}Diff`] = diff;
+        merged[`${key}RelativeError`] = relativeError;
 
         if (estimateValue != null) {
           merged[`${key}EstimateError`] = estimateValue * 0.1;
@@ -188,6 +183,18 @@ export default function Building() {
   const estimateColor = '#6ee7b7';
   const actualColor = '#16a34a';
 
+  const unitMap: Record<AllMetricKey, string> = {
+    totalEnergykWh: 'kWh',
+    spaceHeatingkWh: 'kWh',
+    waterHeatingkWh: 'kWh',
+    electricitykWh: 'kWh',
+    totalWaterM3: 'm³',
+    totalEnergyCost: 'kr',
+    spaceHeatingCost: 'kr',
+    waterHeatingCost: 'kr',
+    electricityCost: 'kr',
+  };
+
   if (loading) return <div>Laddar byggnad...</div>;
 
   return (
@@ -198,9 +205,9 @@ export default function Building() {
             <CardTitle className="text-lg font-semibold sm:text-xl">
               {data?.name}
             </CardTitle>
-            <CardDescription className="text-muted-foreground text-sm">
+            <CardDescription className="text-muted-foreground flex items-center gap-2 text-sm">
               {chartMetricToggleMap[activeChart] && (
-                <div className="flex items-center gap-2">
+                <>
                   <span className="text-xs">Visa kostnad</span>
                   <Switch
                     checked={isCost}
@@ -210,7 +217,7 @@ export default function Building() {
                       )
                     }
                   />
-                </div>
+                </>
               )}
             </CardDescription>
           </div>
@@ -235,7 +242,7 @@ export default function Building() {
             config={chartConfig}
             className="aspect-auto h-[250px] w-full"
           >
-            <LineChart accessibilityLayer data={chartData}>
+            <LineChart accessibilityLayer data={chartData} syncId="default">
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="date"
@@ -250,11 +257,7 @@ export default function Building() {
                   })
                 }
               />
-              <YAxis
-                tickMargin={8}
-                domain={([min, max]) => [Math.floor(min * 0.9), max]}
-                allowDecimals={false}
-              />
+              <YAxis tickMargin={8} allowDecimals={false} />
               <ChartTooltip
                 content={
                   <ChartTooltipContent className="w-[150px]" hideLabel />
@@ -290,7 +293,7 @@ export default function Building() {
                     fill: '#dc2626',
                     fontSize: 12,
                   }}
-                  isFront={true}
+                  isFront
                 />
               )}
               <Brush />
@@ -300,15 +303,19 @@ export default function Building() {
       </Card>
 
       <Card className="mt-8">
+        <CardHeader className="flex flex-col border-b p-0 sm:items-center sm:justify-between lg:flex-row">
+          <div className="flex flex-col gap-1 px-6 py-5 sm:py-6">
+            <CardTitle className="text-lg font-semibold sm:text-xl">
+              Skillnad mellan prognos och faktiskt värde
+            </CardTitle>
+          </div>
+        </CardHeader>
         <CardContent className="px-2 sm:p-6">
-          <h4 className="text-muted-foreground mb-2 text-sm font-medium">
-            Absolut skillnad mellan prognos och faktiskt värde
-          </h4>
           <ChartContainer
             config={chartConfig}
             className="aspect-auto h-[200px] w-full"
           >
-            <BarChart data={chartData}>
+            <BarChart data={chartData} syncId="default">
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="date"
@@ -325,18 +332,28 @@ export default function Building() {
               />
               <YAxis tickMargin={8} />
               <ChartTooltip
-                content={
-                  <ChartTooltipContent
-                    className="w-[160px]"
-                    hideLabel={false}
-                  />
-                }
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    const diff = payload[0].payload[`${activeChart}Diff`];
+                    const relative =
+                      payload[0].payload[`${activeChart}RelativeError`];
+                    return (
+                      <div className="bg-background rounded-md border p-2 shadow-sm">
+                        <div>
+                          Skillnad: {diff?.toFixed(1)} {unitMap[activeChart]}
+                        </div>
+                        {relative != null && (
+                          <div>
+                            Relativt fel: {(relative * 100).toFixed(1)}%
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
               />
-              <Bar
-                dataKey={`${activeChart}Diff`}
-                fill="#60a5fa"
-                name="Absolut skillnad"
-              />
+              <Bar dataKey={`${activeChart}Diff`} fill="#60a5fa" />
             </BarChart>
           </ChartContainer>
         </CardContent>
