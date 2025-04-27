@@ -13,6 +13,8 @@ public class MockGUIStartValueSpecification extends JPanel {
     static JTextField aTempField;
     static JTextField electrictyPriceField;
     static JTextField electricityConsumptionField;
+    static JTextField waterConsumptionField;
+    static JTextField waterPriceField;
 
     public MockGUIStartValueSpecification() {
 
@@ -42,6 +44,18 @@ public class MockGUIStartValueSpecification extends JPanel {
         electricityConsumptionRow.add(electricityConsumptionField);
         electricityConsumptionRow.add(new JLabel("kwh/year"));
 
+        JPanel waterConsumptionRow = new JPanel();
+        waterConsumptionRow.add(new JLabel("Water consumption"));
+        waterConsumptionField = new JTextField("1",20);
+        waterConsumptionRow.add(waterConsumptionField);
+        waterConsumptionRow.add(new JLabel("m^3/year"));
+
+        JPanel waterPriceRow = new JPanel();
+        waterPriceRow.add(new JLabel("Water price"));
+        waterPriceField = new JTextField("1",20);
+        waterPriceRow.add(waterPriceField);
+        waterPriceRow.add(new JLabel("kr/m^3"));
+
         // Add Components to this panel.
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
@@ -55,6 +69,8 @@ public class MockGUIStartValueSpecification extends JPanel {
         add(aTempRow, c);
         add(electrictyPriceRow, c);
         add(electricityConsumptionRow, c);
+        add(waterConsumptionRow, c);
+        add(waterPriceRow, c);
 
     }
 
@@ -93,11 +109,35 @@ public class MockGUIStartValueSpecification extends JPanel {
             throw new Exception("Electricity consumption must be greater than 0!");
         }
 
+        Double waterConsumptionValue;
+        try {
+
+            waterConsumptionValue = Double.parseDouble(waterConsumptionField.getText());
+        } catch (Exception e) {
+            throw new Exception("Water consumption is not a number!");
+        }
+        if (electrictyConsumptionValue<=0.0) {
+            throw new Exception("Water consumption must be greater than 0!");
+        }
+
+        Double waterPriceValue;
+        try {
+
+            waterPriceValue = Double.parseDouble(waterPriceField.getText());
+        } catch (Exception e) {
+            throw new Exception("Water price is not a number!");
+        }
+        if (electrictyConsumptionValue<=0.0) {
+            throw new Exception("Water price must be greater than 0!");
+        }
+
         new AbstractMap.SimpleEntry<String, String>("Atemp","m^2");
         Map<Map.Entry<String,String>,Double> map = new HashMap<Map.Entry<String,String>,Double>();
         map.put(new AbstractMap.SimpleEntry<String, String>("Atemp","m^2"), aTempValue);
         map.put(new AbstractMap.SimpleEntry<String, String>("Electricty price","kr/kwh"), electricityPriceValue);
         map.put(new AbstractMap.SimpleEntry<String, String>("Electricty consumption","kwh/year"), electrictyConsumptionValue);
+        map.put(new AbstractMap.SimpleEntry<String, String>("Water consumption","m^3/year"), waterConsumptionValue);
+        map.put(new AbstractMap.SimpleEntry<String, String>("Water price","kr/m^3"), waterPriceValue);
 
         return map;
     }

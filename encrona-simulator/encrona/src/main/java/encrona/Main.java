@@ -1,6 +1,7 @@
 package encrona;
 
 import encrona.GUIMockup.MockGUIMain;
+import encrona.expertSystem.ReasoningEngine;
 
 /**
  * This is the main class, and is what is initially executed when starting the program. 
@@ -12,5 +13,8 @@ public class Main {
      */
     public static void main(String[] args) {
         MockGUIMain.main(args);
+        //new ReasoningEngine().recommendations(); //This is for testing the expert system directly, with an empty model
     }
+
+
 }

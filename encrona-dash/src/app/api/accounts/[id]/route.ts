@@ -18,7 +18,7 @@ export async function PUT(
 
   const id = parseInt(params.id);
   const body = await request.json();
-  const { email, name, role, password } = body;
+  const { email, name, role, password, companyId } = body;
 
   if (!email || !name || !role || !password) {
     return new Response(
@@ -39,6 +39,29 @@ export async function PUT(
         ...(isAdmin(session) && role ? { role } : {}), // Only update role if admin
       },
     });
+
+    if (companyId) {
+      await prisma.user.update({
+        where: { id },
+        data: {
+          email,
+          name,
+          password: hashedPassword,
+          ...(isAdmin(session) && role ? { role } : {}), // Only update role if admin
+          company: { connect: { id: companyId } },
+        },
+      });
+    } else {
+      await prisma.user.update({
+        where: { id },
+        data: {
+          email,
+          name,
+          password: hashedPassword,
+          ...(isAdmin(session) && role ? { role } : {}), // Only update role if admin
+        },
+      });
+    }
 
     return new Response(null, { status: 204 });
   } catch (err) {

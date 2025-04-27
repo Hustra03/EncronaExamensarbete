@@ -89,11 +89,18 @@ public class MockGUIHeatingSources extends JPanel {
         kwhPerYearHeatingWaterPage.add(kwhPerYearHeatingWaterField);
         kwhPerYearHeatingWaterPage.add(new JLabel("kwh/year for heating water"));
 
+        JPanel electricityNeededPanel = new JPanel();
+        JTextField electricityNeededField = new JTextField(source.getKwhPerYearInElectricity().toString(), 10);
+        electricityNeededPanel.add(electricityNeededField);
+        electricityNeededPanel.add(new JLabel("kwh in electricity needed for the source to operate"));
+
         heatSourcePage.add(selectButtonPage);
         heatSourcePage.add(new JLabel(source.getName()));
         heatSourcePage.add(costPerKWHPage);
         heatSourcePage.add(kwhPerYearHeatingPage);
         heatSourcePage.add(kwhPerYearHeatingWaterPage);
+        heatSourcePage.add(electricityNeededPanel);
+
         return heatSourcePage;
     }
 
@@ -160,6 +167,7 @@ public class MockGUIHeatingSources extends JPanel {
             Double costPerKWH;
             Double kwhHeatingPerYear;
             Double kwhHeatingWaterPerYear;
+            Double kwhElectricityNeeded;
 
             JPanel heatSourceJPanel = (JPanel) heatSourcePage;
 
@@ -203,8 +211,19 @@ public class MockGUIHeatingSources extends JPanel {
                     throw new Exception("kwh per year for heating water for " + name + " must not be negative");
                 }
 
+                JPanel kwhInElectricityPerYearPage = (JPanel) heatSourceJPanel.getComponent(5);
+                try {
+                    kwhElectricityNeeded = Double.parseDouble(((JTextField) kwhInElectricityPerYearPage.getComponent(0)).getText());
+                } catch (Exception e) {
+                    throw new Exception("Electricity for heat source is not a valid number for " + name);
+                }
+                if (kwhElectricityNeeded<0) {
+                    throw new Exception("Electricity for heat source for " + name + " must be greater than 0");
+                }
+
+
                 heatSources.add(new heatingEnergySource(nameField.getText(), kwhHeatingPerYear, kwhHeatingWaterPerYear,
-                        0.0, costPerKWH));
+                kwhElectricityNeeded, costPerKWH));
             }
         }
 

@@ -14,6 +14,7 @@ import javax.swing.BoxLayout;
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -58,7 +59,7 @@ public class MockGUIImprovements extends JPanel {
         createNewImprovementPage.add(createNewButton);
         createNewImprovementPage.add(createNewNameField);
 
-        // Add Components to this panel.
+        // Add Components to this panel with specific constraints on their layout
         GridBagConstraints c = new GridBagConstraints();
         c.gridwidth = GridBagConstraints.REMAINDER;
 
@@ -89,12 +90,15 @@ public class MockGUIImprovements extends JPanel {
         JPanel krPerM2Page = new JPanel();
         JTextField kwhPerYearHeatingField = new JTextField(improvement.getCostPerM2().toString(), 10);
         krPerM2Page.add(kwhPerYearHeatingField);
-        krPerM2Page.add(new JLabel("kr/m^2 per year"));
+        krPerM2Page.add(new JLabel("kr/m^2 over the improvements lifetime"));
 
         JPanel kwhPerM2Page = new JPanel();
         JTextField kwhPerM2TextField = new JTextField(improvement.getKwhPerM2().toString(), 10);
         kwhPerM2Page.add(kwhPerM2TextField);
-        kwhPerM2Page.add(new JLabel("kwh/m^2 over the improvements lifetime"));
+        String[] unitOptions={"kwh/m^2 over the improvements lifetime","kwh per year"};
+        JComboBox<String> unitSelection = new JComboBox<String>(unitOptions);
+        unitSelection.setSelectedIndex(0);
+        kwhPerM2Page.add(unitSelection);
 
         JPanel yearsOfServicePage = new JPanel();
         JTextField yearsOfServiceField = new JTextField(improvement.getYearsOfService().toString(), 10);
@@ -174,11 +178,12 @@ public class MockGUIImprovements extends JPanel {
      * ordering of its components, so any changes made there will likely break this method
      * <p>
      * 
+     * @param aTemp the area of the building 
      * @return A list of improvement with the provided values
      * @throws Exception If something goes wrong, with the only expected case being
      *                   if the values provided are invalid
      */
-    public static java.util.List<improvement> collectFieldValues() throws Exception {
+    public static java.util.List<improvement> collectFieldValues(Double aTemp) throws Exception {
         List<improvement> improvementsCollected = new ArrayList<improvement>();
 
         // This iterates over all of the heat source pages, and all of their components, to retrive the user provided input
@@ -186,7 +191,7 @@ public class MockGUIImprovements extends JPanel {
 
             Double krPerM2;
             Double kwhPerM2;
-            Integer yearsOfService;
+            Integer yearsOfService;            
             improvementImpactEnum impactType;
 
             JPanel improvementJPanel = (JPanel) improvementPage;
@@ -202,23 +207,14 @@ public class MockGUIImprovements extends JPanel {
 
                 JPanel krPerM2Page = (JPanel) improvementJPanel.getComponent(2);
                 try {
-                    kwhPerM2 = Double.parseDouble(((JTextField) krPerM2Page.getComponent(0)).getText());
-                } catch (Exception e) {
-                    throw new Exception("kwh/m^2 not a valid number for " + name);
-                }
-                if (kwhPerM2<=0.0) {
-                    throw new Exception("kwh/m^2 for " + name + " must be greater than 0");
-                }
-
-                JPanel kwhPerM2Page = (JPanel) improvementJPanel.getComponent(3);
-                try {
-                    krPerM2 = Double.parseDouble(((JTextField) kwhPerM2Page.getComponent(0)).getText());
+                    krPerM2 = Double.parseDouble(((JTextField) krPerM2Page.getComponent(0)).getText());
                 } catch (Exception e) {
                     throw new Exception("kr/m^2 not a valid number for " + name);
                 }
                 if (krPerM2<=0.0) {
                     throw new Exception("kr/m^2 for " + name + " must be greater than 0");
                 }
+
 
                 JPanel yearsOfServicePage = (JPanel) improvementJPanel.getComponent(4);
                 try {
@@ -231,6 +227,26 @@ public class MockGUIImprovements extends JPanel {
                     throw new Exception("years of service for " + name + " must be greater than 0");
                 }
 
+                
+                JPanel kwhPerM2Page = (JPanel) improvementJPanel.getComponent(3);
+                try {
+                    kwhPerM2 = Double.parseDouble(((JTextField) kwhPerM2Page.getComponent(0)).getText());
+                    switch ((String)((JComboBox<String>) kwhPerM2Page.getComponent(1)).getSelectedItem()) {
+                        case "kwh/m^2 over the improvements lifetime":
+                            break;
+                        case "kwh per year":
+                        kwhPerM2=(kwhPerM2*yearsOfService)/aTemp;
+                            break;
+                        default:
+                            throw new Exception("no unit selected for improvement kwh " + name);
+                    }
+                } catch (Exception e) {
+                    throw new Exception("improvement kwh not a valid number for " + name);
+                }
+                if (kwhPerM2<=0.0) {
+                    throw new Exception("kwh for " + name + " must be greater than 0");
+                }
+
                 JPanel impactTypePage = (JPanel) improvementJPanel.getComponent(5);
                 try {
                     String currentlySelected=((JRadioButton)impactTypePage.getComponent(0)).getModel().getGroup().getSelection().getActionCommand();
@@ -240,7 +256,7 @@ public class MockGUIImprovements extends JPanel {
                     throw new Exception("No impact type selected for " + name);
                 }
 
-                improvementsCollected.add(new improvement(name, krPerM2, kwhPerM2,
+                improvementsCollected.add(new improvement(name, kwhPerM2,krPerM2,
                 yearsOfService, impactType));
             }
         }

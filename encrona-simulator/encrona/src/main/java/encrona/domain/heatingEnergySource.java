@@ -4,7 +4,7 @@ public class heatingEnergySource extends objectAbstract {
 
     private Double kwhPerYearHeating;
     private Double kwhPerYearHeatingWater;
-    private Double staticCosts;
+    private Double kwhPerYearInElectricity;
     private Double costPerKwh;
 
     /**
@@ -15,12 +15,12 @@ public class heatingEnergySource extends objectAbstract {
      * @param staticCost Any costs which do not depend on kwh consumption
      * @param costPerKwh Kr per kwh
      */
-    public heatingEnergySource(String name, Double kwhPerYearHeating,Double kwhPerYearHeatingWater, Double staticCost,Double costPerKwh)
+    public heatingEnergySource(String name, Double kwhPerYearHeating,Double kwhPerYearHeatingWater, Double kwhPerYearInElectricity,Double costPerKwh)
     {
         this.setName(name);
         this.kwhPerYearHeating=kwhPerYearHeating;
         this.kwhPerYearHeatingWater=kwhPerYearHeatingWater;
-        this.staticCosts=staticCost;
+        this.kwhPerYearInElectricity=kwhPerYearInElectricity;
         this.costPerKwh=costPerKwh;
     }
 
@@ -33,13 +33,13 @@ public class heatingEnergySource extends objectAbstract {
         this.setName(toCopy.getName());
         this.kwhPerYearHeating=toCopy.getKwhPerYearHeating();
         this.kwhPerYearHeatingWater=toCopy.getKwhPerYearHeatingWater();
-        this.staticCosts=toCopy.getStaticCosts();
+        this.kwhPerYearInElectricity=toCopy.getKwhPerYearInElectricity();
         this.costPerKwh=toCopy.getCostPerKwh();
     }
 
     public String toString()
     {
-        return getName() + " provides " + kwhPerYearHeating +" for building heating and " + kwhPerYearHeatingWater +" for water for the cost " + costPerKwh +" per kwh";
+        return getName() + " provides " + kwhPerYearHeating +" for building heating and " + kwhPerYearHeatingWater +" for water for the cost " + costPerKwh +" per kwh and requiring " + kwhPerYearInElectricity+" kwh per year of electricity";
     }
 
     /**
@@ -65,15 +65,15 @@ public class heatingEnergySource extends objectAbstract {
     public void setKwhPerYearHeatingWater(Double newKwhPerYearHeatingWater){this.kwhPerYearHeatingWater=newKwhPerYearHeatingWater;}
 
     /**
-     * This is a getter for staticCosts
-     * @return The value of staticCosts
+     * This is a getter for kwhPerYearInElectricity
+     * @return The value of kwhPerYearInElectricity
      */
-    public Double getStaticCosts(){return this.staticCosts;}
+    public Double getKwhPerYearInElectricity(){return this.kwhPerYearInElectricity;}
     /**
-     * This is a setter for staticCosts
-     * @param newStaticCosts The new value for staticCosts
+     * This is a setter for kwhPerYearInElectricity
+     * @param newKwhPerYearInElectricity The new value for kwhPerYearInElectricity
      */
-    public void setStaticCosts(Double newStaticCosts){this.staticCosts=newStaticCosts;}
+    public void setKwhPerYearInElectricity(Double newKwhPerYearInElectricity){this.kwhPerYearInElectricity=newKwhPerYearInElectricity;}
 
     /**
      * This is a getter for costPerKwh

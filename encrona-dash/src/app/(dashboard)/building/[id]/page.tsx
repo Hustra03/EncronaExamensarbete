@@ -29,6 +29,7 @@ import {
 } from '@/components/ui/chart';
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 type DataPoint = {
   date: number;
@@ -45,7 +46,6 @@ type DataPoint = {
 
 type BuildingData = {
   name: string;
-  owner: string;
   installedAt?: number;
   estimate?: DataPoint[] | null;
   actual?: DataPoint[] | null;
@@ -87,37 +87,65 @@ export default function Building() {
 
   const isCost = activeChart.toLowerCase().includes('cost');
 
+  const dateToMs = (arr: DataPoint[]) =>
+    arr.map(d => ({ ...d, date: new Date(d.date).getTime() }));
+
+  async function fetchBuildingCurrentData() {
+    const res = await fetch('/api/building/' + id);
+    const recivedData = await res.json();
+
+    let currentEstimate = data?.estimate;
+    if (!currentEstimate || currentEstimate == undefined) {
+      currentEstimate = [];
+    }
+
+    setData(prev => ({
+      ...prev,
+      name: recivedData.building.name,
+      installedAt: recivedData.building.installedAt
+        ? new Date(recivedData.building.installedAt).getTime()
+        : undefined,
+      actual: dateToMs(recivedData.actual),
+      estimate: [...currentEstimate, ...dateToMs(recivedData.estimate)],
+    }));
+
+    setLoading(false);
+  }
+
+  /**
+   * This function sends a request for new estimates, which will return 200 if some are generated, 204 if no more are needed, or 4** if something went wrong
+   */
+  async function requestNewEstimates() {
+    const res = await fetch('/api/simulationResults/' + id);
+
+    let currentEstimate = data?.estimate;
+    if (!currentEstimate || currentEstimate == undefined) {
+      currentEstimate = [];
+    }
+
+    if (res.status == 200) {
+      const recivedData = await res.json();
+      if (recivedData != null) {
+        setData(prev => ({
+          ...prev,
+          estimate: [...currentEstimate, ...dateToMs(recivedData.newEstimates)],
+        }));
+      }
+    } else {
+      if (!res.ok) {
+        //TODO handle errors in some manner here, ex provide a toast to the user
+        console.log(res);
+      }
+    }
+  }
+
+  async function refreshEstimates() {
+    fetchBuildingCurrentData();
+    requestNewEstimates();
+  }
+
   useEffect(() => {
-    const source = new EventSource(`/api/building/${id}`);
-
-    const dateToMs = (arr: DataPoint[]) =>
-      arr.map(d => ({ ...d, date: new Date(d.date).getTime() }));
-
-    source.addEventListener('actual', e => {
-      const parsed = JSON.parse(e.data);
-      setData(prev => ({
-        ...prev,
-        name: parsed.building.name,
-        owner: parsed.building.owner,
-        installedAt: parsed.building.installedAt
-          ? new Date(parsed.building.installedAt).getTime()
-          : undefined,
-        actual: dateToMs(parsed.data),
-      }));
-      setLoading(false);
-    });
-
-    source.addEventListener('estimate', e => {
-      const parsed = JSON.parse(e.data);
-      setData(prev => ({
-        ...(prev as BuildingData),
-        estimate: dateToMs(parsed),
-      }));
-    });
-
-    return () => {
-      source.close();
-    };
+    refreshEstimates();
   }, [id]);
 
   const chartData = useMemo(() => {
@@ -220,6 +248,7 @@ export default function Building() {
                 </>
               )}
             </CardDescription>
+            <Button onClick={refreshEstimates}>Förnya skattningar</Button>
           </div>
           <div className="grid grid-cols-3 px-6 lg:flex">
             {Object.keys(chartConfig).map(key => (

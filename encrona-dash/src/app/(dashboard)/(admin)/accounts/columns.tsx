@@ -24,6 +24,7 @@ import {
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
+import { Company } from '../company/columns';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -32,6 +33,7 @@ export type User = {
   name: string;
   email: string;
   role: Role;
+  company: string;
   createdAt: Date;
 };
 
@@ -54,6 +56,19 @@ export const columns: ColumnDef<User>[] = [
           {role === 'ADMIN' ? 'Administratör' : 'Användare'}
         </Badge>
       );
+    },
+  },
+  {
+    accessorKey: 'company',
+    header: 'Företag',
+    cell: ({ row }) => {
+      const formatted: Company = row.getValue('company');
+
+      if (formatted) {
+        return <div>{formatted.name}</div>;
+      } else {
+        return <div></div>;
+      }
     },
   },
   {

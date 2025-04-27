@@ -3,7 +3,6 @@ package encrona.GUIMockup;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.swing.*;
 
@@ -11,77 +10,90 @@ import encrona.DataLoader;
 import encrona.Model;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
+import encrona.expertSystem.ReasoningEngine;
+import encrona.expertSystem.Rule;
 
-public class MockGUIMain extends JPanel{
-    
-     private static final String runString = "Run Simulation";
-     private JButton runButton;
-     private static JFrame theMainFrame;
-     private static JTabbedPane tabbedPane;
-     private static JPanel outputPage;
+public class MockGUIMain extends JPanel {
+
+    private static final String runString = "Run Simulation";
+    private static final String outputTabName="Output";
+    private static final String expertString = "Run Expert System";
+    private static final String expertSystemTabName="Expert System Output";
 
 
-     public MockGUIMain() {
+    private JButton runButton;
+    private JButton expertButton;
+
+    private static JFrame theMainFrame;
+    private static JTabbedPane tabbedPane;
+    private static JPanel outputPage;
+
+    public MockGUIMain() {
         super(new BorderLayout());
-  
+
         runButton = new JButton(runString);
         runButton.setActionCommand(runString);
-        runButton.addActionListener(new RunListener());                
-        //Create a panel that uses BoxLayout.
+        runButton.addActionListener(new RunListener());
+
+        expertButton = new JButton(expertString);
+        expertButton.setActionCommand(expertString);
+        expertButton.addActionListener(new ExpertListner());
+        // Create a panel that uses BoxLayout.
         JPanel buttonPane = new JPanel();
-        buttonPane.setLayout(new BoxLayout(buttonPane,BoxLayout.LINE_AXIS));
+        buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(runButton);
+        buttonPane.add(expertButton);
 
         tabbedPane = new JTabbedPane();
 
-        //This adds the start tab
+        // This adds the start tab
         String toolTip = "<html>This is where start information is written</html>";
         JPanel startPage = new JPanel();
         startPage.add(new JLabel("Start page text"));
-        tabbedPane.addTab("Start", null, startPage, toolTip);       
+        tabbedPane.addTab("Start", null, startPage, toolTip);
 
-        //This adds the numerical value specification tab
+        // This adds the numerical value specification tab
         String toolTip2 = "<html>This is where you specify numeric values</html>";
         tabbedPane.addTab("Numeric variables", null, new MockGUIStartValueSpecification(), toolTip2);
 
-        //This adds the the heat source tab
+        // This adds the the heat source tab
         String toolTip3 = "<html>This is where you specify heat sources</html>";
-        tabbedPane.addTab("Heat sources", null, new MockGUIHeatingSources(DataLoader.createInitialListOfHeatSources()), toolTip3);
+        tabbedPane.addTab("Heat sources", null, new MockGUIHeatingSources(DataLoader.createInitialListOfHeatSources()),
+                toolTip3);
 
-        //This adds the improvement tab
+        // This adds the improvement tab
         String tooltip4 = "<html>This is where you specify improvements</html>";
-        tabbedPane.addTab("Improvements", null, new MockGUIImprovements(DataLoader.createInitialListOfImprovements()), tooltip4);
+        tabbedPane.addTab("Improvements", null, new MockGUIImprovements(DataLoader.createInitialListOfImprovements()),
+                tooltip4);
 
         add(tabbedPane);
 
-        
-
         add(buttonPane, BorderLayout.PAGE_END);
-     }
+    }
 
-     /**
-      * Create the GUI and show it.  For thread safety,
-      * this method should be invoked from the
-      * event-dispatching thread.
-      */
-      private static void createAndShowGUI() {
-        //Create and set up the window.
-        theMainFrame = new JFrame("MockGUI");
+    /**
+     * Create the GUI and show it. For thread safety,
+     * this method should be invoked from the
+     * event-dispatching thread.
+     */
+    private static void createAndShowGUI() {
+        // Create and set up the window.
+        theMainFrame = new JFrame("Encrona Simulator");
         theMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
- 
-        //Create and set up the content pane.
+
+        // Create and set up the content pane.
         JComponent newContentPane = new MockGUIMain();
-        newContentPane.setOpaque(true); //content panes must be opaque
+        newContentPane.setOpaque(true); // content panes must be opaque
         theMainFrame.setContentPane(newContentPane);
- 
-        //Display the window.
+
+        // Display the window.
         theMainFrame.pack();
         theMainFrame.setVisible(true);
     }
- 
+
     public static void main(String[] args) {
-        //Schedule a job for the event-dispatching thread:
-        //creating and showing this application's GUI.
+        // Schedule a job for the event-dispatching thread:
+        // creating and showing this application's GUI.
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
                 createAndShowGUI();
@@ -89,22 +101,26 @@ public class MockGUIMain extends JPanel{
         });
     }
 
-    //This removes the output tab, if it does exist, to be used when it is being re-generated during simulation
-    public static void removeOutputTab()
-    {
-        if (-1!=tabbedPane.indexOfTab("Output")) {
-            tabbedPane.remove(tabbedPane.indexOfTab("Output"));
+    /**
+     * This removes a tab with the specified String name, if it does exist, to be used when it is being re-generated
+     * @param name The name of the tab to remove if it exists
+     */
+    public static void removeTab(String name) {
+        if (-1 != tabbedPane.indexOfTab(name)) {
+            tabbedPane.remove(tabbedPane.indexOfTab(name));
         }
     }
 
-    //This method creates the output tab, along with its contents, based on the input and the results from the simulation
-    public static void createOutputTab(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables,java.util.List<heatingEnergySource> heatingEnergySources,java.util.List<improvement> improvementsCollected)
-    {
-        //This is the tooltip for the heat source page
+    // This method creates the output tab, along with its contents, based on the
+    // input and the results from the simulation
+    public static void createOutputTab(Map<Map.Entry<String, String>, Double> mapOfNumericalVariables,
+            java.util.List<heatingEnergySource> heatingEnergySources,
+            java.util.List<improvement> improvementsCollected) {
+        // This is the tooltip for the heat source page
         String toolTip = new String("<html>This is where the output is shown</html>");
 
         outputPage = new JPanel();
-        
+
         outputPage.setLayout(new BoxLayout(outputPage, BoxLayout.PAGE_AXIS));
 
         JPanel inputSectionPage = new JPanel();
@@ -113,8 +129,9 @@ public class MockGUIMain extends JPanel{
 
         DefaultListModel<String> listModel = new DefaultListModel<String>();
 
-        for (Map.Entry<String,String> entry : mapOfNumericalVariables.keySet()) {
-            listModel.addElement(entry.getKey() + " was set to " + mapOfNumericalVariables.get(entry) + " " + entry.getKey());
+        for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
+            listModel.addElement(
+                    entry.getKey() + " was set to " + mapOfNumericalVariables.get(entry) + " " + entry.getValue());
         }
 
         for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
@@ -124,8 +141,8 @@ public class MockGUIMain extends JPanel{
         for (improvement imp : improvementsCollected) {
             listModel.addElement(imp.toString());
         }
- 
-        //Create the list and put it in a scroll pane.
+
+        // Create the list and put it in a scroll pane.
         JList<String> list = new JList<String>(listModel);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
@@ -137,54 +154,67 @@ public class MockGUIMain extends JPanel{
         outputPage.add(inputSectionPage);
         JScrollPane scrollableOutputPage = new JScrollPane(outputPage);
 
-        tabbedPane.addTab("Output",null, scrollableOutputPage,toolTip);
+        tabbedPane.addTab(outputTabName, null, scrollableOutputPage, toolTip);
     }
 
-    //This class is used to handle the runButton, with its method called when the runButton is clicked, and should collect the relevant information and start the simulation with it
+    // This class is used to handle the runButton, with its method called when the
+    // runButton is clicked, and should collect the relevant information and start
+    // the simulation with it
     class RunListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-            removeOutputTab();
+            removeTab(outputTabName);
 
-            final Map<Map.Entry<String,String>,Double> mapOfNumericalVariables;
+            final Map<Map.Entry<String, String>, Double> mapOfNumericalVariables;
             final java.util.List<heatingEnergySource> heatingEnergySources;
             final java.util.List<improvement> improvements;
 
             try {
-                mapOfNumericalVariables =MockGUIStartValueSpecification.collectFieldValues();
-                heatingEnergySources=MockGUIHeatingSources.collectFieldValues();
-                improvements=MockGUIImprovements.collectFieldValues();
+                mapOfNumericalVariables = MockGUIStartValueSpecification.collectFieldValues();
+
+                Double aTemp = 1.0;
+                for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
+
+                    if (entry.getKey().equals("Atemp")) {
+                        aTemp = mapOfNumericalVariables.get(entry);
+                    }
+
+                }
+
+                heatingEnergySources = MockGUIHeatingSources.collectFieldValues();
+                improvements = MockGUIImprovements.collectFieldValues(aTemp);
             } catch (Exception error) {
-                JOptionPane.showMessageDialog(theMainFrame,error.getMessage(),"The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",
+                        JOptionPane.PLAIN_MESSAGE);
                 System.out.println(error);
                 return;
             }
-
 
             for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
                 System.out.println(heatingEnergySource.toString());
             }
 
-            createOutputTab(mapOfNumericalVariables,heatingEnergySources,improvements);
+            createOutputTab(mapOfNumericalVariables, heatingEnergySources, improvements);
 
-            //Schedule a job for the event-dispatching thread:
-            //running the simulation specifically in this case
+            // Schedule a job for the event-dispatching thread:
+            // running the simulation specifically in this case
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                java.util.List<String> outputList=Model.runSimulation(mapOfNumericalVariables,improvements, heatingEnergySources);
-                addSimulatorOutputToOutput(outputList);
-            }
+                public void run() {
+                    java.util.List<String> outputList = Model.runSimulation(mapOfNumericalVariables, improvements,
+                            heatingEnergySources);
+                    addSimulatorOutputToOutput(outputList);
+                }
             });
         }
     }
 
     /**
-     * This adds a section to the output tab with the output from the simulator 
+     * This adds a section to the output tab with the output from the simulator
+     * 
      * @param outputList
      */
-    public static void addSimulatorOutputToOutput(java.util.List<String> outputList)
-    {
+    public static void addSimulatorOutputToOutput(java.util.List<String> outputList) {
         JPanel simulatorOutputPage = new JPanel();
-        
+
         DefaultListModel<String> listModel = new DefaultListModel<String>();
         for (String list : outputList) {
             listModel.addElement(list);
@@ -198,12 +228,97 @@ public class MockGUIMain extends JPanel{
 
         simulatorOutputPage.add(listScrollPane);
 
-
         outputPage.add(simulatorOutputPage);
         outputPage.updateUI();
 
     }
 
+    // This is used to handle the run expert system button
+    class ExpertListner implements ActionListener {
+        public void actionPerformed(ActionEvent e) {
+            removeTab(expertSystemTabName);
+            final Map<Map.Entry<String, String>, Double> mapOfNumericalVariables;
+            final java.util.List<heatingEnergySource> heatingEnergySources;
+            final java.util.List<improvement> improvements;
 
-    
+            try {
+                mapOfNumericalVariables = MockGUIStartValueSpecification.collectFieldValues();
+
+                Double aTemp = 1.0;
+                for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
+
+                    if (entry.getKey().equals("Atemp")) {
+                        aTemp = mapOfNumericalVariables.get(entry);
+                    }
+
+                }
+                heatingEnergySources = MockGUIHeatingSources.collectFieldValues();
+                improvements = MockGUIImprovements.collectFieldValues(aTemp);
+            } catch (Exception error) {
+                JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
+                System.out.println(error);
+                return;
+            }
+
+            // Schedule a job for the event-dispatching thread:
+            // running the simulation specifically in this case
+            javax.swing.SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    ReasoningEngine reasoningEngine = new ReasoningEngine();
+                    java.util.List<String> resultList = reasoningEngine.recommendations();
+                    addExpertSystemOutputTab(resultList, reasoningEngine.getTriggeredRules());
+                }
+            });
+        }
+    }
+
+    public static void addExpertSystemOutputTab(java.util.List<String> resultList, java.util.List<Rule> triggeredRules) {
+
+        // This is the tooltip for the heat source page
+        String toolTip = new String("<html>This is where the expert system output is shown</html>");
+
+        JPanel expertPage = new JPanel();
+
+        expertPage.setLayout(new BoxLayout(expertPage, BoxLayout.PAGE_AXIS));
+
+        JPanel resultPage = new JPanel();
+        resultPage.setLayout(new BoxLayout(resultPage, BoxLayout.PAGE_AXIS));
+
+        Integer index=1;
+        for (String resultString : resultList) {
+            resultPage.add(new JLabel(index + " : "+resultString));
+            index+=1;
+        }
+        Dimension minSize = new Dimension(5, 100);
+        Dimension prefSize = new Dimension(5, 100);
+        Dimension maxSize = new Dimension(Short.MAX_VALUE, 100);
+        expertPage.add(new Box.Filler(minSize, prefSize, maxSize));
+
+        expertPage.add(resultPage);
+
+        expertPage.add(new Box.Filler(minSize, prefSize, maxSize));
+
+        DefaultListModel<String> listModel = new DefaultListModel<String>();
+
+        index=1;
+        for (Rule rule : triggeredRules) {
+            listModel.addElement(index + " : "+ rule.toString());
+            index+=1;
+        }
+
+        // Create the list and put it in a scroll pane.
+        JList<String> list = new JList<String>(listModel);
+        list.setSelectedIndex(0);
+        list.setVisibleRowCount(5);
+        JScrollPane listScrollPane = new JScrollPane(list);
+
+        expertPage.add(listScrollPane);
+        expertPage.add(new Box.Filler(minSize, prefSize, maxSize));
+
+        JScrollPane scrollableExpert = new JScrollPane(expertPage);
+
+        tabbedPane.addTab(expertSystemTabName, null, scrollableExpert, toolTip);
+
+    }
+
 }

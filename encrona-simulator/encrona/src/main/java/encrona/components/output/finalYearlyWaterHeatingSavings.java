@@ -42,7 +42,7 @@ public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.E
 
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
-        List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = (List<Map.Entry<Integer, List<heatingEnergySource>>>) dependsOnMap.get("waterHeatingOutput").getValue();
+        List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = (List<Map.Entry<Integer, List<heatingEnergySource>>>) dependsOnMap.get("heatingOutput").getValue();
 
         List<Map.Entry<Integer, List<Map.Entry<String, Double>>>> finalSavings = new ArrayList<Map.Entry<Integer, List<Map.Entry<String, Double>>>>();
 

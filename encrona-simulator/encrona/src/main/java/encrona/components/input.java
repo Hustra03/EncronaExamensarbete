@@ -8,16 +8,16 @@ import java.util.Map;
 public class input<T> extends componentAbstract<T>{
     
     /**
-     * This is a constructor for originalElectricityConsumption 
-     * @param currentElectricityValue The current value
+     * This is a constructor for inputs 
+     * @param name The name of the input
+     * @param unit The unit of the input
+     * @param value The value of the input
      */
     public input(String name, String unit, T value)
     {   this.setName(name);
         this.setUnit(unit);
         this.setValue(value);
     }
-
-    
 
     /**
      * This is the calculate method for input, it applies any modifiers and then completes the input
@@ -28,8 +28,6 @@ public class input<T> extends componentAbstract<T>{
         this.applyModifiers();
         this.complete();
     }
-
-
 
     @Override
     public Map<String, componentAbstract> getDependsOn() {

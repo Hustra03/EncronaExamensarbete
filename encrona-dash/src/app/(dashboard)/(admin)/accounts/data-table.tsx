@@ -16,16 +16,19 @@ import { DataTablePagination } from '@/components/data-table/pagination';
 import { DataTableCore } from '@/components/data-table/table';
 import { AccountSheet } from '@/components/account-sheet';
 import type { User } from './columns';
+import { Company } from '../company/columns';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  companies: Company[];
   onRefresh: () => void;
 }
 
 export function DataTable<TData extends User, TValue>({
   columns,
   data,
+  companies,
   onRefresh,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -82,6 +85,7 @@ export function DataTable<TData extends User, TValue>({
         <DataTableFilter table={table} />
         <AccountSheet
           session={session}
+          companies={companies}
           onSubmit={async data => {
             await fetch('/api/accounts', {
               method: 'POST',
@@ -97,6 +101,7 @@ export function DataTable<TData extends User, TValue>({
         <AccountSheet
           hideTrigger
           session={session}
+          companies={companies}
           open={editingUserOpen}
           onOpenChange={setEditingUserOpen}
           title="Redigera användare"
