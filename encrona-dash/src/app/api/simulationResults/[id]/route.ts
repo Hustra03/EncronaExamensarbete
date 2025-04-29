@@ -45,24 +45,64 @@ export async function GET(
 ) {
   const session = await auth();
 
-  //TODO Add check here so that a signed-in user can access this if they have access to this specific building
-  if (!isAdmin(session)) {
-    return new Response('Unauthorized', { status: 401 });
-  }
+  const { id } = await params;
 
-  const buildingId = parseInt(await params.id);
+  let building;
+
+  const buildingId = parseInt(id);
   if (isNaN(buildingId)) {
-    return new Response('Invalid building ID : ' + params.id, { status: 400 });
+    return new Response('Invalid building ID', { status: 400 });
   }
 
-  const building = await prisma.building.findUnique({
-    where: { id: buildingId },
-    select: {
-      name: true,
-      owner: true,
-      installedAt: true,
-    },
-  });
+  if (!isAdmin(session)) {
+    try {
+      if (session?.user.id == undefined) {
+        throw Error();
+      }
+      const companyId = await prisma.user.findUnique({
+        where: { id: Number.parseInt(session?.user.id) },
+        select: { companyId: true },
+      });
+      if (companyId == null || companyId.companyId == null) {
+        throw Error();
+      }
+      building = await prisma.building.findUnique({
+        where: {
+          id: buildingId,
+          //This retrives buildings which match with the specified company id
+          companiesWithAccess: {
+            some: {
+              id: companyId.companyId,
+            },
+          },
+        },
+        select: {
+          name: true,
+          owner: true,
+          installedAt: true,
+        },
+      });
+
+      if (!building) {
+        return new Response('Unauthorized', { status: 401 });
+      }
+    } catch (error) {
+      console.log(error);
+      return new Response(
+        'You do not belong to any company, please contact Encrona Support',
+        { status: 400 }
+      );
+    }
+  } else {
+    building = await prisma.building.findUnique({
+      where: { id: buildingId },
+      select: {
+        name: true,
+        owner: true,
+        installedAt: true,
+      },
+    });
+  }
 
   if (!building) {
     return new Response('Building not found', { status: 404 });

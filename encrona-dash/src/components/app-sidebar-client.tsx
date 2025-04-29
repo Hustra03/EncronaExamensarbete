@@ -26,6 +26,7 @@ import { NavMain } from '@/components/nav-main';
 import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
 import { Role } from '@/lib/auth';
+import { Building as BuildingType } from '@/app/(dashboard)/(admin)/buildings/columns';
 
 const sidebar = {
   navMain: [
@@ -93,6 +94,29 @@ export function AppSidebarClient({
 }: React.ComponentProps<typeof Sidebar> & {
   user: { name: string; email: string; role: Role };
 }) {
+  const [buildings, setBuildings] = React.useState<BuildingType[]>([]);
+
+  async function fetchBuildings() {
+    const res = await fetch('/api/companyBuildings');
+    if (res.ok) {
+      const data = await res.json();
+      setBuildings(data);
+    }
+  }
+
+  React.useEffect(() => {
+    fetchBuildings();
+  }, []);
+
+  if (buildings) {
+    sidebar.navMain[1].items = buildings.map(buildingObject => {
+      return {
+        title: buildingObject.name,
+        url: '/building/' + buildingObject.id,
+      };
+    });
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
