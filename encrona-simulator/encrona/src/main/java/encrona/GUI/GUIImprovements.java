@@ -1,4 +1,4 @@
-package encrona.GUIMockup;
+package encrona.GUI;
 
 import java.awt.Component;
 import java.awt.Dimension;
@@ -25,12 +25,12 @@ import javax.swing.JTextField;
 import encrona.domain.improvement;
 import encrona.domain.improvementImpactEnum;
 
-public class MockGUIImprovements extends JPanel {
+public class GUIImprovements extends JPanel {
 
     List<improvement> improvements;
     static JPanel improvementSpecificationPage;
 
-    public MockGUIImprovements(List<improvement> initialImprovements) {
+    public GUIImprovements(List<improvement> initialImprovements) {
         super(new GridBagLayout());
 
         JPanel infoPage = new JPanel();

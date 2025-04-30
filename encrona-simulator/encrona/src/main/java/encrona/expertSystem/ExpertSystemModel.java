@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import encrona.DataLoader;
+import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 
 /**
@@ -15,13 +16,17 @@ import encrona.domain.improvement;
  */
 public class ExpertSystemModel {
 
-    List<Map.Entry<improvement,Integer>> sortedListOfImprovementsToConsider; //Note that the list is not sorted during operations, but it will be sorted when it is retrived using get
-    Comparator<Map.Entry<improvement,Integer>> comparator = (p1, p2) ->  p2.getValue()-p1.getValue();
+    private Map<Map.Entry<String, String>, Double> numericalValues;
+    private java.util.List<heatingEnergySource> heatingEnergySources;
+    private List<Map.Entry<improvement,Integer>> sortedListOfImprovementsToConsider; //Note that the list is not sorted during operations, but it will be sorted when it is retrived using get
+    private Comparator<Map.Entry<improvement,Integer>> comparator = (p1, p2) ->  p2.getValue()-p1.getValue();
     
-    public ExpertSystemModel()
+    public ExpertSystemModel(Map<Map.Entry<String, String>, Double> numericalValues,java.util.List<heatingEnergySource> heatingEnergySources)
     {
         //This is a simple comparator, which switches elements if the second is larger (Note that a priority queue sorts smallest to largests by default)
         sortedListOfImprovementsToConsider=new ArrayList<Map.Entry<improvement,Integer>>();
+        this.numericalValues=numericalValues;
+        this.heatingEnergySources=heatingEnergySources;
         populateImprovementList();
     }
 

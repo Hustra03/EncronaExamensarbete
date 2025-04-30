@@ -1,4 +1,4 @@
-package encrona.GUIMockup;
+package encrona.GUI;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -13,7 +13,7 @@ import encrona.domain.improvement;
 import encrona.expertSystem.ReasoningEngine;
 import encrona.expertSystem.Rule;
 
-public class MockGUIMain extends JPanel {
+public class GUIMain extends JPanel {
 
     private static final String runString = "Run Simulation";
     private static final String outputTabName="Output";
@@ -28,7 +28,7 @@ public class MockGUIMain extends JPanel {
     private static JTabbedPane tabbedPane;
     private static JPanel outputPage;
 
-    public MockGUIMain() {
+    public GUIMain() {
         super(new BorderLayout());
 
         runButton = new JButton(runString);
@@ -54,16 +54,16 @@ public class MockGUIMain extends JPanel {
 
         // This adds the numerical value specification tab
         String toolTip2 = "<html>This is where you specify numeric values</html>";
-        tabbedPane.addTab("Numeric variables", null, new MockGUIStartValueSpecification(), toolTip2);
+        tabbedPane.addTab("Numeric variables", null, new GUIStartValueSpecification(), toolTip2);
 
         // This adds the the heat source tab
         String toolTip3 = "<html>This is where you specify heat sources</html>";
-        tabbedPane.addTab("Heat sources", null, new MockGUIHeatingSources(DataLoader.createInitialListOfHeatSources()),
+        tabbedPane.addTab("Heat sources", null, new GUIHeatingSources(DataLoader.createInitialListOfHeatSources()),
                 toolTip3);
 
         // This adds the improvement tab
         String tooltip4 = "<html>This is where you specify improvements</html>";
-        tabbedPane.addTab("Improvements", null, new MockGUIImprovements(DataLoader.createInitialListOfImprovements()),
+        tabbedPane.addTab("Improvements", null, new GUIImprovements(DataLoader.createInitialListOfImprovements()),
                 tooltip4);
 
         add(tabbedPane);
@@ -82,7 +82,7 @@ public class MockGUIMain extends JPanel {
         theMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Create and set up the content pane.
-        JComponent newContentPane = new MockGUIMain();
+        JComponent newContentPane = new GUIMain();
         newContentPane.setOpaque(true); // content panes must be opaque
         theMainFrame.setContentPane(newContentPane);
 
@@ -169,7 +169,7 @@ public class MockGUIMain extends JPanel {
             final java.util.List<improvement> improvements;
 
             try {
-                mapOfNumericalVariables = MockGUIStartValueSpecification.collectFieldValues();
+                mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
 
                 Double aTemp = 1.0;
                 for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
@@ -180,8 +180,8 @@ public class MockGUIMain extends JPanel {
 
                 }
 
-                heatingEnergySources = MockGUIHeatingSources.collectFieldValues();
-                improvements = MockGUIImprovements.collectFieldValues(aTemp);
+                heatingEnergySources = GUIHeatingSources.collectFieldValues();
+                improvements = GUIImprovements.collectFieldValues(aTemp);
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",
                         JOptionPane.PLAIN_MESSAGE);
@@ -239,21 +239,10 @@ public class MockGUIMain extends JPanel {
             removeTab(expertSystemTabName);
             final Map<Map.Entry<String, String>, Double> mapOfNumericalVariables;
             final java.util.List<heatingEnergySource> heatingEnergySources;
-            final java.util.List<improvement> improvements;
 
             try {
-                mapOfNumericalVariables = MockGUIStartValueSpecification.collectFieldValues();
-
-                Double aTemp = 1.0;
-                for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
-
-                    if (entry.getKey().equals("Atemp")) {
-                        aTemp = mapOfNumericalVariables.get(entry);
-                    }
-
-                }
-                heatingEnergySources = MockGUIHeatingSources.collectFieldValues();
-                improvements = MockGUIImprovements.collectFieldValues(aTemp);
+                mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
+                heatingEnergySources = GUIHeatingSources.collectFieldValues();
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
                 System.out.println(error);
@@ -264,7 +253,7 @@ public class MockGUIMain extends JPanel {
             // running the simulation specifically in this case
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ReasoningEngine reasoningEngine = new ReasoningEngine();
+                    ReasoningEngine reasoningEngine = new ReasoningEngine(mapOfNumericalVariables,heatingEnergySources);
                     java.util.List<String> resultList = reasoningEngine.recommendations();
                     addExpertSystemOutputTab(resultList, reasoningEngine.getTriggeredRules());
                 }
