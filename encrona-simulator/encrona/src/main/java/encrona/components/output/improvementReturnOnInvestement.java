@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
-import encrona.domain.improvementImpactEnum;
 import encrona.modifiers.modifierAbstract;
 
 public class improvementReturnOnInvestement extends componentAbstract<List<Map.Entry<String, Double>>> {
@@ -37,14 +36,16 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
 
         Double aTemp = (Double) dependsOnMap.get("Atemp").getValue();
         Double electricityPrice = (Double) dependsOnMap.get("Electricty price").getValue();
-        List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
+        Double waterPrice = (Double) dependsOnMap.get("Water price").getValue();
+
+        List<Map.Entry<improvement, Map<String, Double>>> improvementImpacts = (List<Map.Entry<improvement, Map<String, Double>>>) dependsOnMap.get("improvementImpact").getValue();
         List<heatingEnergySource> heatSources = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
         List<Map.Entry<String, Double>> improvementROI = new ArrayList<Map.Entry<String, Double>>();
 
-        for (Entry<improvement, Double> entry : improvementImpacts) {
+        for (Entry<improvement, Map<String, Double>> entry : improvementImpacts) {
 
-            Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice,heatSources);
+            Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice,waterPrice,heatSources);
             Entry<String, Double> roiEntry = new AbstractMap.SimpleEntry<String, Double>(entry.getKey().getName(),entryROIValue);
             improvementROI.add(roiEntry);
         }
@@ -65,28 +66,19 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      * @return The number of years until investment is repayed (assumes all prices rise at the same rate the investment would)
      * @throws Exception
      */
-    private Double calculateROI(Double aTemp, improvement improvement, Double improvementImpact,
-            Double electricityPrice, List<heatingEnergySource> heatSources) throws Exception {
+    private Double calculateROI(Double aTemp, improvement improvement, Map<String, Double> improvementImpact,
+            Double electricityPrice,Double waterPrice, List<heatingEnergySource> heatSources) throws Exception {
         Double totalCost = improvement.getCostPerM2() * aTemp;
 
-        Double yearsToReturnInvestment = -1.0;
+        Double totalYearlySavings=(improvementImpact.get("electricity") * electricityPrice)+
+        (improvementImpact.get("buildingHeating") * calculateHeatingSourceKwhPrice(heatSources))
+        +
+        (improvementImpact.get("waterHeating") * calculateHeatingWaterSourceKwhPrice(heatSources))
+        +
+        (improvementImpact.get("water")*waterPrice)
+        ;
 
-        switch (improvement.getImpactType()) {
-            case Electricity:
-                yearsToReturnInvestment = totalCost / (improvementImpact * electricityPrice);
-                break;
-            case BuildingHeating:
-                yearsToReturnInvestment = totalCost / (improvementImpact * calculateHeatingSourceKwhPrice(heatSources));
-                //TODO maybe update method here?
-                break;
-            case Water:
-                yearsToReturnInvestment = totalCost / (improvementImpact * calculateHeatingWaterSourceKwhPrice(heatSources));
-                //TODO maybe update method here?
-                break;
-            default:
-                throw new Exception("Calculate ROI misssing implementation for " + improvement.getImpactType());
-        }
-        return yearsToReturnInvestment;
+        return (totalCost/totalYearlySavings);
     }
 
     /**

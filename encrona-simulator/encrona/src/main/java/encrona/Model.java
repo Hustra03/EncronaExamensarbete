@@ -1,14 +1,10 @@
 package encrona;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.LinkedHashSet;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
@@ -26,19 +22,20 @@ public class Model {
      * instantiating relevant data, scheduling tasks, executing tasks and then
      * presenting results
      * 
-     * @param mapOfNumericalVariables A map of numerical variables, in the format <<name,unit>,value>
-     * @param improvement          The list of improvements to implement
-     * @param heatingEnergySources The list of heat sources
-     * @return A list of the different components final values in a standard string
-     *         format
+     * @param mapOfNumericalVariables A map of numerical variables, in the format
+     *                                <<name,unit>,value>
+     * @param improvement             The list of improvements to implement
+     * @param heatingEnergySources    The list of heat sources
+     * @return A map of string lists, which contains different types of output
      */
-    public static List<String> runSimulation(Map<Map.Entry<String,String>,Double> mapOfNumericalVariables,List<improvement> improvement,
+    public static Map<String, List<String>> runSimulation(Map<Map.Entry<String, String>, Double> mapOfNumericalVariables,
+            List<improvement> improvement,
             List<heatingEnergySource> heatingEnergySources) {
         // We instantiate the data
         // TODO change it so it only loads data relevant for the current simulation, if
         // the data grows sufficently large
 
-        dataLoader = new DataLoader(mapOfNumericalVariables,improvement, heatingEnergySources);
+        dataLoader = new DataLoader(mapOfNumericalVariables, improvement, heatingEnergySources);
 
         Collection<componentAbstract> componentsToCalculate = dataLoader.getAllComponentAbstract();
 
@@ -46,22 +43,31 @@ public class Model {
             recursiveRun(component);
         }
 
+        Map<String, List<String>> outputLists = new HashMap<String, List<String>>();
         List<String> outputList = new ArrayList<String>();
+        List<String> clipboardList = new ArrayList<String>();
 
-        // This gives the values, for testing purposes
+        // This prints the values, for testing purposes
         for (componentAbstract componentAbstract : componentsToCalculate) {
 
-            String printString = toStringFunction(componentAbstract);
-            if (printString!="") {
-            outputList.add(printString);
-            System.out.println(printString);
+            if (componentAbstract.getName().equals("dashboardString")) {
+                clipboardList.add((String)componentAbstract.getValue());
+            } else {
+                String printString = toStringFunction(componentAbstract);
+                if (printString != "") {
+                    outputList.add(printString);
+                }
             }
         }
-        return outputList;
+        outputLists.put("clipboard", clipboardList);
+        outputLists.put("output", outputList);
+        return outputLists;
     }
 
     /**
-     * This method creates a string for the value of an componentAbstract, whose value consists of a list or values to a string
+     * This method creates a string for the value of an componentAbstract, whose
+     * value consists of a list or values to a string
+     * 
      * @param componentAbstract The component to generate a value string for
      * @return The components value string
      */
@@ -69,37 +75,34 @@ public class Model {
         String printString = "";
 
         if (componentAbstract.getValue() instanceof java.util.List) {
-            if (((List)componentAbstract.getValue()).size()!=0) {
-            printString+=(componentAbstract.getName() + " equals : [ ");
+            if (((List) componentAbstract.getValue()).size() != 0) {
+                printString += (componentAbstract.getName() + " equals : [ ");
 
-            ((List) componentAbstract.getValue()).toString();
+                ((List) componentAbstract.getValue()).toString();
 
-            for (Object a : (List) componentAbstract.getValue()) {
-                printString+=(a.toString()+", ");
+                for (Object a : (List) componentAbstract.getValue()) {
+                    printString += (a.toString() + ", ");
+                }
+                printString += (" ]");
             }
-            printString+=(" ]");
-        }
         } else {
 
             if (componentAbstract.getValue() instanceof Object[]) {
-                printString+=(componentAbstract.getName() + " equals : [ ");
+                printString += (componentAbstract.getName() + " equals : [ ");
 
-                for (int i = 0; i < ((Object[])componentAbstract.getValue()).length; i++) {
-                    printString+=(((Object[])componentAbstract.getValue())[i].toString()+", ");
+                for (int i = 0; i < ((Object[]) componentAbstract.getValue()).length; i++) {
+                    printString += (((Object[]) componentAbstract.getValue())[i].toString() + ", ");
                 }
-                printString+=(" ]");
+                printString += (" ]");
 
-            }
-            else
-            {
+            } else {
 
-            
-            printString+=(componentAbstract.getName() + " equals ");
-            printString+=(componentAbstract.getValue().toString());
+                printString += (componentAbstract.getName() + " equals ");
+                printString += (componentAbstract.getValue().toString());
 
-            if (!(componentAbstract.getUnit().equals("") || componentAbstract.getUnit() == null)) {
-                printString+=(" " + componentAbstract.getUnit());
-            }
+                if (!(componentAbstract.getUnit().equals("") || componentAbstract.getUnit() == null)) {
+                    printString += (" " + componentAbstract.getUnit());
+                }
             }
         }
 

@@ -11,7 +11,6 @@ import java.util.Set;
 
 import encrona.components.componentAbstract;
 import encrona.domain.improvement;
-import encrona.domain.improvementImpactEnum;
 import encrona.modifiers.modifierAbstract;
 
 public class finalYearlyElectricityConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>> {
@@ -44,16 +43,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
 
         Double baseValue = (Double) dependsOnMap.get("originalElectricityConsumption").getValue();
 
-        List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
-        // Here we create a shallow copy of improvementImpacts, so the list is cloned
-        // but the objects are the same instances as in the origninal
-        improvementImpacts = (List<Entry<improvement, Double>>) ((ArrayList) improvementImpacts).clone();
-        // https://www.w3schools.com/java/java_lambda.asp
-        // This removes all improvements which do not impact Electricity
-        // TODO update this if type structure is changed
-        improvementImpacts.removeIf((improvement) -> {
-            return !(improvement.getKey().getImpactType().equals(improvementImpactEnum.Electricity));
-        });
+        List<Map.Entry<improvement,Map<String,Double>>> improvementImpacts = (List<Map.Entry<improvement,Map<String,Double>>>) dependsOnMap.get("improvementImpact").getValue();
 
         // Note that we use Map.Entry<Double,Double> to represent a pair of doubles, in
         // this case years of service and yearly consumption
@@ -67,7 +57,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
             // need to find electricity for
             Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
 
-            for (Entry<improvement, Double> entry : improvementImpacts) {
+            for (Entry<improvement,Map<String,Double>> entry : improvementImpacts) {
                 uniqueYearsOfService.add(entry.getKey().getYearsOfService());
             }
 
@@ -83,12 +73,12 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
                     min = yearsOfService[i - 1];
                 }
 
-                for (Entry<improvement, Double> entry : improvementImpacts) {
+                for (Entry<improvement,Map<String,Double>> entry : improvementImpacts) {
                     if (entry.getKey().getYearsOfService() > min) {
                         if (entry.getKey().getYearsOfService() < currentMin) {
                             currentMin = entry.getKey().getYearsOfService();
                         }
-                        improvementImpact += (entry.getValue());
+                        improvementImpact += (entry.getValue().get("electricity"));
 
                     }
                 }

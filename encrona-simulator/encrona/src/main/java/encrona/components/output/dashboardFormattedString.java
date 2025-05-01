@@ -116,7 +116,6 @@ public class dashboardFormattedString extends componentAbstract<String>{
         object.put("heatSources", heatSourcesOverTimeArray);
 
         setValue(object.toString());
-        System.out.println(object.toString());
     }
     
 }

@@ -1,7 +1,9 @@
 package encrona.GUI;
 
+// Link to example used for this https://blog.idrsolutions.com/tutorial-copy-text-javafx-swing/#Copying_Text_in_Swing 
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.datatransfer.StringSelection;//
 import java.util.Map;
 
 import javax.swing.*;
@@ -16,13 +18,14 @@ import encrona.expertSystem.Rule;
 public class GUIMain extends JPanel {
 
     private static final String runString = "Run Simulation";
-    private static final String outputTabName="Output";
+    private static final String outputTabName = "Output";
     private static final String expertString = "Run Expert System";
-    private static final String expertSystemTabName="Expert System Output";
-
+    private static final String expertSystemTabName = "Expert System Output";
 
     private JButton runButton;
     private JButton expertButton;
+    private static JButton clipboardButton;
+    private static String clipboardString;
 
     private static JFrame theMainFrame;
     private static JTabbedPane tabbedPane;
@@ -38,6 +41,10 @@ public class GUIMain extends JPanel {
         expertButton = new JButton(expertString);
         expertButton.setActionCommand(expertString);
         expertButton.addActionListener(new ExpertListner());
+
+        clipboardButton=new JButton("Copy to clipboard");
+        clipboardButton.addActionListener(new clipboardListener());
+
         // Create a panel that uses BoxLayout.
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
@@ -102,7 +109,9 @@ public class GUIMain extends JPanel {
     }
 
     /**
-     * This removes a tab with the specified String name, if it does exist, to be used when it is being re-generated
+     * This removes a tab with the specified String name, if it does exist, to be
+     * used when it is being re-generated
+     * 
      * @param name The name of the tab to remove if it exists
      */
     public static void removeTab(String name) {
@@ -189,35 +198,50 @@ public class GUIMain extends JPanel {
                 return;
             }
 
-            for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
-                System.out.println(heatingEnergySource.toString());
-            }
-
             createOutputTab(mapOfNumericalVariables, heatingEnergySources, improvements);
 
             // Schedule a job for the event-dispatching thread:
             // running the simulation specifically in this case
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    java.util.List<String> outputList = Model.runSimulation(mapOfNumericalVariables, improvements,
+                    Map<String, java.util.List<String>> outputLists = Model.runSimulation(mapOfNumericalVariables,
+                            improvements,
                             heatingEnergySources);
-                    addSimulatorOutputToOutput(outputList);
+                    addSimulatorOutputToOutput(outputLists);
                 }
             });
         }
     }
+
+        // This class is used to handle the toClipboard button
+        class clipboardListener implements ActionListener {
+            public void actionPerformed(ActionEvent e) {
+                StringSelection clipboardOutput = new StringSelection(clipboardString);
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardOutput, null);
+                JOptionPane.showMessageDialog(theMainFrame, "Copied dashboard string to clipboard", "Copied to clipboard",
+                JOptionPane.PLAIN_MESSAGE);
+            }
+        }
 
     /**
      * This adds a section to the output tab with the output from the simulator
      * 
      * @param outputList
      */
-    public static void addSimulatorOutputToOutput(java.util.List<String> outputList) {
+    public static void addSimulatorOutputToOutput(Map<String, java.util.List<String>> outputLists) {
         JPanel simulatorOutputPage = new JPanel();
 
+        // Link to example used for this
+        // https://blog.idrsolutions.com/tutorial-copy-text-javafx-swing/#Copying_Text_in_Swing
+
+        clipboardString="";
+        for (String listItem : outputLists.get("clipboard")) {
+            clipboardString += listItem;
+        }
+
         DefaultListModel<String> listModel = new DefaultListModel<String>();
-        for (String list : outputList) {
-            listModel.addElement(list);
+        for (String listItem : outputLists.get("output")) {
+            listModel.addElement(listItem);
         }
         JList<String> list = new JList<String>(listModel);
         list.setSelectedIndex(0);
@@ -225,6 +249,7 @@ public class GUIMain extends JPanel {
         JScrollPane listScrollPane = new JScrollPane(list);
 
         simulatorOutputPage.add(new JLabel("Simultor Output"));
+        simulatorOutputPage.add(clipboardButton);
 
         simulatorOutputPage.add(listScrollPane);
 
@@ -244,7 +269,8 @@ public class GUIMain extends JPanel {
                 mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
                 heatingEnergySources = GUIHeatingSources.collectFieldValues();
             } catch (Exception error) {
-                JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",
+                        JOptionPane.PLAIN_MESSAGE);
                 System.out.println(error);
                 return;
             }
@@ -253,7 +279,8 @@ public class GUIMain extends JPanel {
             // running the simulation specifically in this case
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ReasoningEngine reasoningEngine = new ReasoningEngine(mapOfNumericalVariables,heatingEnergySources);
+                    ReasoningEngine reasoningEngine = new ReasoningEngine(mapOfNumericalVariables,
+                            heatingEnergySources);
                     java.util.List<String> resultList = reasoningEngine.recommendations();
                     addExpertSystemOutputTab(resultList, reasoningEngine.getTriggeredRules());
                 }
@@ -261,7 +288,8 @@ public class GUIMain extends JPanel {
         }
     }
 
-    public static void addExpertSystemOutputTab(java.util.List<String> resultList, java.util.List<Rule> triggeredRules) {
+    public static void addExpertSystemOutputTab(java.util.List<String> resultList,
+            java.util.List<Rule> triggeredRules) {
 
         // This is the tooltip for the heat source page
         String toolTip = new String("<html>This is where the expert system output is shown</html>");
@@ -273,10 +301,10 @@ public class GUIMain extends JPanel {
         JPanel resultPage = new JPanel();
         resultPage.setLayout(new BoxLayout(resultPage, BoxLayout.PAGE_AXIS));
 
-        Integer index=1;
+        Integer index = 1;
         for (String resultString : resultList) {
-            resultPage.add(new JLabel(index + " : "+resultString));
-            index+=1;
+            resultPage.add(new JLabel(index + " : " + resultString));
+            index += 1;
         }
         Dimension minSize = new Dimension(5, 100);
         Dimension prefSize = new Dimension(5, 100);
@@ -289,10 +317,10 @@ public class GUIMain extends JPanel {
 
         DefaultListModel<String> listModel = new DefaultListModel<String>();
 
-        index=1;
+        index = 1;
         for (Rule rule : triggeredRules) {
-            listModel.addElement(index + " : "+ rule.toString());
-            index+=1;
+            listModel.addElement(index + " : " + rule.toString());
+            index += 1;
         }
 
         // Create the list and put it in a scroll pane.

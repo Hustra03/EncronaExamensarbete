@@ -23,12 +23,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 
 import encrona.domain.improvement;
-import encrona.domain.improvementImpactEnum;
 
 public class GUIImprovements extends JPanel {
 
     List<improvement> improvements;
     static JPanel improvementSpecificationPage;
+
+    final static String kwhHeatingOverLifetimeUnit="kwh/m^2 over the improvements lifetime for building heating";
+    final static String kwhHeatingPerYearUnit="kwh per year for building heating";
+    final static String kwhHeatingWaterOverLifetimeUnit="kwh/m^2 over the improvements lifetime for heating water";
+    final static String kwhHeatingWaterPerYearUnit="kwh per year for water heating";
+    final static String kwhElectricityOverLifetimeUnit="kwh/m^2 over the improvements lifetime for electricity";
+    final static String kwhElectricityPerYearUnit="kwh per year for electricity";
+    final static String m3WaterOverImprovementLifetimeUnit="m^3 water/m^2 Atemp over the improvements lifetime for water";
+    final static String m3WaterPerYearUnit="m^3 per year for water";
+
 
     public GUIImprovements(List<improvement> initialImprovements) {
         super(new GridBagLayout());
@@ -68,15 +77,16 @@ public class GUIImprovements extends JPanel {
 
         c.fill = GridBagConstraints.BOTH;
         c.weighty = 0.10;
-        c.weightx=1.0;
+        c.weightx = 1.0;
         add(createNewImprovementPage, c);
         c.weighty = 0.90;
-        c.weightx=0.9;
+        c.weightx = 0.9;
         add(scrollimprovementSpecificationPage, c);
     }
 
     /**
      * This creates an improvement page, based on a provided improvement
+     * 
      * @param improvement The improvement this page is for
      * @return The improvement page component
      */
@@ -92,38 +102,52 @@ public class GUIImprovements extends JPanel {
         krPerM2Page.add(kwhPerYearHeatingField);
         krPerM2Page.add(new JLabel("kr/m^2 over the improvements lifetime"));
 
-        JPanel kwhPerM2Page = new JPanel();
-        JTextField kwhPerM2TextField = new JTextField(improvement.getKwhPerM2().toString(), 10);
-        kwhPerM2Page.add(kwhPerM2TextField);
-        String[] unitOptions={"kwh/m^2 over the improvements lifetime","kwh per year"};
+        JPanel kwhPerM2BuildingHeatingPage = new JPanel();
+        JTextField kwhPerM2TextField = new JTextField(improvement.getKwhPerM2BuildingHeating().toString(), 10);
+        kwhPerM2BuildingHeatingPage.add(kwhPerM2TextField);
+        String[] unitOptions = { kwhHeatingOverLifetimeUnit,kwhHeatingPerYearUnit};
         JComboBox<String> unitSelection = new JComboBox<String>(unitOptions);
         unitSelection.setSelectedIndex(0);
-        kwhPerM2Page.add(unitSelection);
+        kwhPerM2BuildingHeatingPage.add(unitSelection);
+
+        JPanel kwhPerM2WaterHeatingPage = new JPanel();
+        JTextField kwhPerM2WaterHeatingTextField = new JTextField(improvement.getKwhPerM2WaterHeating().toString(), 10);
+        kwhPerM2WaterHeatingPage.add(kwhPerM2WaterHeatingTextField);
+        String[] unitOptions2 = { kwhHeatingWaterOverLifetimeUnit,
+            kwhHeatingWaterPerYearUnit };
+        JComboBox<String> unitSelection2 = new JComboBox<String>(unitOptions2);
+        unitSelection2.setSelectedIndex(0);
+        kwhPerM2WaterHeatingPage.add(unitSelection2);
+        
+        JPanel kwhPerM2ElectricityPage = new JPanel();
+        JTextField kwhPerM2ElectricityTextField = new JTextField(improvement.getKwhPerM2Electricity().toString(), 10);
+        kwhPerM2ElectricityPage.add(kwhPerM2ElectricityTextField);
+        String[] unitOptions3 = { kwhElectricityOverLifetimeUnit,kwhElectricityPerYearUnit };
+        JComboBox<String> unitSelection3 = new JComboBox<String>(unitOptions3);
+        unitSelection3.setSelectedIndex(0);
+        kwhPerM2ElectricityPage.add(unitSelection3);
+
+        JPanel m3WaterPage = new JPanel();
+        JTextField m3TextField = new JTextField(improvement.getM3PerM2Water().toString(), 10);
+        m3WaterPage.add(m3TextField);
+        String[] unitOptions4 ={m3WaterOverImprovementLifetimeUnit,m3WaterPerYearUnit};
+        JComboBox<String> unitSelection4 = new JComboBox<String>(unitOptions4);
+        unitSelection4.setSelectedIndex(0);
+        m3WaterPage.add(unitSelection4);
 
         JPanel yearsOfServicePage = new JPanel();
         JTextField yearsOfServiceField = new JTextField(improvement.getYearsOfService().toString(), 10);
         yearsOfServicePage.add(yearsOfServiceField);
         yearsOfServicePage.add(new JLabel("years the improvement is efficent"));
 
-        JPanel impactTypePage = new JPanel(new GridLayout(0, 1));
-        ButtonGroup impactTypeGroup = new ButtonGroup();
-
-        for (improvementImpactEnum impactEnum : improvementImpactEnum.values()) {
-            JRadioButton radioButton = new JRadioButton(impactEnum.toString());
-            radioButton.setActionCommand(impactEnum.toString());
-            impactTypeGroup.add(radioButton);
-            if (impactEnum.equals(improvement.getImpactType())) {
-                impactTypeGroup.setSelected(radioButton.getModel(), true);
-            }
-            impactTypePage.add(radioButton);
-        }
-
         improvementPage.add(selectButtonPage);
         improvementPage.add(new JLabel(improvement.getName()));
         improvementPage.add(krPerM2Page);
-        improvementPage.add(kwhPerM2Page);
+        improvementPage.add(kwhPerM2BuildingHeatingPage);
+        improvementPage.add(kwhPerM2WaterHeatingPage);
+        improvementPage.add(kwhPerM2ElectricityPage);
+        improvementPage.add(m3WaterPage);
         improvementPage.add(yearsOfServicePage);
-        improvementPage.add(impactTypePage);
 
         return improvementPage;
     }
@@ -160,7 +184,7 @@ public class GUIImprovements extends JPanel {
                         return;
                     }
                 }
-                improvement newImprovement = new improvement(name, 0.0, 0.0, 0, improvementImpactEnum.Electricity);
+                improvement newImprovement = new improvement(name, 0.0, 0.0, 0.0, 0.0, 0.0, 0);
                 improvements.add(newImprovement);
                 JPanel improvementPage = createImprovementPage(newImprovement);
                 improvementSpecificationPage.add(improvementPage);
@@ -175,10 +199,11 @@ public class GUIImprovements extends JPanel {
      * exist in the improvement component
      * <p>
      * Note that this depends on the structure of the improvement page, and the
-     * ordering of its components, so any changes made there will likely break this method
+     * ordering of its components, so any changes made there will likely break this
+     * method
      * <p>
      * 
-     * @param aTemp the area of the building 
+     * @param aTemp the area of the building
      * @return A list of improvement with the provided values
      * @throws Exception If something goes wrong, with the only expected case being
      *                   if the values provided are invalid
@@ -186,24 +211,40 @@ public class GUIImprovements extends JPanel {
     public static java.util.List<improvement> collectFieldValues(Double aTemp) throws Exception {
         List<improvement> improvementsCollected = new ArrayList<improvement>();
 
-        // This iterates over all of the heat source pages, and all of their components, to retrive the user provided input
+        // This iterates over all of the heat source pages, and all of their components,
+        // to retrive the user provided input
         for (Component improvementPage : improvementSpecificationPage.getComponents()) {
 
             Double krPerM2;
-            Double kwhPerM2;
-            Integer yearsOfService;            
-            improvementImpactEnum impactType;
+            Double kwhPerM2HeatingBuilding;
+            Double kwhPerM2HeatingWater;
+            Double kwhPerM2Electricity;
+            Double m3WaterPerM2;
+
+            Integer yearsOfService;
 
             JPanel improvementJPanel = (JPanel) improvementPage;
 
-            JCheckBox selectBox = (JCheckBox) ((JPanel)improvementJPanel.getComponent(0)).getComponent(0);
+            JCheckBox selectBox = (JCheckBox) ((JPanel) improvementJPanel.getComponent(0)).getComponent(0);
             Boolean selected = selectBox.isSelected();
 
-            // This confirms that the user selected this specific heat source 
+            // This confirms that the user selected this specific improvement
             if (selected) {
+
 
                 JLabel nameLabel = (JLabel) improvementJPanel.getComponent(1);
                 String name = nameLabel.getText();
+
+                JPanel yearsOfServicePage = (JPanel) improvementJPanel.getComponent(7);
+                try {
+                    yearsOfService = Integer
+                            .parseInt(((JTextField) yearsOfServicePage.getComponent(0)).getText());
+                } catch (Exception e) {
+                    throw new Exception("years of service is not a valid number for " + name);
+                }
+                if (yearsOfService <= 0) {
+                    throw new Exception("years of service for " + name + " must be greater than 0");
+                }
 
                 JPanel krPerM2Page = (JPanel) improvementJPanel.getComponent(2);
                 try {
@@ -211,53 +252,91 @@ public class GUIImprovements extends JPanel {
                 } catch (Exception e) {
                     throw new Exception("kr/m^2 not a valid number for " + name);
                 }
-                if (krPerM2<=0.0) {
+                if (krPerM2 <= 0.0) {
                     throw new Exception("kr/m^2 for " + name + " must be greater than 0");
                 }
-
-
-                JPanel yearsOfServicePage = (JPanel) improvementJPanel.getComponent(4);
-                try {
-                    yearsOfService = Integer
-                            .parseInt(((JTextField) yearsOfServicePage.getComponent(0)).getText());
-                } catch (Exception e) {
-                    throw new Exception("years of service is not a valid number for " + name);
-                }
-                if (yearsOfService<=0) {
-                    throw new Exception("years of service for " + name + " must be greater than 0");
-                }
-
                 
-                JPanel kwhPerM2Page = (JPanel) improvementJPanel.getComponent(3);
+                JPanel kwhPerM2HeatingBuildingPage = (JPanel) improvementJPanel.getComponent(3);
                 try {
-                    kwhPerM2 = Double.parseDouble(((JTextField) kwhPerM2Page.getComponent(0)).getText());
-                    switch ((String)((JComboBox<String>) kwhPerM2Page.getComponent(1)).getSelectedItem()) {
-                        case "kwh/m^2 over the improvements lifetime":
+                    kwhPerM2HeatingBuilding = Double.parseDouble(((JTextField) kwhPerM2HeatingBuildingPage.getComponent(0)).getText());
+                    switch ((String) ((JComboBox<String>) kwhPerM2HeatingBuildingPage.getComponent(1)).getSelectedItem()) {
+                        case kwhHeatingOverLifetimeUnit:
                             break;
-                        case "kwh per year":
-                        kwhPerM2=(kwhPerM2*yearsOfService)/aTemp;
+                        case kwhHeatingPerYearUnit:
+                        kwhPerM2HeatingBuilding = (kwhPerM2HeatingBuilding * yearsOfService) / aTemp;
                             break;
                         default:
                             throw new Exception("no unit selected for improvement kwh " + name);
                     }
                 } catch (Exception e) {
-                    throw new Exception("improvement kwh not a valid number for " + name);
+                    System.out.println(e);
+                    throw new Exception("improvement kwh for heating the building is not a valid number for " + name);
                 }
-                if (kwhPerM2<=0.0) {
-                    throw new Exception("kwh for " + name + " must be greater than 0");
+                if (kwhPerM2HeatingBuilding < 0.0) {
+                    throw new Exception("kwh heating the building for " + name + " must be non-negative");
                 }
 
-                JPanel impactTypePage = (JPanel) improvementJPanel.getComponent(5);
+                JPanel kwhPerM2HeatingWaterPage = (JPanel) improvementJPanel.getComponent(4);
                 try {
-                    String currentlySelected=((JRadioButton)impactTypePage.getComponent(0)).getModel().getGroup().getSelection().getActionCommand();
-                    System.out.println(currentlySelected);
-                    impactType = improvementImpactEnum.valueOf(currentlySelected);
+                    kwhPerM2HeatingWater = Double.parseDouble(((JTextField) kwhPerM2HeatingWaterPage.getComponent(0)).getText());
+                    switch ((String) ((JComboBox<String>) kwhPerM2HeatingWaterPage.getComponent(1)).getSelectedItem()) {
+                        case kwhHeatingWaterOverLifetimeUnit:
+                            break;
+                        case kwhHeatingWaterPerYearUnit:
+                        kwhPerM2HeatingWater = (kwhPerM2HeatingWater * yearsOfService) / aTemp;
+                            break;
+                        default:
+                            throw new Exception("no unit selected for improvement kwh " + name);
+                    }
                 } catch (Exception e) {
-                    throw new Exception("No impact type selected for " + name);
+                    System.out.println(e);
+                    throw new Exception("improvement kwh heating water not a valid number for " + name);
+                }
+                if (kwhPerM2HeatingWater < 0.0) {
+                    throw new Exception("kwh heating water for " + name + " must be non-negative");
+                }
+                JPanel kwhPerM2ElectricityPage = (JPanel) improvementJPanel.getComponent(5);
+                try {
+                    kwhPerM2Electricity = Double.parseDouble(((JTextField) kwhPerM2ElectricityPage.getComponent(0)).getText());
+                    switch ((String) ((JComboBox<String>) kwhPerM2ElectricityPage.getComponent(1)).getSelectedItem()) {
+                        case kwhElectricityOverLifetimeUnit:
+                            break;
+                        case kwhElectricityPerYearUnit:
+                        kwhPerM2Electricity = (kwhPerM2Electricity * yearsOfService) / aTemp;
+                            break;
+                        default:
+                            throw new Exception("no unit selected for improvement kwh " + name);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                    throw new Exception("improvement kwh for electricity not a valid number for " + name);
+                }
+                if (kwhPerM2Electricity < 0.0) {
+                    throw new Exception("kwh for electricity for " + name + " must be non-negative");
                 }
 
-                improvementsCollected.add(new improvement(name, kwhPerM2,krPerM2,
-                yearsOfService, impactType));
+                JPanel m3PerM2Page = (JPanel) improvementJPanel.getComponent(6);
+                try {
+                    m3WaterPerM2 = Double.parseDouble(((JTextField) m3PerM2Page.getComponent(0)).getText());
+                    switch ((String) ((JComboBox<String>) m3PerM2Page.getComponent(1)).getSelectedItem()) {
+                        case m3WaterOverImprovementLifetimeUnit:
+                            break;
+                        case m3WaterPerYearUnit:
+                        m3WaterPerM2 = (m3WaterPerM2 * yearsOfService) / aTemp;
+                            break;
+                        default:
+                            throw new Exception("no unit selected for improvement kwh " + name);
+                    }
+                } catch (Exception e) {
+                    System.out.println(e);
+                    throw new Exception("improvement m^3 not a valid number for " + name);
+                }
+                if (m3WaterPerM2 < 0.0) {
+                    throw new Exception("m^3 for " + name + " must be non-negative");
+                }
+
+
+                improvementsCollected.add(new improvement(name, kwhPerM2HeatingBuilding, kwhPerM2HeatingWater, kwhPerM2Electricity, m3WaterPerM2, krPerM2, yearsOfService));
             }
         }
 

@@ -1,6 +1,5 @@
 package encrona.modifiers.basicModifiers;
 
-import encrona.domain.systems.heatingSystem;
 import encrona.modifiers.modifierAbstract;
 
 public class multiplicationModifier extends modifierAbstract<Double>{
