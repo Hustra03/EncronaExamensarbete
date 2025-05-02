@@ -3,9 +3,12 @@ package encrona.GUI;
 // Link to example used for this https://blog.idrsolutions.com/tutorial-copy-text-javafx-swing/#Copying_Text_in_Swing 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.awt.datatransfer.StringSelection;//
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import encrona.DataLoader;
@@ -53,12 +56,6 @@ public class GUIMain extends JPanel {
 
         tabbedPane = new JTabbedPane();
 
-        // This adds the start tab
-        String toolTip = "<html>This is where start information is written</html>";
-        JPanel startPage = new JPanel();
-        startPage.add(new JLabel("Start page text"));
-        tabbedPane.addTab("Start", null, startPage, toolTip);
-
         // This adds the numerical value specification tab
         String toolTip2 = "<html>This is where you specify numeric values</html>";
         tabbedPane.addTab("Numeric variables", null, new GUIStartValueSpecification(), toolTip2);
@@ -92,6 +89,11 @@ public class GUIMain extends JPanel {
         JComponent newContentPane = new GUIMain();
         newContentPane.setOpaque(true); // content panes must be opaque
         theMainFrame.setContentPane(newContentPane);
+        try {
+            theMainFrame.setIconImage(ImageIO.read(new File("encrona-simulator\\encrona\\src\\main\\resources\\Encrona.png")));
+        } catch (IOException e) {
+            System.out.println("Unable to set icon");
+        }
 
         // Display the window.
         theMainFrame.pack();

@@ -1,6 +1,7 @@
 package encrona.GUI;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -100,6 +101,7 @@ public class GUIHeatingSources extends JPanel {
         heatSourcePage.add(kwhPerYearHeatingPage);
         heatSourcePage.add(kwhPerYearHeatingWaterPage);
         heatSourcePage.add(electricityNeededPanel);
+        heatSourcePage.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         return heatSourcePage;
     }
