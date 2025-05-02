@@ -2,14 +2,10 @@ package encrona.components.output;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import encrona.domain.heatingEnergySource;
 import encrona.components.componentAbstract;
 import encrona.modifiers.modifierAbstract;
 import encrona.domain.improvement;
@@ -51,14 +47,12 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
         Entry<Integer, Double> alwaysIncludedEntry = new AbstractMap.SimpleEntry<Integer, Double>(-1, baseValue);
         waterConsumptionList.add(alwaysIncludedEntry);
 
-        int i = 0;
         for (Map.Entry<improvement, Map<String, Double>> impact : improvementImpacts) {
             // https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html
             Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(
                     impact.getKey().getYearsOfService(),
-                    Double.min(baseValue - impact.getValue().get("water"), 0.0));
+                    Double.max(baseValue - impact.getValue().get("water"), 0.0));
             waterConsumptionList.add(entry);
-            i++;
         }
 
         this.setValue(waterConsumptionList);

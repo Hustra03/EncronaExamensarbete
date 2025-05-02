@@ -8,6 +8,8 @@ export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
+  const { id:idParam } = await params;
+
   const session = await auth();
 
   if (!session || (!isAdmin(session) && session.user.id !== params.id)) {
@@ -16,7 +18,7 @@ export async function PUT(
     });
   }
 
-  const id = parseInt(params.id);
+  const id = parseInt(idParam);
   const body = await request.json();
   const { email, name, role, password, companyId } = body;
 
