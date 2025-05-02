@@ -3,22 +3,22 @@ import prisma from '../../../../../prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }>}
 ) {
   const session = await auth();
 
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
-  await params;
-  const id = parseInt(params.id);
+  const { id:idParam } = await params;
+  const id = parseInt(idParam);
 
   const buildings = await prisma.building.findMany({
     where: {
       //This retrives buildings which match with the specified company id
       companiesWithAccess: {
         some: {
-          companyId: id,
+          id: id,
         },
       },
     },

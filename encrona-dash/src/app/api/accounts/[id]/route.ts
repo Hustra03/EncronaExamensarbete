@@ -7,12 +7,12 @@ const prisma = new PrismaClient();
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }>}
 ) {
   const { id:idParam } = await params;
 
   const session = await auth();
-  if (!session || (!isAdmin(session) && session.user.id !== params.id)) {
+  if (!session || (!isAdmin(session) && session.user.id !== idParam)) {
     return new Response(JSON.stringify({ message: 'Unauthorized' }), {
       status: 401,
     });
@@ -77,15 +77,17 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }>}
 ) {
+  const { id:idParam } = await params;
+
   const session = await auth();
 
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const id = parseInt(params.id);
+  const id = parseInt(idParam);
 
   try {
     await prisma.user.delete({ where: { id } });
