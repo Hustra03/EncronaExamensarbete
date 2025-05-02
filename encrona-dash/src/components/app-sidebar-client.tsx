@@ -11,6 +11,7 @@ import {
   Eye,
   ComputerIcon,
   Building2Icon,
+  HistoryIcon,
 } from 'lucide-react';
 
 import {
@@ -61,6 +62,11 @@ const sidebar = {
       title: 'Fastigheter',
       url: '/buildings',
       icon: HousePlus,
+    },
+    {
+      title: 'Historisk Data',
+      url: '/historic-data',
+      icon: HistoryIcon,
     },
     {
       title: 'Simulation',
