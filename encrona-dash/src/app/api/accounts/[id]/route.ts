@@ -1,17 +1,17 @@
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { auth, isAdmin } from '@/lib/auth';
+import { NextRequest } from 'next/server';
 
 const prisma = new PrismaClient();
 
 export async function PUT(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   const { id:idParam } = await params;
 
   const session = await auth();
-
   if (!session || (!isAdmin(session) && session.user.id !== params.id)) {
     return new Response(JSON.stringify({ message: 'Unauthorized' }), {
       status: 401,
@@ -19,7 +19,7 @@ export async function PUT(
   }
 
   const id = parseInt(idParam);
-  const body = await request.json();
+  const body = await req.json();
   const { email, name, role, password, companyId } = body;
 
   if (!email || !name || !role || !password) {
