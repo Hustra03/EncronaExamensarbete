@@ -18,6 +18,11 @@ enum BuildingDataType {
   ACTUAL
 }
 
+enum DeviceSource {
+  BELIMO
+  MIVO
+}
+
 model User {
   id             Int      @id @default(autoincrement())
   name           String
@@ -47,7 +52,7 @@ model Building {
   owner          String 
   installedAt    DateTime 
 
-  mivoId         String? @unique
+  devices           Device[]
 
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
@@ -56,23 +61,38 @@ model Building {
   companiesWithAccess Company[] @relation("buildingCompany")
 }
 
+model Device {
+  id          Int           @id @default(autoincrement())
+  buildingId  Int
+  building    Building      @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  
+  source      DeviceSource
+  externalId  String
+
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@unique([source, externalId])
+}
+
 model BuildingData {
   id          Int        @id @default(autoincrement())
   building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
   buildingId  Int
   type        BuildingDataType
-  date        DateTime      
+  date        DateTime
 
-  totalEnergykWh        Float?   
-  spaceHeatingkWh       Float?
-  waterHeatingkWh       Float?  
-  electricitykWh        Float?
-  totalWaterM3          Float?
+  totalEnergykWh        Float  @default(0)
+  spaceHeatingkWh       Float  @default(0)
+  waterHeatingkWh       Float  @default(0)
+  electricitykWh        Float  @default(0)
+  totalWaterM3          Float  @default(0)
 
-  totalEnergyCost       Float?
-  spaceHeatingCost      Float?
-  waterHeatingCost      Float?
-  electricityCost       Float?
+  totalEnergyCost       Float  @default(0)
+  spaceHeatingCost      Float  @default(0)
+  waterHeatingCost      Float  @default(0)
+  electricityCost       Float  @default(0)
+  totalWaterCost        Float  @default(0)
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
