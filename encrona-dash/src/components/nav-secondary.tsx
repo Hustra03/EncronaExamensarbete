@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { LucideIcon } from "lucide-react";
-
+import { LucideIcon } from 'lucide-react';
 
 import {
   SidebarGroup,

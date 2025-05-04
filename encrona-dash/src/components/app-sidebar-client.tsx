@@ -1,10 +1,10 @@
 'use client';
+import Image from 'next/image';
 
 import * as React from 'react';
 import {
   HelpCircleIcon,
   SettingsIcon,
-  Leaf,
   UserPen,
   HousePlus,
   Building,
@@ -28,6 +28,7 @@ import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
 import { Role } from '@/lib/auth';
 import { Building as BuildingType } from '@/app/(dashboard)/(admin)/buildings/columns';
+import Link from 'next/link';
 
 const sidebar = {
   navMain: [
@@ -132,10 +133,17 @@ export function AppSidebarClient({
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
-                <img src="/Encrona.png" />
+              <Link href="/" className="relative">
+                <div className="text-primary-foreground relative flex size-6 items-center justify-center rounded-md">
+                  <Image
+                    src="/Encrona.png"
+                    alt="Bild på Encronas Loga, vilket är en cirkel med en 1 i sig, med ENCRONA längs med den övre halvan, och El och Automation längs med den nedre halvan"
+                    fill
+                    priority
+                  />
+                </div>
                 <span className="text-base font-semibold">EncronaDash</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

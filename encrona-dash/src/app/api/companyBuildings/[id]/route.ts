@@ -3,14 +3,14 @@ import prisma from '../../../../../prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }>}
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
-  const { id:idParam } = await params;
+  const { id: idParam } = await params;
   const id = parseInt(idParam);
 
   const buildings = await prisma.building.findMany({

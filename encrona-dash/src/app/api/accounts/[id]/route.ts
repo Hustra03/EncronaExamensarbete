@@ -7,9 +7,9 @@ const prisma = new PrismaClient();
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: Promise<{ id: string }>}
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id:idParam } = await params;
+  const { id: idParam } = await params;
 
   const session = await auth();
   if (!session || (!isAdmin(session) && session.user.id !== idParam)) {
@@ -77,9 +77,9 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: Promise<{ id: string }>}
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const { id:idParam } = await params;
+  const { id: idParam } = await params;
 
   const session = await auth();
 

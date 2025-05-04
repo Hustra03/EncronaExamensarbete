@@ -6,14 +6,14 @@ const prisma = new PrismaClient();
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }>}
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
-  const { id:idParam } = await params;
+  const { id: idParam } = await params;
   const id = parseInt(idParam);
 
   const users = await prisma.user.findMany({
@@ -39,10 +39,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }>}
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
-  const { id:idParam } = await params;
+  const { id: idParam } = await params;
 
   if (!session || (!isAdmin(session) && session.user.id !== idParam)) {
     return new Response(JSON.stringify({ message: 'Unauthorized' }), {
@@ -109,7 +109,7 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: Promise<{ id: string }>}
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
 
@@ -117,7 +117,7 @@ export async function DELETE(
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const { id:idParam } = await params;
+  const { id: idParam } = await params;
   const id = parseInt(idParam);
 
   try {
