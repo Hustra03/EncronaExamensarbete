@@ -35,6 +35,27 @@ export async function POST(request: Request) {
     );
   }
 
+  let buildingId: number;
+  try {
+    buildingId = Number.parseInt(id);
+  } catch {
+    return new Response(JSON.stringify({ message: 'Building id is invalid' }), {
+      status: 400,
+    });
+  }
+
+  const previousValue = await prisma.buildingSimulation.findFirst({
+    where: { buildingId },
+  });
+  if (previousValue) {
+    return new Response(
+      JSON.stringify({
+        message: 'Simulation already exists for this building',
+      }),
+      { status: 409 }
+    );
+  }
+
   //We first try parsin the simulation results as a json, to confirm it is in the correct format
   let parsedSimulationResults;
   try {
@@ -472,7 +493,7 @@ export async function POST(request: Request) {
       data: {
         building: {
           connect: {
-            id: Number.parseInt(id),
+            id: buildingId,
           },
         },
         heatCurve: {
