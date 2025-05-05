@@ -109,6 +109,26 @@ def prompt_user_selection(child_orgs):
     indexes = [int(i) for i in choice.split(',') if i.strip().isdigit()]
     return [child_orgs[i - 1] for i in indexes if 1 <= i <= len(child_orgs)]
 
+def prompt_start_month():
+    raw = input("Ange startmånad (t.ex. 2025-02): ").strip()
+    try:
+        start = datetime.strptime(raw, "%Y-%m").replace(
+            day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc
+        )
+        return start
+    except ValueError:
+        print("Fel format. Använd ÅÅÅÅ-MM.")
+        return None
+
+def generate_months_from(start_date: datetime):
+    months = []
+    now = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    current = start_date
+    while current <= now:
+        months.append(current)
+        current += relativedelta(months=1)
+    return months
+
 # ---------------- DB Operations ---------------- #
 
 def building_data_exists(building_id):
@@ -143,7 +163,7 @@ def submit_to_sqlmodel(building_id, data_per_month):
 
 # ---------------- Main Logic ---------------- #
 
-def process_building(orgs, building_org, building_id):
+def process_building(orgs, building_org, building_id, start_month):
     print(f"\nBearbetar: {building_org['Name']} (ID: {building_org['Id']})")
 
     all_sub_org_ids = get_all_sub_organizations(orgs, building_org["Id"])
@@ -162,16 +182,13 @@ def process_building(orgs, building_org, building_id):
         print("Inga mätare hittades i byggnaden.")
         return
 
-    install_date = install_date.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
+    current = start_month.replace(day=1, hour=0, minute=0, second=0, microsecond=0, tzinfo=timezone.utc)
     now_month = datetime.now(timezone.utc).replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+
     months = []
-    current = install_date
     while current <= now_month:
         months.append(current)
         current += relativedelta(months=1)
-
-    if building_data_exists(building_id):
-        months = [months[-1]]
 
     total_consumption = [{"kWh": 0, "m³": 0} for _ in months]
 
@@ -212,9 +229,14 @@ def main():
         print("Inga byggnader valda.")
         return
 
+    start_month = prompt_start_month()
+    if not start_month:
+        print("Ingen giltig startmånad angiven. Avslutar.")
+        return
+
     for building in selected:
         db_id = int(input(f"Ange id för '{building['Name']}': ").strip())
-        process_building(all_orgs, building, db_id)
+        process_building(all_orgs, building, db_id, start_month)
 
 if __name__ == "__main__":
     main()
