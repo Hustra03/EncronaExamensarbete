@@ -36,19 +36,17 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = await request.json();
-    const name = body.name;
-    const owner = body.owner;
-    let installedAt = body.installedAt;
-
-    const companiesWithAccess = body.companiesWithAccess;
-    if (companiesWithAccess.length == 0) {
-      return new Response(JSON.stringify({ message: 'No company specified' }), {
-        status: 400,
-      });
-    }
-
-    const companiesWithAccessTyped: number[] = companiesWithAccess;
+    const {
+      name,
+      owner,
+      installedAt,
+      companiesWithAccess,
+    }: {
+      name: string;
+      owner: string;
+      installedAt: string;
+      companiesWithAccess: number[];
+    } = await request.json();
 
     if (!installedAt || !owner || !name) {
       return new Response(JSON.stringify({ message: 'Missing fields' }), {
@@ -56,14 +54,13 @@ export async function POST(request: Request) {
       });
     }
 
-    installedAt = new Date(installedAt).toISOString();
     await prisma.building.create({
       data: {
-        installedAt,
+        installedAt: new Date(installedAt).toISOString(),
         owner,
         name,
         companiesWithAccess: {
-          connect: companiesWithAccessTyped.map(id => {
+          connect: companiesWithAccess.map(id => {
             return { id: id };
           }),
         },
