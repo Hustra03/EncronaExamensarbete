@@ -33,7 +33,7 @@ model User {
   updatedAt      DateTime @updatedAt  
   
   companyId Int?
-  company Company? @relation("userCompany", fields: [companyId], references: [id])
+  company Company? @relation("userCompany", fields: [companyId], references: [id], onDelete: SetNull)
 }
 
 model Company{
@@ -131,7 +131,7 @@ model HeatSourceEstimation{
 model BuildingSimulation{
   id Int @id @default(autoincrement())
   buildingId Int @unique
-  building Building @relation("building", fields: [buildingId], references: [id])
+  building Building @relation("building", fields: [buildingId], references: [id], onDelete: Cascade)
   heatCurveId Int
   heatCurve Curve @relation("HeatCurve", fields: [heatCurveId], references: [id])
   waterCurveId Int
