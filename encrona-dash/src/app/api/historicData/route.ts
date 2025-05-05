@@ -17,12 +17,10 @@ export async function POST(req: NextRequest) {
     const {
       buildingId,
       date,
-      totalEnergykWh,
       spaceHeatingkWh,
       waterHeatingkWh,
       electricitykWh,
       totalWaterM3,
-      totalEnergyCost,
       spaceHeatingCost,
       waterHeatingCost,
       electricityCost,
@@ -53,6 +51,10 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
+    const totalEnergykWh = spaceHeatingkWh + waterHeatingkWh + electricitykWh;
+
+    const totalEnergyCost =
+      spaceHeatingCost + waterHeatingCost + electricityCost;
 
     const result = await prisma.buildingData.upsert({
       where: {

@@ -66,10 +66,15 @@ export function AccountSheet({
     defaultValues.companyId ?? undefined
   );
 
+  let requireValues = true;
+  if (defaultValues.name || defaultValues.email || defaultValues.role) {
+    requireValues = false;
+  }
+
   const isFormValid = name && email && password;
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!isFormValid) return;
+    if (!isFormValid && requireValues) return; //TODO add toast here to warn the user
 
     onSubmit({
       name,
@@ -84,7 +89,6 @@ export function AccountSheet({
 
   function selectOptions() {
     if (companies != undefined) {
-      console.log(companies);
       return companies.map(company => (
         <SelectItem
           key={company['id']}
@@ -130,7 +134,7 @@ export function AccountSheet({
                   value={name}
                   onChange={e => setName(e.target.value)}
                   className="col-span-3"
-                  required
+                  required={requireValues}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -143,7 +147,7 @@ export function AccountSheet({
                   value={email}
                   onChange={e => setEmail(e.target.value)}
                   className="col-span-3"
-                  required
+                  required={requireValues}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -156,7 +160,7 @@ export function AccountSheet({
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   className="col-span-3"
-                  required
+                  required={requireValues}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
@@ -202,7 +206,7 @@ export function AccountSheet({
 
           <SheetFooter>
             <SheetClose asChild>
-              <Button type="submit" disabled={!isFormValid}>
+              <Button type="submit" disabled={!isFormValid && requireValues}>
                 {confirmLabel}
               </Button>
             </SheetClose>

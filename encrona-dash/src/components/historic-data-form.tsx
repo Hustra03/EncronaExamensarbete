@@ -200,11 +200,6 @@ export default function HistoricDataForm() {
       <div className="flex w-full max-w-5xl flex-col gap-8">
         {[
           {
-            consumption: 'totalEnergykWh',
-            cost: 'totalEnergyCost',
-            label: 'Total energi (kWh & kr)',
-          },
-          {
             consumption: 'spaceHeatingkWh',
             cost: 'spaceHeatingCost',
             label: 'Uppvärmning (kWh & kr)',
