@@ -1,9 +1,14 @@
-package encrona.GUIMockup;
+package encrona.GUI;
 
+// Link to example used for this https://blog.idrsolutions.com/tutorial-copy-text-javafx-swing/#Copying_Text_in_Swing 
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
+import java.awt.datatransfer.StringSelection;//
 import java.util.Map;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import encrona.DataLoader;
@@ -13,22 +18,23 @@ import encrona.domain.improvement;
 import encrona.expertSystem.ReasoningEngine;
 import encrona.expertSystem.Rule;
 
-public class MockGUIMain extends JPanel {
+public class GUIMain extends JPanel {
 
     private static final String runString = "Run Simulation";
-    private static final String outputTabName="Output";
+    private static final String outputTabName = "Output";
     private static final String expertString = "Run Expert System";
-    private static final String expertSystemTabName="Expert System Output";
-
+    private static final String expertSystemTabName = "Expert System Output";
 
     private JButton runButton;
     private JButton expertButton;
+    private static JButton clipboardButton;
+    private static String clipboardString;
 
     private static JFrame theMainFrame;
     private static JTabbedPane tabbedPane;
     private static JPanel outputPage;
 
-    public MockGUIMain() {
+    public GUIMain() {
         super(new BorderLayout());
 
         runButton = new JButton(runString);
@@ -38,6 +44,10 @@ public class MockGUIMain extends JPanel {
         expertButton = new JButton(expertString);
         expertButton.setActionCommand(expertString);
         expertButton.addActionListener(new ExpertListner());
+
+        clipboardButton=new JButton("Copy to clipboard");
+        clipboardButton.addActionListener(new clipboardListener());
+
         // Create a panel that uses BoxLayout.
         JPanel buttonPane = new JPanel();
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
@@ -46,24 +56,18 @@ public class MockGUIMain extends JPanel {
 
         tabbedPane = new JTabbedPane();
 
-        // This adds the start tab
-        String toolTip = "<html>This is where start information is written</html>";
-        JPanel startPage = new JPanel();
-        startPage.add(new JLabel("Start page text"));
-        tabbedPane.addTab("Start", null, startPage, toolTip);
-
         // This adds the numerical value specification tab
         String toolTip2 = "<html>This is where you specify numeric values</html>";
-        tabbedPane.addTab("Numeric variables", null, new MockGUIStartValueSpecification(), toolTip2);
+        tabbedPane.addTab("Numeric variables", null, new GUIStartValueSpecification(), toolTip2);
 
         // This adds the the heat source tab
         String toolTip3 = "<html>This is where you specify heat sources</html>";
-        tabbedPane.addTab("Heat sources", null, new MockGUIHeatingSources(DataLoader.createInitialListOfHeatSources()),
+        tabbedPane.addTab("Heat sources", null, new GUIHeatingSources(DataLoader.createInitialListOfHeatSources()),
                 toolTip3);
 
         // This adds the improvement tab
         String tooltip4 = "<html>This is where you specify improvements</html>";
-        tabbedPane.addTab("Improvements", null, new MockGUIImprovements(DataLoader.createInitialListOfImprovements()),
+        tabbedPane.addTab("Improvements", null, new GUIImprovements(DataLoader.createInitialListOfImprovements()),
                 tooltip4);
 
         add(tabbedPane);
@@ -82,9 +86,14 @@ public class MockGUIMain extends JPanel {
         theMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         // Create and set up the content pane.
-        JComponent newContentPane = new MockGUIMain();
+        JComponent newContentPane = new GUIMain();
         newContentPane.setOpaque(true); // content panes must be opaque
         theMainFrame.setContentPane(newContentPane);
+        try {
+            theMainFrame.setIconImage(ImageIO.read(new File("encrona-simulator\\encrona\\src\\main\\resources\\Encrona.png")));
+        } catch (IOException e) {
+            System.out.println("Unable to set icon");
+        }
 
         // Display the window.
         theMainFrame.pack();
@@ -102,7 +111,9 @@ public class MockGUIMain extends JPanel {
     }
 
     /**
-     * This removes a tab with the specified String name, if it does exist, to be used when it is being re-generated
+     * This removes a tab with the specified String name, if it does exist, to be
+     * used when it is being re-generated
+     * 
      * @param name The name of the tab to remove if it exists
      */
     public static void removeTab(String name) {
@@ -169,7 +180,7 @@ public class MockGUIMain extends JPanel {
             final java.util.List<improvement> improvements;
 
             try {
-                mapOfNumericalVariables = MockGUIStartValueSpecification.collectFieldValues();
+                mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
 
                 Double aTemp = 1.0;
                 for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
@@ -180,17 +191,13 @@ public class MockGUIMain extends JPanel {
 
                 }
 
-                heatingEnergySources = MockGUIHeatingSources.collectFieldValues();
-                improvements = MockGUIImprovements.collectFieldValues(aTemp);
+                heatingEnergySources = GUIHeatingSources.collectFieldValues();
+                improvements = GUIImprovements.collectFieldValues(aTemp);
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",
                         JOptionPane.PLAIN_MESSAGE);
                 System.out.println(error);
                 return;
-            }
-
-            for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
-                System.out.println(heatingEnergySource.toString());
             }
 
             createOutputTab(mapOfNumericalVariables, heatingEnergySources, improvements);
@@ -199,25 +206,44 @@ public class MockGUIMain extends JPanel {
             // running the simulation specifically in this case
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    java.util.List<String> outputList = Model.runSimulation(mapOfNumericalVariables, improvements,
+                    Map<String, java.util.List<String>> outputLists = Model.runSimulation(mapOfNumericalVariables,
+                            improvements,
                             heatingEnergySources);
-                    addSimulatorOutputToOutput(outputList);
+                    addSimulatorOutputToOutput(outputLists);
                 }
             });
         }
     }
+
+        // This class is used to handle the toClipboard button
+        class clipboardListener implements ActionListener {
+            public void actionPerformed(ActionEvent e) {
+                StringSelection clipboardOutput = new StringSelection(clipboardString);
+                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardOutput, null);
+                JOptionPane.showMessageDialog(theMainFrame, "Copied dashboard string to clipboard", "Copied to clipboard",
+                JOptionPane.PLAIN_MESSAGE);
+            }
+        }
 
     /**
      * This adds a section to the output tab with the output from the simulator
      * 
      * @param outputList
      */
-    public static void addSimulatorOutputToOutput(java.util.List<String> outputList) {
+    public static void addSimulatorOutputToOutput(Map<String, java.util.List<String>> outputLists) {
         JPanel simulatorOutputPage = new JPanel();
 
+        // Link to example used for this
+        // https://blog.idrsolutions.com/tutorial-copy-text-javafx-swing/#Copying_Text_in_Swing
+
+        clipboardString="";
+        for (String listItem : outputLists.get("clipboard")) {
+            clipboardString += listItem;
+        }
+
         DefaultListModel<String> listModel = new DefaultListModel<String>();
-        for (String list : outputList) {
-            listModel.addElement(list);
+        for (String listItem : outputLists.get("output")) {
+            listModel.addElement(listItem);
         }
         JList<String> list = new JList<String>(listModel);
         list.setSelectedIndex(0);
@@ -225,6 +251,7 @@ public class MockGUIMain extends JPanel {
         JScrollPane listScrollPane = new JScrollPane(list);
 
         simulatorOutputPage.add(new JLabel("Simultor Output"));
+        simulatorOutputPage.add(clipboardButton);
 
         simulatorOutputPage.add(listScrollPane);
 
@@ -239,23 +266,13 @@ public class MockGUIMain extends JPanel {
             removeTab(expertSystemTabName);
             final Map<Map.Entry<String, String>, Double> mapOfNumericalVariables;
             final java.util.List<heatingEnergySource> heatingEnergySources;
-            final java.util.List<improvement> improvements;
 
             try {
-                mapOfNumericalVariables = MockGUIStartValueSpecification.collectFieldValues();
-
-                Double aTemp = 1.0;
-                for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
-
-                    if (entry.getKey().equals("Atemp")) {
-                        aTemp = mapOfNumericalVariables.get(entry);
-                    }
-
-                }
-                heatingEnergySources = MockGUIHeatingSources.collectFieldValues();
-                improvements = MockGUIImprovements.collectFieldValues(aTemp);
+                mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
+                heatingEnergySources = GUIHeatingSources.collectFieldValues();
             } catch (Exception error) {
-                JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",
+                        JOptionPane.PLAIN_MESSAGE);
                 System.out.println(error);
                 return;
             }
@@ -264,7 +281,8 @@ public class MockGUIMain extends JPanel {
             // running the simulation specifically in this case
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
-                    ReasoningEngine reasoningEngine = new ReasoningEngine();
+                    ReasoningEngine reasoningEngine = new ReasoningEngine(mapOfNumericalVariables,
+                            heatingEnergySources);
                     java.util.List<String> resultList = reasoningEngine.recommendations();
                     addExpertSystemOutputTab(resultList, reasoningEngine.getTriggeredRules());
                 }
@@ -272,7 +290,8 @@ public class MockGUIMain extends JPanel {
         }
     }
 
-    public static void addExpertSystemOutputTab(java.util.List<String> resultList, java.util.List<Rule> triggeredRules) {
+    public static void addExpertSystemOutputTab(java.util.List<String> resultList,
+            java.util.List<Rule> triggeredRules) {
 
         // This is the tooltip for the heat source page
         String toolTip = new String("<html>This is where the expert system output is shown</html>");
@@ -284,10 +303,10 @@ public class MockGUIMain extends JPanel {
         JPanel resultPage = new JPanel();
         resultPage.setLayout(new BoxLayout(resultPage, BoxLayout.PAGE_AXIS));
 
-        Integer index=1;
+        Integer index = 1;
         for (String resultString : resultList) {
-            resultPage.add(new JLabel(index + " : "+resultString));
-            index+=1;
+            resultPage.add(new JLabel(index + " : " + resultString));
+            index += 1;
         }
         Dimension minSize = new Dimension(5, 100);
         Dimension prefSize = new Dimension(5, 100);
@@ -300,10 +319,10 @@ public class MockGUIMain extends JPanel {
 
         DefaultListModel<String> listModel = new DefaultListModel<String>();
 
-        index=1;
+        index = 1;
         for (Rule rule : triggeredRules) {
-            listModel.addElement(index + " : "+ rule.toString());
-            index+=1;
+            listModel.addElement(index + " : " + rule.toString());
+            index += 1;
         }
 
         // Create the list and put it in a scroll pane.

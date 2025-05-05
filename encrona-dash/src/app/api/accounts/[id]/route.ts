@@ -1,23 +1,25 @@
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '@prisma/client';
 import { auth, isAdmin } from '@/lib/auth';
+import { NextRequest } from 'next/server';
 
 const prisma = new PrismaClient();
 
 export async function PUT(
-  request: Request,
-  { params }: { params: { id: string } }
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ) {
-  const session = await auth();
+  const { id: idParam } = await params;
 
-  if (!session || (!isAdmin(session) && session.user.id !== params.id)) {
+  const session = await auth();
+  if (!session || (!isAdmin(session) && session.user.id !== idParam)) {
     return new Response(JSON.stringify({ message: 'Unauthorized' }), {
       status: 401,
     });
   }
 
-  const id = parseInt(params.id);
-  const body = await request.json();
+  const id = parseInt(idParam);
+  const body = await req.json();
   const { email, name, role, password, companyId } = body;
 
   if (!email || !name || !role || !password) {
@@ -75,15 +77,17 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id: idParam } = await params;
+
   const session = await auth();
 
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const id = parseInt(params.id);
+  const id = parseInt(idParam);
 
   try {
     await prisma.user.delete({ where: { id } });

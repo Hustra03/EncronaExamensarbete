@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import { Leaf } from 'lucide-react';
 import { LoginForm } from '@/components/login-form';
 
 export default function LoginPage() {
@@ -8,8 +7,13 @@ export default function LoginPage() {
       <div className="flex flex-col gap-4 p-6 md:p-10">
         <div className="flex justify-center gap-2 md:justify-start">
           <a href="#" className="flex items-center gap-2 font-medium">
-            <div className="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
-              <Leaf className="size-4" />
+            <div className="text-primary-foreground relative flex size-6 items-center justify-center rounded-md">
+              <Image
+                src="/Encrona.png"
+                alt="Bild på Encronas Loga, vilket är en cirkel med en 1 i sig, med ENCRONA längs med den övre halvan, och El och Automation längs med den nedre halvan"
+                fill
+                priority
+              />
             </div>
             EncronaDash
           </a>
@@ -23,7 +27,7 @@ export default function LoginPage() {
       <div className="bg-muted relative hidden lg:block">
         <Image
           src="/login.jpg"
-          alt="Image"
+          alt="Bild på en skog"
           fill
           priority
           className="absolute inset-0 object-cover dark:brightness-[0.75]"

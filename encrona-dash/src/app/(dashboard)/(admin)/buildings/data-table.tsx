@@ -16,16 +16,19 @@ import { DataTablePagination } from '@/components/data-table/pagination';
 import { DataTableCore } from '@/components/data-table/table';
 import { BuildingSheet } from '@/components/building-sheet';
 import type { Building } from './columns';
+import { Company } from '../company/columns';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  companies: Company[];
   onRefresh: () => void;
 }
 
 export function DataTable<TData extends Building, TValue>({
   columns,
   data,
+  companies,
   onRefresh,
 }: DataTableProps<TData, TValue>) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
@@ -82,6 +85,7 @@ export function DataTable<TData extends Building, TValue>({
         <DataTableFilter table={table} />
         <BuildingSheet
           session={session}
+          companies={companies}
           onSubmit={async data => {
             await fetch('/api/buildings', {
               method: 'POST',
@@ -97,6 +101,7 @@ export function DataTable<TData extends Building, TValue>({
         <BuildingSheet
           hideTrigger
           session={session}
+          companies={companies}
           open={editingBuildingOpen}
           onOpenChange={setEditingBuildingOpen}
           title="Redigera byggnad"

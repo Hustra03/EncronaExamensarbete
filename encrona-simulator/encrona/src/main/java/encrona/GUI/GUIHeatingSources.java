@@ -1,6 +1,7 @@
-package encrona.GUIMockup;
+package encrona.GUI;
 
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -20,12 +21,12 @@ import javax.swing.JTextField;
 import encrona.domain.heatingEnergySource;
 
 
-public class MockGUIHeatingSources extends JPanel {
+public class GUIHeatingSources extends JPanel {
 
     List<heatingEnergySource> energySources;
     static JPanel heatSourceSpecificationPage;
 
-    public MockGUIHeatingSources(List<heatingEnergySource> initialHeatingEnergySources) {
+    public GUIHeatingSources(List<heatingEnergySource> initialHeatingEnergySources) {
         super(new GridBagLayout());
 
         JPanel infoPage = new JPanel();
@@ -100,6 +101,7 @@ public class MockGUIHeatingSources extends JPanel {
         heatSourcePage.add(kwhPerYearHeatingPage);
         heatSourcePage.add(kwhPerYearHeatingWaterPage);
         heatSourcePage.add(electricityNeededPanel);
+        heatSourcePage.setLayout(new FlowLayout(FlowLayout.RIGHT));
 
         return heatSourcePage;
     }

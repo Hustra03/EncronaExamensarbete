@@ -12,7 +12,6 @@ import java.util.Set;
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
-import encrona.domain.improvementImpactEnum;
 import encrona.modifiers.modifierAbstract;
 
 public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.Entry<Integer, List<heatingEnergySource>>>> {
@@ -47,18 +46,8 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         // costs
         baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> -h1.getCostPerKwh().compareTo(h2.getCostPerKwh()));
 
-        List<Entry<improvement, Double>> improvementImpacts = (List<Entry<improvement, Double>>) dependsOnMap.get("improvementImpact").getValue();
-        // Here we create a shallow copy of improvementImpacts, so the list is cloned
-        // but the objects are the same instances as in the origninal
-        improvementImpacts = (List<Entry<improvement, Double>>) ((ArrayList) improvementImpacts).clone();
+        List<Map.Entry<improvement,Map<String,Double>>> improvementImpacts = (List<Map.Entry<improvement,Map<String,Double>>>) dependsOnMap.get("improvementImpact").getValue();
 
-        // https://www.w3schools.com/java/java_lambda.asp
-        // This removes all improvements which do not impact Electricity
-        // TODO update this if type structure is changed
-        improvementImpacts.removeIf((improvement) -> {
-            return !(
-                improvement.getKey().getImpactType().equals(improvementImpactEnum.BuildingHeating) || improvement.getKey().getImpactType().equals(improvementImpactEnum.Water));
-        });
 
         // Note that we use Map.Entry<Integer,List<heatingEnergySource>> to represent a ranges and heat sources
         List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = new ArrayList<Map.Entry<Integer, List<heatingEnergySource>>>();
@@ -73,7 +62,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         // need to find electricity for
         Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
 
-        for (Entry<improvement, Double> entry : improvementImpacts) {
+        for (Map.Entry<improvement,Map<String,Double>> entry : improvementImpacts) {
             uniqueYearsOfService.add(entry.getKey().getYearsOfService());
         }
         int yearsOfService[] = new int[uniqueYearsOfService.size()];
@@ -82,17 +71,17 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
 
                 Integer min = 0;
                 Integer currentMin = Integer.MAX_VALUE;
-                List<Entry<improvement, Double>> improvementsStillActive = new ArrayList<Entry<improvement, Double>>();
+                List<Entry<improvement, Map<String,Double>>> improvementsStillActive = new ArrayList<Entry<improvement, Map<String,Double>>>();
                 if (i > 0) {
                     min = yearsOfService[i - 1];
                 }
 
-                for (Entry<improvement, Double> entry : improvementImpacts) {
+                for (Map.Entry<improvement,Map<String,Double>> entry : improvementImpacts) {
                     if (entry.getKey().getYearsOfService() > min) {
                         if (entry.getKey().getYearsOfService() < currentMin) {
                             currentMin = entry.getKey().getYearsOfService();
                         }
-                        improvementsStillActive.add(entry);
+                        improvementsStillActive.add(new AbstractMap.SimpleEntry<improvement,Map<String,Double>>(entry.getKey(),entry.getValue()));
                     }
                 }
                 yearsOfService[i] = currentMin;
@@ -118,23 +107,16 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
      *         between them
      */
     private List<heatingEnergySource> distributeImpact(List<heatingEnergySource> heatSources,
-            List<Entry<improvement, Double>> improvementsStillActive) {
+    List<Entry<improvement, Map<String,Double>>> improvementsStillActive) {
 
         // We first combine the impact of the relevant improvements, to get the total
         // reduction for building and water heating
         Double sumOfHeatingNeedReduction = 0.0;        
         Double sumOfWaterHeatingNeedReduction = 0.0;
 
-        for (Entry<improvement, Double> entry : improvementsStillActive) {
-            if (entry.getKey().getImpactType().equals(improvementImpactEnum.BuildingHeating)) {
-                sumOfHeatingNeedReduction += entry.getValue();
-            }
-            else
-            {
-                if (entry.getKey().getImpactType().equals(improvementImpactEnum.Water)) {
-                    sumOfWaterHeatingNeedReduction += entry.getValue();
-                }
-            }
+        for (Entry<improvement, Map<String,Double>> entry : improvementsStillActive) {
+            sumOfHeatingNeedReduction += entry.getValue().get("buildingHeating");
+            sumOfWaterHeatingNeedReduction += entry.getValue().get("waterHeating");
         }
 
         // We then create a copy of heatSources, which we can modify to represent this

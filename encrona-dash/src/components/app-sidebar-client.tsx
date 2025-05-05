@@ -1,10 +1,10 @@
 'use client';
+import Image from 'next/image';
 
 import * as React from 'react';
 import {
   HelpCircleIcon,
   SettingsIcon,
-  Leaf,
   UserPen,
   HousePlus,
   Building,
@@ -27,6 +27,8 @@ import { NavMain } from '@/components/nav-main';
 import { NavSecondary } from '@/components/nav-secondary';
 import { NavUser } from '@/components/nav-user';
 import { Role } from '@/lib/auth';
+import { Building as BuildingType } from '@/app/(dashboard)/(admin)/buildings/columns';
+import Link from 'next/link';
 
 const sidebar = {
   navMain: [
@@ -99,6 +101,29 @@ export function AppSidebarClient({
 }: React.ComponentProps<typeof Sidebar> & {
   user: { name: string; email: string; role: Role };
 }) {
+  const [buildings, setBuildings] = React.useState<BuildingType[]>([]);
+
+  async function fetchBuildings() {
+    const res = await fetch('/api/companyBuildings');
+    if (res.ok) {
+      const data = await res.json();
+      setBuildings(data);
+    }
+  }
+
+  React.useEffect(() => {
+    fetchBuildings();
+  }, []);
+
+  if (buildings) {
+    sidebar.navMain[1].items = buildings.map(buildingObject => {
+      return {
+        title: buildingObject.name,
+        url: '/building/' + buildingObject.id,
+      };
+    });
+  }
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -108,10 +133,17 @@ export function AppSidebarClient({
               asChild
               className="data-[slot=sidebar-menu-button]:!p-1.5"
             >
-              <a href="#">
-                <Leaf className="h-5 w-5" />
+              <Link href="/" className="relative">
+                <div className="text-primary-foreground relative flex size-6 items-center justify-center rounded-md">
+                  <Image
+                    src="/Encrona.png"
+                    alt="Bild på Encronas Loga, vilket är en cirkel med en 1 i sig, med ENCRONA längs med den övre halvan, och El och Automation längs med den nedre halvan"
+                    fill
+                    priority
+                  />
+                </div>
                 <span className="text-base font-semibold">EncronaDash</span>
-              </a>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>

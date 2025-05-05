@@ -1,4 +1,4 @@
-package encrona.GUIMockup;
+package encrona.GUI;
 
 import java.awt.*;
 import java.util.AbstractMap;
@@ -8,7 +8,7 @@ import java.util.Map;
 
 import javax.swing.*;
 
-public class MockGUIStartValueSpecification extends JPanel {
+public class GUIStartValueSpecification extends JPanel {
 
     static JTextField aTempField;
     static JTextField electrictyPriceField;
@@ -16,7 +16,7 @@ public class MockGUIStartValueSpecification extends JPanel {
     static JTextField waterConsumptionField;
     static JTextField waterPriceField;
 
-    public MockGUIStartValueSpecification() {
+    public GUIStartValueSpecification() {
 
         this.setLayout(new GridBagLayout());
 

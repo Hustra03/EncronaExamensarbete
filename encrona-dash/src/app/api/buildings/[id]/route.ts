@@ -5,9 +5,10 @@ const prisma = new PrismaClient();
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
+  const { id: idParam } = await params;
 
   if (!session || !isAdmin(session)) {
     return new Response(JSON.stringify({ message: 'Unauthorized' }), {
@@ -15,17 +16,27 @@ export async function PUT(
     });
   }
 
-  const id = parseInt(params.id);
+  const id = parseInt(idParam);
   const body = await request.json();
   const name = body.name;
   const owner = body.owner;
+  const companiesWithAccess = body.companiesWithAccess;
+
   let installedAt = body.installedAt;
 
-  if (!installedAt || !owner || !name) {
+  if (!installedAt || !owner || !name || !companiesWithAccess) {
     return new Response(JSON.stringify({ message: 'Missing fields' }), {
       status: 400,
     });
   }
+
+  if (companiesWithAccess.length == 0) {
+    return new Response(JSON.stringify({ message: 'No company specified' }), {
+      status: 400,
+    });
+  }
+
+  const companiesWithAccessTyped: number[] = companiesWithAccess;
 
   installedAt = new Date(installedAt).toISOString();
 
@@ -36,6 +47,12 @@ export async function PUT(
         name,
         owner,
         installedAt,
+        companiesWithAccess: {
+          set: [], //This removes any existing relations
+          connect: companiesWithAccessTyped.map(id => {
+            return { id: id };
+          }), //And this adds the relations which were specified now, so only they will now exist
+        },
       },
     });
 
@@ -51,15 +68,17 @@ export async function PUT(
 
 export async function DELETE(
   _: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
+  const { id: idParam } = await params;
+
   const session = await auth();
 
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const id = parseInt(params.id);
+  const id = parseInt(idParam);
 
   try {
     await prisma.building.delete({ where: { id } });

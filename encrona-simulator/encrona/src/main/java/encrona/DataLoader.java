@@ -14,7 +14,6 @@ import encrona.modifiers.modifierAbstract;
 import encrona.modifiers.basicModifiers.multiplicationModifier;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
-import encrona.domain.improvementImpactEnum;
 import encrona.components.output.*;
 
 /**
@@ -110,8 +109,6 @@ public class DataLoader {
         input<List<improvement>> improvementsToImplement = new input<List<improvement>>("improvements", "",
                 improvement);
 
-        components.put(improvementsToImplement.getName(), improvementsToImplement);
-
         // We then add the different sources of heating energy
         input<List<heatingEnergySource>> heatingSourcesInput = new input<List<heatingEnergySource>>("heatingSources",
                 "", heatingEnergySources);
@@ -120,11 +117,6 @@ public class DataLoader {
         // ones for all of the heating sources
         // We then define the intermediate values
 
-        Map<String, componentAbstract> waterConsumptionDependsOn = new HashMap<String, componentAbstract>();
-        waterConsumptionDependsOn.put(waterConsumptionInput.getName(), waterConsumptionInput);
-        waterConsumptionDependsOn.put(improvementsToImplement.getName(), improvementsToImplement);
-        finalYearlyWaterConsumption waterConsumption = new finalYearlyWaterConsumption(
-                "waterConsumption", "m^3", waterConsumptionDependsOn, null);
 
         Map<String, componentAbstract> originalElectricityConsumptionDependsOn = new HashMap<String, componentAbstract>();
         originalElectricityConsumptionDependsOn.put(electricityInput.getName(), electricityInput);
@@ -139,10 +131,17 @@ public class DataLoader {
         improvementImpact improvementImpact = new improvementImpact("improvementImpact", "kwh",
                 improvementImpactDependsOn, null);
 
+        Map<String, componentAbstract> waterConsumptionDependsOn = new HashMap<String, componentAbstract>();
+        waterConsumptionDependsOn.put(waterConsumptionInput.getName(), waterConsumptionInput);
+        waterConsumptionDependsOn.put(improvementImpact.getName(), improvementImpact);
+        finalYearlyWaterConsumption waterConsumption = new finalYearlyWaterConsumption(
+                "waterConsumption", "m^3", waterConsumptionDependsOn, null);
+
         // TODO add remaining types of cost for the different energy sources
         Map<String, componentAbstract> improvementReturnOnInvestementDependsOn = new HashMap<String, componentAbstract>();
         improvementReturnOnInvestementDependsOn.put(aTempInput.getName(), aTempInput);
         improvementReturnOnInvestementDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
+        improvementReturnOnInvestementDependsOn.put(waterPriceInput.getName(), waterPriceInput);
         improvementReturnOnInvestementDependsOn.put(improvementImpact.getName(), improvementImpact);
         improvementReturnOnInvestementDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement(
@@ -247,25 +246,18 @@ public class DataLoader {
         // We first create the representation for those improvements which are treated
         // in a "binary" manner, and which are applied, and then add them to the data
         // loader for objects
-        improvement BergOrMarkHeating = new improvement("Berg Or Mark Heating", 940.0, 570.0, 15,
-                improvementImpactEnum.BuildingHeating);
-        improvement FTX = new improvement("FTX", 860.0, 620.0, 15, improvementImpactEnum.BuildingHeating);
-        improvement ChangeWindows = new improvement("Change Windows", 770.0, 445.0, 40,
-                improvementImpactEnum.BuildingHeating);
-        improvement InsulateFacade = new improvement("Insulate Facade", 620.0, 630.0, 40,
-                improvementImpactEnum.BuildingHeating);
-        improvement FVP = new improvement("FVP", 600.0, 290.0, 20, improvementImpactEnum.BuildingHeating);
-        improvement InsulateAttic = new improvement("Insulate Attic", 330.0, 100.0, 40,
-                improvementImpactEnum.BuildingHeating);
-        improvement SolarPanels = new improvement("Solar Panels", 220.0, 210.0, 15, improvementImpactEnum.Electricity);
-        improvement IMDWater = new improvement("IMD Water", 140.0, 85.0, 10, improvementImpactEnum.Water);
-        improvement ControlSystem = new improvement("Control System", 100.0, 45.0, 10,
-                improvementImpactEnum.BuildingHeating);
-        improvement ThermometerReconfiguration = new improvement("Thermometer Reconfiguration", 90.0, 50.0, 10,
-                improvementImpactEnum.BuildingHeating);
-        improvement EconomicalFlush = new improvement("Economical Flush", 100.0, 45.0, 15, improvementImpactEnum.Water);
-        improvement EfficentLighting = new improvement("Efficent Lighting", 30.0, 15.0, 15,
-                improvementImpactEnum.Electricity);
+        improvement BergOrMarkHeating = new improvement("Berg Or Mark värme", 940.0,0.0,0.0,0.0, 570.0, 15 );
+        improvement FTX = new improvement("FTX", 860.0,0.0,0.0,0.0, 620.0, 15 );
+        improvement ChangeWindows = new improvement("Byt fönster", 770.0,0.0,0.0,0.0, 445.0, 40 );
+        improvement InsulateFacade = new improvement("Fasadisolering", 620.0,0.0,0.0,0.0, 630.0, 40 );
+        improvement FVP = new improvement("FVP", 600.00,0.0,0.0,0.0, 290.0, 20 );
+        improvement InsulateAttic = new improvement("Vindisolering", 330.0,0.0,0.0,0.0, 100.0, 40 );
+        improvement SolarPanels = new improvement("Solpaneler", 0.0,0.0,220.0,0.0, 210.0, 15 );
+        improvement IMDWater = new improvement("IMD Vatten", 0.0,140.0,0.0,0.0, 85.0, 10 );
+        improvement ControlSystem = new improvement("Regel och Styr", 0.0,100.0,0.0,0.0, 45.0, 10 );
+        improvement ThermometerReconfiguration = new improvement("Termostat+Inljustering", 90.0,0.0,0.0,0.0, 50.0, 10 );
+        improvement EconomicalFlush = new improvement("Snålpolande armatur", 0.0,100.0,0.0,0.0, 45.0, 15 );
+        improvement EfficentLighting = new improvement("Belysning", 0.0,0.0,30.0,0.0, 15.0, 15 );
 
         List<improvement> initialListOfImprovements = new ArrayList<improvement>();
         initialListOfImprovements.add(BergOrMarkHeating);

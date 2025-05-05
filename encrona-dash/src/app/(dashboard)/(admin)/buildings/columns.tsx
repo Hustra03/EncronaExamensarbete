@@ -23,6 +23,7 @@ import {
   AlertDialogDescription,
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -56,6 +57,28 @@ export const columns: ColumnDef<Building>[] = [
     cell: ({ row }) => {
       const formatted = format(row.getValue('installedAt'), 'yyyy-MM-dd');
       return <div>{formatted}</div>;
+    },
+  },
+  {
+    accessorKey: 'companiesWithAccess',
+    header: 'Företag som har tillgång',
+    cell: ({ row }) => {
+      const formatted: { id: number; name: string }[] = row.getValue(
+        'companiesWithAccess'
+      );
+
+      if (formatted.length > 0) {
+        return (
+          <ScrollArea className="rounded-md border whitespace-nowrap">
+            {formatted.map(company => (
+              <div key={company.id} className="mt-5 mb-5">
+                <p className="text-center">{company.name}</p>
+              </div>
+            ))}
+            <ScrollBar />
+          </ScrollArea>
+        );
+      }
     },
   },
 

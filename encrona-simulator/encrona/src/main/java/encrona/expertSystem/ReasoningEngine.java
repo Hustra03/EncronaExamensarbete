@@ -2,8 +2,10 @@ package encrona.expertSystem;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
+import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 
 /**
@@ -15,10 +17,10 @@ public class ReasoningEngine {
     private List<Rule> rules;
     private List<Rule> triggeredRules;
 
-    public ReasoningEngine()
+    public ReasoningEngine(Map<Map.Entry<String, String>, Double> numericalValues,java.util.List<heatingEnergySource> heatingEnergySources )
     {
         this.rules=new ArrayList<Rule>();
-        this.model = new ExpertSystemModel();
+        this.model = new ExpertSystemModel(numericalValues,heatingEnergySources);
         generateRules();
     }
 
@@ -33,7 +35,7 @@ public class ReasoningEngine {
         };
         PostCondition firstPostCondition =(model)->
         {
-            model.sortedListOfImprovementsToConsider.forEach((item)->{
+            model.getSortedListOfImprovementsToConsider().forEach((item)->{
 
                 if (item.getKey().getName().equals("Berg Or Mark Heating")) {
                     item.setValue(item.getValue()-100);
@@ -41,7 +43,7 @@ public class ReasoningEngine {
 
             });
         };
-        Rule exampleRule = new Rule("Basic static rule","It decreases the priority of Berg or Mark Heatings", firstCondition, firstPostCondition, null);
+        Rule exampleRule = new Rule("Basic static rule","It decreases the priority of Berg or Mark Heating", firstCondition, firstPostCondition, null);
         rules.add(exampleRule);
     }
 
