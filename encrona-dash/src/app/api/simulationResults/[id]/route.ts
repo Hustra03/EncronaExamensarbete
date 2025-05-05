@@ -302,7 +302,7 @@ function checkAndPotentiallyCreateEstimates(
         simulationResults.heatCurve.curve[latestDate.getMonth()];
 
       waterHeatingkWh = waterHeatingkWh * currentHeatingCurveValue.toNumber();
-      spaceHeatingkWh = waterHeatingkWh * currentHeatingCurveValue.toNumber();
+      spaceHeatingkWh = spaceHeatingkWh * currentHeatingCurveValue.toNumber();
 
       const totalEnergykWh = waterHeatingkWh + spaceHeatingkWh + electricitykWh;
 
