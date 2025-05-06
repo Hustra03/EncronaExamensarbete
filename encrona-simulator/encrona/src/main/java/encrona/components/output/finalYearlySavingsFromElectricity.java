@@ -11,17 +11,19 @@ import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 import encrona.modifiers.modifierAbstract;
 
-public class finalYearlySavingsFromElectricity extends componentAbstract<List<Map.Entry<Integer,Double>>>{
+public class finalYearlySavingsFromElectricity extends componentAbstract<List<Map.Entry<Integer, Double>>> {
 
     /**
-     * This is a constructor for finalElectricityConsumptionChange 
-     * @param name The name of this output
-     * @param unit The unit of this output
+     * This is a constructor for finalYearlySavingsFromElectricity
+     * 
+     * @param name      The name of this output
+     * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      * @param modifiers the modifiers which should be applied to this component
      */
-    public finalYearlySavingsFromElectricity(String name, String unit, Map<String,componentAbstract> dependsOn, List<modifierAbstract<List<Map.Entry<Integer,Double>>>> modifiers)
-    {   this.setName(name);
+    public finalYearlySavingsFromElectricity(String name, String unit, Map<String, componentAbstract> dependsOn,
+            List<modifierAbstract<List<Map.Entry<Integer, Double>>>> modifiers) {
+        this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
         this.setModifiers(modifiers);
@@ -29,25 +31,21 @@ public class finalYearlySavingsFromElectricity extends componentAbstract<List<Ma
 
     @Override
     public void calculate() throws Exception {
-        Map<String,componentAbstract> dependsOnMap = this.getDependsOn();
+        Map<String, componentAbstract> dependsOnMap = this.getDependsOn();
 
-        Double baseValue = (Double)dependsOnMap.get("Electricty consumption").getValue();
-        Double electricityPrice = (Double)dependsOnMap.get("Electricty price").getValue();
-        List<Map.Entry<Integer,Double>> electricityConsumptionList = (List<Map.Entry<Integer,Double>>)dependsOnMap.get("electricityOutput").getValue();
-        List<heatingEnergySource> heatSources = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
+        Double electricityPrice = (Double) dependsOnMap.get("Electricty price").getValue();
+        List<Map.Entry<Integer, Double>> electricityConsumptionList = (List<Map.Entry<Integer, Double>>) dependsOnMap.get("electricityOutput").getValue();
 
-        //We add the electricity from heating sources
-        for (heatingEnergySource heatingEnergySource : heatSources) {
-            baseValue+=heatingEnergySource.getKwhPerYearInElectricity();
-        }
-        List<Map.Entry<Integer,Double>> finalSavings=new ArrayList<Map.Entry<Integer,Double>>();
+        List<Map.Entry<Integer, Double>> finalSavings = new ArrayList<Map.Entry<Integer, Double>>();
 
         for (Map.Entry e : electricityConsumptionList) {
-            Entry<Integer,Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer)e.getKey(), (baseValue-(Double)e.getValue())*electricityPrice);
-            finalSavings.add(entry);
+            if ((Integer) e.getKey() != -1) {
+                Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer) e.getKey(), (electricityConsumptionList.getLast().getValue() - (Double) e.getValue()) * electricityPrice);
+                finalSavings.add(entry);
+            }
         }
 
         this.setValue(finalSavings);
     }
-    
+
 }

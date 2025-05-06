@@ -2,6 +2,7 @@ package encrona.components.output;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -44,7 +45,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>) dependsOnMap.get("heatingSources").getValue();
         // We sort heat sources based on their kwh price, since we want to minimize
         // costs
-        baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> -h1.getCostPerKwh().compareTo(h2.getCostPerKwh()));
+        baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> Double.compare(h2.getCostPerKwh(), h1.getCostPerKwh()));
 
         List<Map.Entry<improvement,Map<String,Double>>> improvementImpacts = (List<Map.Entry<improvement,Map<String,Double>>>) dependsOnMap.get("improvementImpact").getValue();
 
@@ -128,8 +129,8 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
 
         int index = 0;
         // We then iterate over the above list, and remove building heating by
-        // sumOfHeatingNeedReduction until it is fully used
-        while (sumOfHeatingNeedReduction > 0.0) {
+        // sumOfHeatingNeedReduction until it is fully used, or reduced each to 0 if the impact is greater than the sum of energy currently used
+        while (sumOfHeatingNeedReduction > 0.0 && index<copyOfHeatSources.size()) {
 
             heatingEnergySource source = copyOfHeatSources.get(index);
 
@@ -141,7 +142,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
 
         //We then do the same for sumOfWaterHeatingNeedReduction
         index = 0;
-        while (sumOfWaterHeatingNeedReduction > 0.0) {
+        while (sumOfWaterHeatingNeedReduction > 0.0 && index<copyOfHeatSources.size()) {
             heatingEnergySource source = copyOfHeatSources.get(index);
             Double reduceBy = Double.min(sumOfWaterHeatingNeedReduction, source.getKwhPerYearHeatingWater());
             source.setKwhPerYearHeating(source.getKwhPerYearHeating() - reduceBy);

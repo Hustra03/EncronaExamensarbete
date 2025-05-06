@@ -22,33 +22,22 @@ export async function PUT(
   const body = await req.json();
   const { email, name, role, password, companyId } = body;
 
-  if (!email || !name || !role || !password) {
-    return new Response(
-      JSON.stringify({ message: 'Missing required fields' }),
-      { status: 400 }
-    );
-  }
-
   try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    await prisma.user.update({
-      where: { id },
-      data: {
-        email,
-        name,
-        password: hashedPassword,
-        ...(isAdmin(session) && role ? { role } : {}), // Only update role if admin
-      },
-    });
+    let hashedPassword = '';
+    if (password.length != 0) {
+      hashedPassword = await bcrypt.hash(password, 10);
+    }
 
     if (companyId) {
       await prisma.user.update({
         where: { id },
         data: {
-          email,
-          name,
-          password: hashedPassword,
+          email: email != '' ? email : undefined, //If email is '' then set to undefined => do not update
+          name: name != '' && name != undefined ? name : undefined,
+          password:
+            hashedPassword != '' && hashedPassword != undefined
+              ? hashedPassword
+              : undefined,
           ...(isAdmin(session) && role ? { role } : {}), // Only update role if admin
           company: { connect: { id: companyId } },
         },
@@ -57,9 +46,12 @@ export async function PUT(
       await prisma.user.update({
         where: { id },
         data: {
-          email,
-          name,
-          password: hashedPassword,
+          email: email != '' ? email : undefined, //If email is '' then set to undefined => do not update
+          name: name != '' && name != undefined ? name : undefined,
+          password:
+            hashedPassword != '' && hashedPassword != undefined
+              ? hashedPassword
+              : undefined,
           ...(isAdmin(session) && role ? { role } : {}), // Only update role if admin
         },
       });

@@ -60,7 +60,7 @@ export async function DELETE(
   const id = parseInt(idParam);
 
   try {
-    await prisma.building.delete({ where: { id } });
+    await prisma.company.delete({ where: { id } });
     return new Response(null, { status: 204 });
   } catch (err) {
     console.error('Error deleting company:', err);
