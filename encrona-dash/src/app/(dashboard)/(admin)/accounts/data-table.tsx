@@ -17,6 +17,7 @@ import { DataTableCore } from '@/components/data-table/table';
 import { AccountSheet } from '@/components/account-sheet';
 import type { User } from './columns';
 import { Company } from '../company/columns';
+import { toast } from 'sonner';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -87,12 +88,17 @@ export function DataTable<TData extends User, TValue>({
           session={session}
           companies={companies}
           onSubmit={async data => {
-            await fetch('/api/accounts', {
+            const res = await fetch('/api/accounts', {
               method: 'POST',
               body: JSON.stringify(data),
               headers: { 'Content-Type': 'application/json' },
             });
-            onRefresh();
+            if (res.status === 204) {
+              toast('Användare skapad.');
+              onRefresh();
+            } else {
+              toast('Något gick fel när användaren skulle skapas.');
+            }
           }}
         />
       </div>
@@ -109,13 +115,18 @@ export function DataTable<TData extends User, TValue>({
           confirmLabel="Spara ändringar"
           defaultValues={editingUser}
           onSubmit={async formData => {
-            await fetch(`/api/accounts/${editingUser.id}`, {
+            const res = await fetch(`/api/accounts/${editingUser.id}`, {
               method: 'PUT',
               body: JSON.stringify(formData),
               headers: { 'Content-Type': 'application/json' },
             });
             setEditingUser(null);
-            onRefresh();
+            if (res.status === 204) {
+              toast('Användare uppdaterad.');
+              onRefresh();
+            } else {
+              ('Något gick fel när användaren skulle uppdateras.');
+            }
           }}
         />
       )}

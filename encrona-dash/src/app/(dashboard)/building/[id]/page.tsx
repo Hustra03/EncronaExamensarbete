@@ -30,6 +30,7 @@ import {
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { Button } from '@/components/ui/button';
+import Spinner from '@/components/spinner';
 
 type DataPoint = {
   date: number;
@@ -223,7 +224,7 @@ export default function Building() {
     electricityCost: 'kr',
   };
 
-  if (loading) return <div>Laddar byggnad...</div>;
+  if (loading) return <Spinner />;
 
   return (
     <>

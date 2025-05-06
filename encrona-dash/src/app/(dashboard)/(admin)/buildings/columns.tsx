@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
 import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { toast } from 'sonner';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -131,10 +132,15 @@ export const columns: ColumnDef<Building>[] = [
               <AlertDialogCancel>Avbryt</AlertDialogCancel>
               <AlertDialogAction
                 onClick={async () => {
-                  await fetch(`/api/buildings/${building.id}`, {
+                  const res = await fetch(`/api/buildings/${building.id}`, {
                     method: 'DELETE',
                   });
-                  window.dispatchEvent(new Event('refresh-buildings'));
+                  if (res.status === 204) {
+                    toast('Fastighet borttagen.');
+                    window.dispatchEvent(new Event('refresh-buildings'));
+                  } else {
+                    toast('Något gick fel när fastigheten skulle tas bort.');
+                  }
                 }}
               >
                 Ta bort

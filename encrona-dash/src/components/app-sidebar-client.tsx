@@ -66,6 +66,11 @@ const sidebar = {
       icon: HousePlus,
     },
     {
+      title: 'Företag',
+      url: '/company',
+      icon: Building2Icon,
+    },
+    {
       title: 'Historisk Data',
       url: '/historic-data',
       icon: HistoryIcon,
@@ -74,11 +79,6 @@ const sidebar = {
       title: 'Simulation',
       url: '/simulationInput',
       icon: ComputerIcon,
-    },
-    {
-      title: 'Företag',
-      url: '/company',
-      icon: Building2Icon,
     },
   ],
   navSecondary: [

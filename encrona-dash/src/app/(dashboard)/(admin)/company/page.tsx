@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { columns } from './columns';
 import { DataTable } from './data-table';
 import type { Company } from './columns';
+import Spinner from '@/components/spinner';
 
 export default function AccountsTable() {
   const [companies, setCompanies] = useState<Company[]>([]);
@@ -22,7 +23,7 @@ export default function AccountsTable() {
     fetchCompanies();
   }, []);
 
-  if (loading) return <div>Laddar företag...</div>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="container mx-auto py-10">

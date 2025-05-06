@@ -5,6 +5,7 @@ import { columns } from './columns';
 import { DataTable } from './data-table';
 import type { User } from './columns';
 import { Company } from '../company/columns';
+import Spinner from '@/components/spinner';
 
 export default function AccountsTable() {
   const [users, setUsers] = useState<User[]>([]);
@@ -35,7 +36,7 @@ export default function AccountsTable() {
     fetchCompanies();
   }, []);
 
-  if (loading) return <div>Laddar användare...</div>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="container mx-auto py-10">

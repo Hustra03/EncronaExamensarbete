@@ -17,6 +17,7 @@ import { DataTableCore } from '@/components/data-table/table';
 import { BuildingSheet } from '@/components/building-sheet';
 import type { Building } from './columns';
 import { Company } from '../company/columns';
+import { toast } from 'sonner';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -87,12 +88,17 @@ export function DataTable<TData extends Building, TValue>({
           session={session}
           companies={companies}
           onSubmit={async data => {
-            await fetch('/api/buildings', {
+            const res = await fetch('/api/buildings', {
               method: 'POST',
               body: JSON.stringify(data),
               headers: { 'Content-Type': 'application/json' },
             });
-            onRefresh();
+            if (res.status === 204) {
+              toast('Fastighet skapad.');
+              onRefresh();
+            } else {
+              toast('Något gick fel när byggnaden skulle skapas.');
+            }
           }}
         />
       </div>
@@ -109,13 +115,18 @@ export function DataTable<TData extends Building, TValue>({
           confirmLabel="Spara ändringar"
           defaultValues={editingBuilding}
           onSubmit={async formData => {
-            await fetch(`/api/buildings/${editingBuilding.id}`, {
+            const res = await fetch(`/api/buildings/${editingBuilding.id}`, {
               method: 'PUT',
               body: JSON.stringify(formData),
               headers: { 'Content-Type': 'application/json' },
             });
             setEditingBuilding(null);
-            onRefresh();
+            if (res.status === 204) {
+              toast('Fastighet uppdaterad.');
+              onRefresh();
+            } else {
+              toast('Något gick fel när fastigheten skulle uppdateras');
+            }
           }}
         />
       )}

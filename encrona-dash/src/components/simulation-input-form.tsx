@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/select';
 import { useActionState, useEffect, useState } from 'react';
 import { Textarea } from './ui/text-area';
+import Spinner from './spinner';
 
 export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   const [buildings, setBuildings] = useState([]);
@@ -35,7 +36,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   }, []);
 
   if (loading) {
-    return <div>Laddar byggnader</div>;
+    return <Spinner />;
   }
 
   const selectOptions = buildings.map(building => (

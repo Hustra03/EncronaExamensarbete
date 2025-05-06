@@ -16,6 +16,7 @@ import { DataTablePagination } from '@/components/data-table/pagination';
 import { DataTableCore } from '@/components/data-table/table';
 import { CompanySheet } from '@/components/company-sheet';
 import type { Company } from './columns';
+import { toast } from 'sonner';
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -83,12 +84,17 @@ export function DataTable<TData extends Company, TValue>({
         <CompanySheet
           session={session}
           onSubmit={async data => {
-            await fetch('/api/company', {
+            const res = await fetch('/api/company', {
               method: 'POST',
               body: JSON.stringify(data),
               headers: { 'Content-Type': 'application/json' },
             });
-            onRefresh();
+            if (res.status === 204) {
+              toast('Företag skapat.');
+              onRefresh();
+            } else {
+              toast('Något gick fel när företaget skulle skapas.');
+            }
           }}
         />
       </div>
@@ -104,13 +110,18 @@ export function DataTable<TData extends Company, TValue>({
           confirmLabel="Spara ändringar"
           defaultValues={editingCompany}
           onSubmit={async formData => {
-            await fetch(`/api/company/${editingCompany.id}`, {
+            const res = await fetch(`/api/company/${editingCompany.id}`, {
               method: 'PUT',
               body: JSON.stringify(formData),
               headers: { 'Content-Type': 'application/json' },
             });
             setEditingCompany(null);
-            onRefresh();
+            if (res.status === 204) {
+              toast('Företag uppdaterat.');
+              onRefresh();
+            } else {
+              toast('Något gick fel när företaget skulle uppdateras.');
+            }
           }}
         />
       )}

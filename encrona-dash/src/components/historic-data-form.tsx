@@ -11,6 +11,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useEffect, useState } from 'react';
+import Spinner from './spinner';
+import { toast } from 'sonner';
 
 type Building = {
   id: number;
@@ -20,6 +22,7 @@ type Building = {
 export default function HistoricDataForm() {
   const [buildings, setBuildings] = useState<Building[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingData, setLoadingData] = useState(false);
   const [selectedBuildingId, setSelectedBuildingId] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -46,6 +49,7 @@ export default function HistoricDataForm() {
   ) {
     if (!buildingId || !year || !month) return;
 
+    setLoadingData(true);
     const res = await fetch(
       `/api/historicData?buildingId=${buildingId}&year=${year}&month=${month}`
     );
@@ -66,6 +70,7 @@ export default function HistoricDataForm() {
     } else {
       setFormData({});
     }
+    setLoadingData(false);
   }
 
   useEffect(() => {
@@ -96,19 +101,21 @@ export default function HistoricDataForm() {
       ),
     };
 
-    await fetch('/api/historicData', {
+    const res = await fetch('/api/historicData', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
     });
 
-    setFormData({});
-    setSelectedMonth('');
-    setSelectedYear('');
+    if (res.status === 200) {
+      toast('Datan sparad.');
+    } else {
+      toast('Något gick fel när datan skulle sparas.');
+    }
   }
 
   if (loading) {
-    return <div>Laddar byggnader...</div>;
+    return <Spinner />;
   }
 
   const currentYear = new Date().getFullYear();
@@ -197,66 +204,72 @@ export default function HistoricDataForm() {
         </div>
       </div>
 
-      <div className="flex w-full max-w-5xl flex-col gap-8">
-        {[
-          {
-            consumption: 'spaceHeatingkWh',
-            cost: 'spaceHeatingCost',
-            label: 'Uppvärmning (kWh & kr)',
-          },
-          {
-            consumption: 'waterHeatingkWh',
-            cost: 'waterHeatingCost',
-            label: 'Tappvarmvatten (kWh & kr)',
-          },
-          {
-            consumption: 'electricitykWh',
-            cost: 'electricityCost',
-            label: 'El (kWh & kr)',
-          },
-          {
-            consumption: 'totalWaterM3',
-            cost: 'totalWaterCost',
-            label: 'Vattenförbrukning (m³ & kr)',
-          },
-        ].map(({ consumption, cost, label }) => (
-          <div key={consumption} className="flex flex-col gap-2">
-            <Label>{label}</Label>
-            <div className="flex gap-4">
-              <Input
-                id={consumption}
-                type="number"
-                step="any"
-                placeholder="Förbrukning"
-                value={formData[consumption] || ''}
-                onChange={e =>
-                  setFormData(prev => ({
-                    ...prev,
-                    [consumption]: e.target.value,
-                  }))
-                }
-              />
-              <Input
-                id={cost}
-                type="number"
-                step="any"
-                placeholder="Kostnad"
-                value={formData[cost] || ''}
-                onChange={e =>
-                  setFormData(prev => ({
-                    ...prev,
-                    [cost]: e.target.value,
-                  }))
-                }
-              />
-            </div>
+      {loadingData ? (
+        <Spinner />
+      ) : (
+        <>
+          <div className="flex w-full max-w-5xl flex-col gap-8">
+            {[
+              {
+                consumption: 'spaceHeatingkWh',
+                cost: 'spaceHeatingCost',
+                label: 'Uppvärmning (kWh & kr)',
+              },
+              {
+                consumption: 'waterHeatingkWh',
+                cost: 'waterHeatingCost',
+                label: 'Tappvarmvatten (kWh & kr)',
+              },
+              {
+                consumption: 'electricitykWh',
+                cost: 'electricityCost',
+                label: 'El (kWh & kr)',
+              },
+              {
+                consumption: 'totalWaterM3',
+                cost: 'totalWaterCost',
+                label: 'Vattenförbrukning (m³ & kr)',
+              },
+            ].map(({ consumption, cost, label }) => (
+              <div key={consumption} className="flex flex-col gap-2">
+                <Label>{label}</Label>
+                <div className="flex gap-4">
+                  <Input
+                    id={consumption}
+                    type="number"
+                    step="any"
+                    placeholder="Förbrukning"
+                    value={formData[consumption] || ''}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        [consumption]: e.target.value,
+                      }))
+                    }
+                  />
+                  <Input
+                    id={cost}
+                    type="number"
+                    step="any"
+                    placeholder="Kostnad"
+                    value={formData[cost] || ''}
+                    onChange={e =>
+                      setFormData(prev => ({
+                        ...prev,
+                        [cost]: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <Button className="mt-8" type="submit">
-        Spara data
-      </Button>
+          <Button className="mt-8" type="submit">
+            Spara data
+          </Button>
+        </>
+      )}
     </form>
   );
 }

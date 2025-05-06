@@ -25,6 +25,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { MoreVertical } from 'lucide-react';
 import { Company } from '../company/columns';
+import { toast } from 'sonner';
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
@@ -120,8 +121,15 @@ export const columns: ColumnDef<User>[] = [
               <AlertDialogCancel>Avbryt</AlertDialogCancel>
               <AlertDialogAction
                 onClick={async () => {
-                  await fetch(`/api/accounts/${user.id}`, { method: 'DELETE' });
-                  window.dispatchEvent(new Event('refresh-users'));
+                  const res = await fetch(`/api/accounts/${user.id}`, {
+                    method: 'DELETE',
+                  });
+                  if (res.status === 204) {
+                    toast('Användare borttagen.');
+                    window.dispatchEvent(new Event('refresh-users'));
+                  } else {
+                    toast('Något gick fel när användaren skulle tas bort.');
+                  }
                 }}
               >
                 Ta bort

@@ -5,6 +5,7 @@ import { columns } from './columns';
 import { DataTable } from './data-table';
 import type { Building } from './columns';
 import { Company } from '../company/columns';
+import Spinner from '@/components/spinner';
 
 export default function AccountsTable() {
   const [buildings, setBuildings] = useState<Building[]>([]);
@@ -35,7 +36,7 @@ export default function AccountsTable() {
     fetchCompanies();
   }, []);
 
-  if (loading) return <div>Laddar byggnader...</div>;
+  if (loading) return <Spinner />;
 
   return (
     <div className="container mx-auto py-10">

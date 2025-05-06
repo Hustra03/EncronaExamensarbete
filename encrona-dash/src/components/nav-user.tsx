@@ -25,6 +25,7 @@ import {
 
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export function NavUser({
   user,
@@ -39,6 +40,7 @@ export function NavUser({
   const handleSignOut = async () => {
     await signOut({ redirect: false });
     router.replace('/login');
+    toast('Du är utloggad.');
   };
 
   const nameShortener = (name: string) => {
