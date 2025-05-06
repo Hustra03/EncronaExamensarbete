@@ -2,6 +2,7 @@ package encrona.components.output;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -125,6 +126,8 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         for (heatingEnergySource heatingEnergySource : heatSources) {
             copyOfHeatSources.add(new heatingEnergySource(heatingEnergySource));
         }
+
+        copyOfHeatSources.sort((heatingEnergySource h1, heatingEnergySource h2) -> Double.compare(h2.getCostPerKwh(), h1.getCostPerKwh()));
 
         int index = 0;
         // We then iterate over the above list, and remove building heating by
