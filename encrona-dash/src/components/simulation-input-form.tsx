@@ -52,7 +52,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   }
 
   return (
-    <form id="simulationForm" action={formAction}>
+    <form action={formAction}>
       <div className="grid gap-3">
         <Label htmlFor="selectBuildings">Välj Byggnad : </Label>
         <Select

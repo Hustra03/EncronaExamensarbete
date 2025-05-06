@@ -41,14 +41,7 @@ export async function POST(request: Request) {
     const owner = body.owner;
     let installedAt = body.installedAt;
 
-    const companiesWithAccess = body.companiesWithAccess;
-    if (companiesWithAccess.length == 0) {
-      return new Response(JSON.stringify({ message: 'No company specified' }), {
-        status: 400,
-      });
-    }
-
-    const companiesWithAccessTyped: number[] = companiesWithAccess;
+    const companiesWithAccessTyped: number[] = body.companiesWithAccess;
 
     if (!installedAt || !owner || !name) {
       return new Response(JSON.stringify({ message: 'Missing fields' }), {
