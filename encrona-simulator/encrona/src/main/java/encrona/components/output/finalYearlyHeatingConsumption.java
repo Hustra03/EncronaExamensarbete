@@ -45,7 +45,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>) dependsOnMap.get("heatingSources").getValue();
         // We sort heat sources based on their kwh price, since we want to minimize
         // costs
-        baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> -h1.getCostPerKwh().compareTo(h2.getCostPerKwh()));
+        baseValues.sort((heatingEnergySource h1, heatingEnergySource h2) -> Double.compare(h2.getCostPerKwh(), h1.getCostPerKwh()));
 
         List<Map.Entry<improvement,Map<String,Double>>> improvementImpacts = (List<Map.Entry<improvement,Map<String,Double>>>) dependsOnMap.get("improvementImpact").getValue();
 
@@ -126,8 +126,6 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         for (heatingEnergySource heatingEnergySource : heatSources) {
             copyOfHeatSources.add(new heatingEnergySource(heatingEnergySource));
         }
-
-        copyOfHeatSources.sort((heatingEnergySource h1, heatingEnergySource h2) -> Double.compare(h2.getCostPerKwh(), h1.getCostPerKwh()));
 
         int index = 0;
         // We then iterate over the above list, and remove building heating by
