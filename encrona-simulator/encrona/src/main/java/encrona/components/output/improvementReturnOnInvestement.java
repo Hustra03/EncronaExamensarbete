@@ -43,9 +43,12 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
 
         List<Map.Entry<String, Double>> improvementROI = new ArrayList<Map.Entry<String, Double>>();
 
+        Double heatingBuildingKwhPrice=calculateHeatingSourceKwhPrice(heatSources);
+        Double heatingWaterKwhPrice=calculateHeatingWaterSourceKwhPrice(heatSources);
+
         for (Entry<improvement, Map<String, Double>> entry : improvementImpacts) {
 
-            Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice,waterPrice,heatSources);
+            Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice,waterPrice,heatingBuildingKwhPrice,heatingWaterKwhPrice);
             Entry<String, Double> roiEntry = new AbstractMap.SimpleEntry<String, Double>(entry.getKey().getName(),entryROIValue);
             improvementROI.add(roiEntry);
         }
@@ -67,13 +70,13 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      * @throws Exception
      */
     private Double calculateROI(Double aTemp, improvement improvement, Map<String, Double> improvementImpact,
-            Double electricityPrice,Double waterPrice, List<heatingEnergySource> heatSources) throws Exception {
+            Double electricityPrice,Double waterPrice, Double HeatingSourceKwhPrice, Double HeatingWaterSourceKwhPrice) throws Exception {
         Double totalCost = improvement.getCostPerM2() * aTemp;
 
         Double totalYearlySavings=(improvementImpact.get("electricity") * electricityPrice)+
-        (improvementImpact.get("buildingHeating") * calculateHeatingSourceKwhPrice(heatSources))
+        (improvementImpact.get("buildingHeating") * HeatingSourceKwhPrice)
         +
-        (improvementImpact.get("waterHeating") * calculateHeatingWaterSourceKwhPrice(heatSources))
+        (improvementImpact.get("waterHeating") * HeatingWaterSourceKwhPrice)
         +
         (improvementImpact.get("water")*waterPrice)
         ;
