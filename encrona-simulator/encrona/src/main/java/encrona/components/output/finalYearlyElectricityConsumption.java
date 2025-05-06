@@ -65,7 +65,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
                 if (entryForImprovementImpacts.getKey().getKwhPerM2Electricity() > 0.0) {
                     uniqueYearsOfService.add(entryForImprovementImpacts.getKey().getYearsOfService());
                 }
-
+            }
                 int yearsOfService[] = new int[uniqueYearsOfService.size()];
                 Set<Double> improvementImpactList = new LinkedHashSet<Double>();
 
@@ -100,7 +100,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
                     electricityConsumptionList.add(entry);
                     i++;
                 }
-            }
+            
             Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(-1, baseValue);
             electricityConsumptionList.add(entry);
 

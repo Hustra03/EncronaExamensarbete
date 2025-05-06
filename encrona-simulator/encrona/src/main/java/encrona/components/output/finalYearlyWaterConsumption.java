@@ -58,6 +58,7 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
                 if (entryForImprovementImpacts.getKey().getM3PerM2Water() > 0.0) {
                     uniqueYearsOfService.add(entryForImprovementImpacts.getKey().getYearsOfService());
                 }
+            }
 
                 int yearsOfService[] = new int[uniqueYearsOfService.size()];
                 Set<Double> improvementImpactList = new LinkedHashSet<Double>();
@@ -94,7 +95,7 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
                     waterConsumptionList.add(entry);
                     i++;
                 }
-            }
+            
             Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(-1, baseValue);
             waterConsumptionList.add(entry);
 
