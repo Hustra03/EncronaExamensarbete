@@ -137,7 +137,12 @@ public class DataLoader {
         finalYearlyWaterConsumption waterConsumption = new finalYearlyWaterConsumption(
                 "waterConsumption", "m^3", waterConsumptionDependsOn, null);
 
-        // TODO add remaining types of cost for the different energy sources
+        Map<String, componentAbstract> waterSavingsDependsOn = new HashMap<String, componentAbstract>();
+        waterSavingsDependsOn.put(waterConsumption.getName(), waterConsumption);
+        waterSavingsDependsOn.put(waterPriceInput.getName(), waterPriceInput);
+        finalYearlySavingsFromWater waterSavings = new finalYearlySavingsFromWater(
+                        "waterSavings", "kr/year", waterSavingsDependsOn, null);
+        
         Map<String, componentAbstract> improvementReturnOnInvestementDependsOn = new HashMap<String, componentAbstract>();
         improvementReturnOnInvestementDependsOn.put(aTempInput.getName(), aTempInput);
         improvementReturnOnInvestementDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
@@ -148,16 +153,14 @@ public class DataLoader {
                 "improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn, null);
 
         Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
+        electricityOutputDependsOn.put(originalElectricityConsumption.getName(),originalElectricityConsumption);
         electricityOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
-        electricityOutputDependsOn.put(originalElectricityConsumption.getName(), originalElectricityConsumption);
         finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput",
                 "kwh/year", electricityOutputDependsOn, null);
 
         Map<String, componentAbstract> electricitySavingsDependsOn = new HashMap<String, componentAbstract>();
-        electricitySavingsDependsOn.put(electricityInput.getName(), electricityInput);
         electricitySavingsDependsOn.put(electricityOutput.getName(), electricityOutput);
         electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
-        electricitySavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity(
                 "electricitySavings", "kr/year", electricitySavingsDependsOn, null);
 
@@ -181,6 +184,7 @@ public class DataLoader {
 
         // We then finally add all of the defined outputs to components
         components.put(waterConsumption.getName(), waterConsumption);
+        components.put(waterSavings.getName(), waterSavings);
         components.put(improvementImpact.getName(), improvementImpact);
         components.put(improvementReturnOnInvestement.getName(), improvementReturnOnInvestement);
         components.put(electricityOutput.getName(), electricityOutput);
@@ -188,6 +192,8 @@ public class DataLoader {
         components.put(heatingOutput.getName(), heatingOutput);
         components.put(heatingSavings.getName(), heatingSavings);
         components.put(waterHeatingSavings.getName(), waterHeatingSavings);
+
+
 
         // TODO note below is where the hard-coded ranges are defined, and will need to
         // be removed if it should be changed

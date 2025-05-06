@@ -45,8 +45,7 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
 
         List<Map.Entry<improvement,Map<String,Double>>> improvementImpacts = (List<Map.Entry<improvement,Map<String,Double>>>) dependsOnMap.get("improvementImpact").getValue();
 
-        // Note that we use Map.Entry<Double,Double> to represent a pair of doubles, in
-        // this case years of service and yearly consumption
+        // Note that we use Map.Entry<Integer,Double> to represent a pair of doubles, in this case years of service and yearly consumption
         List<Map.Entry<Integer, Double>> electricityConsumptionList = new ArrayList<Map.Entry<Integer, Double>>();
 
         //We check if there are any improvements affecting electricity, if so we calculate the impact of improvements in ranges in the format <year this range ends,impact value>
@@ -57,8 +56,9 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
             // need to find electricity for
             Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
 
-            for (Entry<improvement,Map<String,Double>> entry : improvementImpacts) {
-                uniqueYearsOfService.add(entry.getKey().getYearsOfService());
+            for (Entry<improvement,Map<String,Double>> entryForImprovementImpacts : improvementImpacts) {
+                if(entryForImprovementImpacts.getKey().getKwhPerM2Electricity()>0.0)
+                {uniqueYearsOfService.add(entryForImprovementImpacts.getKey().getYearsOfService());
             }
 
             int yearsOfService[] = new int[uniqueYearsOfService.size()];
@@ -101,4 +101,5 @@ public class finalYearlyElectricityConsumption extends componentAbstract<List<Ma
         this.setValue(electricityConsumptionList);
     }
 
+}
 }
