@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useActionState, useEffect } from 'react';
+import { useActionState, useEffect, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 
 export function LoginForm({
@@ -13,18 +13,20 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<'form'>) {
   const [status, formAction] = useActionState(loginAction, null);
-
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   useEffect(() => {
-    if (status === 'sucess') router.push('/');
+    if (status === 'sucess') {
+      router.push('/');
+    }
   }, [status, router]);
 
   return (
     <form
       className={cn('flex flex-col gap-6', className)}
       {...props}
-      action={formAction}
+      action={formData => startTransition(() => formAction(formData))}
     >
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="text-2xl font-bold">Logga in på ditt konto</h1>
@@ -36,19 +38,31 @@ export function LoginForm({
       <div className="grid gap-6">
         <div className="grid gap-3">
           <Label htmlFor="email">Email</Label>
-          <Input id="email" name="email" type="email" required />
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            required
+            disabled={isPending}
+          />
         </div>
         <div className="grid gap-3">
           <Label htmlFor="password">Lösenord</Label>
-          <Input id="password" name="password" type="password" required />
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            required
+            disabled={isPending}
+          />
         </div>
 
         {status && status !== 'sucess' && (
           <p className="text-center text-sm text-red-500">{status}</p>
         )}
 
-        <Button type="submit" className="w-full">
-          Login
+        <Button type="submit" className="w-full" disabled={isPending}>
+          {isPending ? 'Loggar in...' : 'Login'}
         </Button>
       </div>
     </form>
