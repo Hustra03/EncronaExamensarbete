@@ -94,21 +94,16 @@ export default function Building() {
     const res = await fetch('/api/building/' + id);
     const recivedData = await res.json();
 
-    let currentEstimate = data?.estimate;
-    if (!currentEstimate || currentEstimate == undefined) {
-      currentEstimate = [];
-    }
-
-    setData(prev => ({
+    setData(prev => (
+      {
       ...prev,
       name: recivedData.building.name,
       installedAt: recivedData.building.installedAt
         ? new Date(recivedData.building.installedAt).getTime()
         : undefined,
       actual: dateToMs(recivedData.actual),
-      estimate: [...currentEstimate, ...dateToMs(recivedData.estimate)],
+      estimate: [...prev?.estimate||[], ...dateToMs(recivedData.estimate)],
     }));
-
     setLoading(false);
   }
 
@@ -118,19 +113,16 @@ export default function Building() {
   async function requestNewEstimates() {
     const res = await fetch('/api/simulationResults/' + id);
 
-    let currentEstimate = data?.estimate;
-    if (!currentEstimate || currentEstimate == undefined) {
-      currentEstimate = [];
-    }
-
     if (res.status == 200) {
       const recivedData = await res.json();
       if (recivedData != null) {
+
         setData(prev => ({
           ...prev,
-          estimate: [...currentEstimate, ...dateToMs(recivedData.newEstimates)],
+          estimate: [...prev?.estimate||[], ...dateToMs(recivedData.newEstimates)],
         }));
       }
+
     } else {
       if (!res.ok) {
         //TODO handle errors in some manner here, ex provide a toast to the user

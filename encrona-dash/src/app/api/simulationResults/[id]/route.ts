@@ -156,30 +156,28 @@ function checkAndPotentiallyCreateEstimates(
   let year = building.installedAt.getFullYear();
   let month = building.installedAt.getMonth();
   let dateToAdd: Date = new Date();
-  dateToAdd.setHours(0,0,0,0);//This removes hour,minute,second and millisecond information from estimates
+  dateToAdd.setUTCHours(0,0,0,0);//This removes hour,minute,second and millisecond information from estimates
   let dateToReach: { year: number; month: number } = {
-    year: dateToAdd.getFullYear() + 1,
-    month: dateToAdd.getMonth(),
+    year: dateToAdd.getUTCFullYear() + 1,
+    month: dateToAdd.getUTCMonth(),
   };
 
   //We then, using the estimate array and the buildings installedAt date, define which months are currently lacking an estimate
   let arrayIndex: number = 0;
   let add = true;
 
-  if(month!=12) //This ensures year for the new date is set before we use if
-  {
-    dateToAdd.setFullYear(year);
-  }
+  dateToAdd.setUTCFullYear(year,month,1);
 
   while ((year < dateToReach.year || month <= dateToReach.month)) {
-    add = true;
+    add = true;    
     month += 1;
     if (month == 12) {
       year += 1;
       month = 0;
-      dateToAdd.setFullYear(year);
+      dateToAdd.setUTCFullYear(year,month);
     }
-    dateToAdd.setMonth(month);
+    else
+    {dateToAdd.setUTCMonth(month);}
     //This checks, as long as there are more estimates and we did not just find a match, 
     //if the current index estimate is older than the currently investigated date, 
     // if so increment index, but if it is not and it is this year we set add to false (since this date already has an estimate)
@@ -196,8 +194,9 @@ function checkAndPotentiallyCreateEstimates(
       } 
     }
     if (add) {
-      datesToAdd.push(new Date(dateToAdd.toDateString()));
+      datesToAdd.push(new Date(dateToAdd.toLocaleDateString()));
     }
+
   }
 
   console.log(datesToAdd);
@@ -229,21 +228,20 @@ function checkAndPotentiallyCreateEstimates(
     );
   }
 
-
     datesToAdd.forEach(dateToAddEstimateFor => {
       
       let yearsSinceInstallation=dateToAddEstimateFor.getFullYear()-building.installedAt.getFullYear();
 
       if (electricityIndex + 1 < simulationResults.electricityEstimation.length) {
         //And then that the current entry is out of date (the last entry should have year : -1, and is for after the improvements stop having a noticable effect)
-        if ((simulationResults.electricityEstimation[electricityIndex].year <yearsSinceInstallation )|| (electricityIndex < simulationResults.electricityEstimation.length)) 
+        if ((simulationResults.electricityEstimation[electricityIndex].year <yearsSinceInstallation ) && (electricityIndex < simulationResults.electricityEstimation.length)) 
           {electricityIndex += 1;}
       }
   
       //We first test that there are more water entries
       if (waterIndex + 1 < simulationResults.waterEstimation.length) {
         //And then that the current entry is out of date (the last entry should have year : -1, and is for after the improvements stop having a noticable effect)
-        if ((simulationResults.waterEstimation[waterIndex].year <yearsSinceInstallation) ||(waterIndex < simulationResults.waterEstimation.length)) 
+        if ((simulationResults.waterEstimation[waterIndex].year <yearsSinceInstallation) && (waterIndex < simulationResults.waterEstimation.length)) 
         {waterIndex += 1;}
       }
   
@@ -251,7 +249,7 @@ function checkAndPotentiallyCreateEstimates(
       heatSourceArrayOfArrays.forEach((element, localIndexHere) => {
         if (heatSourceIndexes[localIndexHere] + 1 < element.length) {
           //And then that the current entry is out of date (the last entry should have year : -1, and is for after the improvements stop having a noticable effect)
-          if ((element[localIndexHere].year < yearsSinceInstallation) ||(waterIndex < element.length)) {
+          if ((element[localIndexHere].year < yearsSinceInstallation) && (localIndexHere < element.length)) {
             heatSourceIndexes[localIndexHere] += 1;
           }
         }
@@ -308,7 +306,7 @@ function checkAndPotentiallyCreateEstimates(
     //We finally store the newly created estimates and return 200 ok
     await tx.buildingData.createMany({
       data: buildingEstimation,
-    });
+    }); 
 
     return new Response(
       JSON.stringify({
