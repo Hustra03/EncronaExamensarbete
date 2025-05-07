@@ -94,15 +94,14 @@ export default function Building() {
     const res = await fetch('/api/building/' + id);
     const recivedData = await res.json();
 
-    setData(prev => (
-      {
+    setData(prev => ({
       ...prev,
       name: recivedData.building.name,
       installedAt: recivedData.building.installedAt
         ? new Date(recivedData.building.installedAt).getTime()
         : undefined,
       actual: dateToMs(recivedData.actual),
-      estimate: [...prev?.estimate||[], ...dateToMs(recivedData.estimate)],
+      estimate: [...(prev?.estimate || []), ...dateToMs(recivedData.estimate)],
     }));
     setLoading(false);
   }
@@ -116,13 +115,14 @@ export default function Building() {
     if (res.status == 200) {
       const recivedData = await res.json();
       if (recivedData != null) {
-
         setData(prev => ({
           ...prev,
-          estimate: [...prev?.estimate||[], ...dateToMs(recivedData.newEstimates)],
+          estimate: [
+            ...(prev?.estimate || []),
+            ...dateToMs(recivedData.newEstimates),
+          ],
         }));
       }
-
     } else {
       if (!res.ok) {
         //TODO handle errors in some manner here, ex provide a toast to the user
