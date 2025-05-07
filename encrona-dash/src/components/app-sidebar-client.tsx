@@ -8,10 +8,11 @@ import {
   UserPen,
   HousePlus,
   Building,
-  Eye,
   ComputerIcon,
   Building2Icon,
   HistoryIcon,
+  MessageSquareQuoteIcon,
+  Leaf,
 } from 'lucide-react';
 
 import {
@@ -33,9 +34,9 @@ import Link from 'next/link';
 const sidebar = {
   navMain: [
     {
-      title: 'Överblick',
+      title: 'Start',
       url: '/',
-      icon: Eye,
+      icon: Leaf,
       isActive: false,
     },
     {
@@ -79,6 +80,11 @@ const sidebar = {
       title: 'Simulation',
       url: '/simulationInput',
       icon: ComputerIcon,
+    },
+    {
+      title: 'Nyheter',
+      url: '/news',
+      icon: MessageSquareQuoteIcon,
     },
   ],
   navSecondary: [

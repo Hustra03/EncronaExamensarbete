@@ -125,7 +125,7 @@ export function DataTable<TData extends User, TValue>({
               toast('Användare uppdaterad.');
               onRefresh();
             } else {
-              ('Något gick fel när användaren skulle uppdateras.');
+              toast('Något gick fel när användaren skulle uppdateras.');
             }
           }}
         />
