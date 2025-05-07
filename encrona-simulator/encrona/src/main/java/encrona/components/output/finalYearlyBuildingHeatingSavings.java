@@ -34,7 +34,6 @@ public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Ma
     @Override
     /**
      * This is the calculate method for finalYearlyBuildingHeatingSavings
-     * TODO describe calculation method here, once that is finialized
      */
     public void calculate() throws Exception {
 
