@@ -64,8 +64,8 @@ export async function POST(req: NextRequest) {
           date: buildingDate,
         },
       },
-      create: {
-        buildingId,
+      create: {        
+        building:{connect:{id:buildingId}},
         type: 'ACTUAL',
         date: buildingDate,
         totalEnergykWh,
@@ -78,7 +78,6 @@ export async function POST(req: NextRequest) {
         waterHeatingCost,
         electricityCost,
         totalWaterCost,
-        building:{connect:{id:buildingId}}
       },
       update: {
         totalEnergykWh,
