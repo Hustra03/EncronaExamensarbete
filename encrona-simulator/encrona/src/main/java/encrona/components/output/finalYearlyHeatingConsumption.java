@@ -145,7 +145,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
         while (sumOfWaterHeatingNeedReduction > 0.0 && index<copyOfHeatSources.size()) {
             heatingEnergySource source = copyOfHeatSources.get(index);
             Double reduceBy = Double.min(sumOfWaterHeatingNeedReduction, source.getKwhPerYearHeatingWater());
-            source.setKwhPerYearHeating(source.getKwhPerYearHeating() - reduceBy);
+            source.setKwhPerYearHeatingWater(source.getKwhPerYearHeatingWater() - reduceBy);
             sumOfWaterHeatingNeedReduction -= reduceBy;
             index += 1;
         }       

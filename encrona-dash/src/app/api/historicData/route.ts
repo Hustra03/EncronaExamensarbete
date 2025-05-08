@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
         waterHeatingCost,
         electricityCost,
         totalWaterCost,
+        building:{connect:{id:buildingId}}
       },
       update: {
         totalEnergykWh,

@@ -100,6 +100,8 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
             price+=heatingEnergySource.getKwhPerYearHeating()*heatingEnergySource.getCostPerKwh();
             sumKWH+=heatingEnergySource.getKwhPerYearHeating();
         }
+        if(sumKWH==0.0)
+        {return 0.0;}
 
         return price/sumKWH;
     }
@@ -120,6 +122,9 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
             sumKWH+=heatingEnergySource.getKwhPerYearHeatingWater();
         }
 
+        if(sumKWH==0.0)
+        {return 0.0;}
+        
         return price/sumKWH;
     }
 }
