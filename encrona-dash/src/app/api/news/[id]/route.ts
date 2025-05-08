@@ -4,17 +4,18 @@ import { PrismaClient } from '@prisma/client';
 const prisma = new PrismaClient();
 
 export async function DELETE(
-  req: Request,
-  { params }: { params: { id: string } }
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
+  const { id } = await params;
 
   try {
-    const id = parseInt(params.id);
-    await prisma.newsEntry.delete({ where: { id } });
+    const newsId = parseInt(id);
+    await prisma.newsEntry.delete({ where: { id:newsId } });
 
     return new Response(null, { status: 204 });
   } catch (error) {
