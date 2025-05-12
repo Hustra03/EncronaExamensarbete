@@ -40,7 +40,7 @@ public class finalYearlySavingsFromElectricity extends componentAbstract<List<Ma
 
         for (Map.Entry e : electricityConsumptionList) {
             if ((Integer) e.getKey() != -1) {
-                Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer) e.getKey(), (electricityConsumptionList.getLast().getValue() - (Double) e.getValue()) * electricityPrice);
+                Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer) e.getKey(), (electricityConsumptionList.get(electricityConsumptionList.size() -1).getValue() - (Double) e.getValue()) * electricityPrice);
                 finalSavings.add(entry);
             }
         }
