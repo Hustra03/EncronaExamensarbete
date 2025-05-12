@@ -37,7 +37,7 @@ public class ReasoningEngine {
         {
             model.getSortedListOfImprovementsToConsider().forEach((item)->{
 
-                if (item.getKey().getName().equals("Berg Or Mark Heating")) {
+                if (item.getKey().getName().equals("Berg Or Mark värme")) {
                     item.setValue(item.getValue()-100);
                 }
 

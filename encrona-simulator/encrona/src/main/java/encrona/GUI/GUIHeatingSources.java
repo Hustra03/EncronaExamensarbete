@@ -61,9 +61,12 @@ public class GUIHeatingSources extends JPanel {
         add(infoPage, c);
 
         c.fill = GridBagConstraints.BOTH;
-        c.weighty = 0.10;
+        c.weighty = 0.10;        
+        c.weightx = 1;
+
         add(createNewHeatSourcePage, c);
         c.weighty = 0.90;
+        c.weightx = 0.9;
 
         add(scrollheatSourceSpecificationPage, c);
     }
