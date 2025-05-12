@@ -169,14 +169,6 @@ function checkAndPotentiallyCreateEstimates(
     dateToAdd.setUTCFullYear(year, month, 1);
 
     while (year < dateToReach.year || month <= dateToReach.month) {
-      month += 1;
-      if (month == 12) {
-        year += 1;
-        month = 0;
-        dateToAdd.setUTCFullYear(year, month);
-      } else {
-        dateToAdd.setUTCMonth(month);
-      }
       //This checks, as long as there are more estimates and we did not just find a match,
       //if the current index estimate is older than the currently investigated date,
       // if so increment index, but if it is not and it is this year we set add to false (since this date already has an estimate)
@@ -201,6 +193,14 @@ function checkAndPotentiallyCreateEstimates(
         datesToAdd.push(new Date(dateToAdd.toLocaleDateString()));
       }
       add = true;
+      month += 1;
+      if (month == 12) {
+        year += 1;
+        month = 0;
+        dateToAdd.setUTCFullYear(year, month);
+      } else {
+        dateToAdd.setUTCMonth(month);
+      }
     }
 
     console.log(datesToAdd);
