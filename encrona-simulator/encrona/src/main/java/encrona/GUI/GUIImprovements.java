@@ -2,7 +2,6 @@ package encrona.GUI;
 
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -38,6 +36,9 @@ public class GUIImprovements extends JPanel {
     final static String kwhElectricityPerYearUnit = "kwh per year for electricity";
     final static String m3WaterOverImprovementLifetimeUnit = "m^3 water/m^2 Atemp over the improvements lifetime for water";
     final static String m3WaterPerYearUnit = "m^3 per year for water";
+    final static String costKrPerM2LifetimeUnit = "kr/m² over the improvements lifetime";
+    final static String costkrPerYearUnit = "kr per year";
+    final static String costTotalUnit = "total cost";
 
     public GUIImprovements(List<improvement> initialImprovements) {
         super(new GridBagLayout());
@@ -101,7 +102,12 @@ public class GUIImprovements extends JPanel {
         JPanel krPerM2Page = new JPanel();
         JTextField kwhPerYearHeatingField = new JTextField(improvement.getCostPerM2().toString(), 10);
         krPerM2Page.add(kwhPerYearHeatingField);
-        krPerM2Page.add(new JLabel("kr/m^2 over the improvements lifetime"));
+
+        String[] costUnitOptions = {costKrPerM2LifetimeUnit, costTotalUnit, costkrPerYearUnit};
+        JComboBox<String> costUnitSelection = new JComboBox<>(costUnitOptions);
+        costUnitSelection.setSelectedIndex(0);
+        krPerM2Page.add(costUnitSelection);
+        krPerM2Page.setBorder(BorderFactory.createLineBorder(Color.black));
 
         JPanel kwhPerM2BuildingHeatingPage = new JPanel();
         JTextField kwhPerM2TextField = new JTextField(improvement.getKwhPerM2BuildingHeating().toString(), 10);
@@ -254,6 +260,19 @@ public class GUIImprovements extends JPanel {
                 JPanel krPerM2Page = (JPanel) improvementJPanel.getComponent(2);
                 try {
                     krPerM2 = Double.parseDouble(((JTextField) krPerM2Page.getComponent(0)).getText());
+                    switch ((String) ((JComboBox<String>) krPerM2Page.getComponent(1)).getSelectedItem()) {
+                        case costKrPerM2LifetimeUnit:
+                            break;
+                        case costTotalUnit:
+                            krPerM2 = krPerM2 / aTemp;
+                            break;
+                        case costkrPerYearUnit:
+                            krPerM2 = (krPerM2 * yearsOfService) / aTemp;
+                            break;
+                        default:
+                            throw new Exception("No valid unit selected for cost for " + name);
+                    }
+
                 } catch (Exception e) {
                     throw new Exception("kr/m^2 not a valid number for " + name);
                 }

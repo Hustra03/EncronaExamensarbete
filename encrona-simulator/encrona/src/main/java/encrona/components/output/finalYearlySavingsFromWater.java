@@ -39,7 +39,7 @@ public class finalYearlySavingsFromWater extends componentAbstract<List<Map.Entr
 
         for (Map.Entry e : waterConsumptionList) {
             if ((Integer) e.getKey() != -1) {
-            Double savedWaterM3=waterConsumptionList.getLast().getValue()-(Double)e.getValue();
+            Double savedWaterM3=waterConsumptionList.get(waterConsumptionList.size() - 1).getValue()-(Double)e.getValue();
             Entry<Integer,Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer)e.getKey(), savedWaterM3*waterPrice);
             finalSavings.add(entry);
             }
