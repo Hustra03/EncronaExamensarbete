@@ -20,12 +20,11 @@ public class input<T> extends componentAbstract<T>{
     }
 
     /**
-     * This is the calculate method for input, it applies any modifiers and then completes the input
+     * This is the calculate method for input, it simply completes the input
      * @throws Exception if something goes wrong
      */
     @Override
     public void calculate() throws Exception {
-        this.applyModifiers();
         this.complete();
     }
 

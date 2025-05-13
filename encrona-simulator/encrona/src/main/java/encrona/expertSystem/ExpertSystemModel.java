@@ -40,6 +40,24 @@ public class ExpertSystemModel {
         return this.sortedListOfImprovementsToConsider;
     }
 
+    /**
+     * This is a getter for the numericalValues attribute
+     * @return The current numericalValues
+     */
+    public Map<Map.Entry<String, String>, Double> getNumericalValues()
+    {        
+        return this.numericalValues;
+    }
+
+    /**
+     * This is a getter for the heatingEnergySources attribute
+     * @return The current heatingEnergySources
+     */
+    public java.util.List<heatingEnergySource> getHeatingEnergySources()
+    {        
+        return this.heatingEnergySources;
+    }
+
     public void populateImprovementList()
     {
         List<improvement> improvements=DataLoader.createInitialListOfImprovements();

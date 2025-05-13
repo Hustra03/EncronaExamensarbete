@@ -11,7 +11,6 @@ import java.util.Set;
 
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
-import encrona.modifiers.modifierAbstract;
 
 public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Map.Entry<Integer, List<Map.Entry<String, Double>>>>> {
     
@@ -21,14 +20,11 @@ public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Ma
      * @param name      The name of this output
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
-     * @param modifiers the modifiers which should be applied to this component
      */
-    public finalYearlyBuildingHeatingSavings(String name, String unit, Map<String, componentAbstract> dependsOn,
-            List<modifierAbstract<List<Map.Entry<Integer, List<Map.Entry<String, Double>>>>>> modifiers) {
+    public finalYearlyBuildingHeatingSavings(String name, String unit, Map<String, componentAbstract> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
-        this.setModifiers(modifiers);
     }
 
     @Override

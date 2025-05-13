@@ -10,7 +10,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import encrona.components.componentAbstract;
-import encrona.modifiers.modifierAbstract;
 import encrona.domain.improvement;
 
 public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>> {
@@ -20,14 +19,11 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
      * @param name      The name of this output
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
-     * @param modifiers the modifiers which should be applied to this component
      */
-    public finalYearlyWaterConsumption(String name, String unit, Map<String, componentAbstract> dependsOn,
-            List<modifierAbstract<List<Map.Entry<Integer, Double>>>> modifiers) {
+    public finalYearlyWaterConsumption(String name, String unit, Map<String, componentAbstract> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
-        this.setModifiers(modifiers);
     }
 
     @Override

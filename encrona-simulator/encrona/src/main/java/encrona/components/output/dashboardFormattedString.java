@@ -25,7 +25,6 @@ public class dashboardFormattedString extends componentAbstract<String>{
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
-        this.setModifiers(null);
     }
 
     @Override
