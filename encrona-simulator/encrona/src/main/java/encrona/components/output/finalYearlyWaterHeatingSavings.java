@@ -39,9 +39,9 @@ public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.E
 
         List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = (List<Map.Entry<Integer, List<heatingEnergySource>>>) dependsOnMap.get("heatingOutput").getValue();
 
-        List<Map.Entry<Integer, List<Map.Entry<String, Double>>>> finalSavings = new ArrayList<Map.Entry<Integer, List<Map.Entry<String, Double>>>>();
+        List<Map.Entry<Integer, List<Map.Entry<String, Double>>>> finalSavings = new ArrayList<>();
 
-        Map<String,heatingEnergySource> originalSourceMap=new HashMap<String,heatingEnergySource>();
+        Map<String,heatingEnergySource> originalSourceMap=new HashMap<>();
 
         for (heatingEnergySource source : baseValues) {
             originalSourceMap.put(source.getName(), source);
@@ -49,17 +49,17 @@ public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.E
 
         for (Map.Entry<Integer, List<heatingEnergySource>> e : heatingConsumptionList) {
 
-            List<Map.Entry<String, Double>> sourceSavings = new ArrayList<Map.Entry<String, Double>>();
+            List<Map.Entry<String, Double>> sourceSavings = new ArrayList<>();
 
             for (heatingEnergySource sources : e.getValue()) {
 
                 Double savingsGenerated =  (originalSourceMap.get(sources.getName()).getKwhPerYearHeatingWater()-sources.getKwhPerYearHeatingWater()) * sources.getCostPerKwh();
 
-                Entry<String, Double> listEntryToSave = new AbstractMap.SimpleEntry<String, Double>(sources.getName(),savingsGenerated);
+                Entry<String, Double> listEntryToSave = new AbstractMap.SimpleEntry<>(sources.getName(),savingsGenerated);
                 sourceSavings.add(listEntryToSave);
             }
 
-            Entry<Integer, List<Map.Entry<String, Double>>> listEntryToSave = new AbstractMap.SimpleEntry<Integer, List<Map.Entry<String, Double>>>((Integer) e.getKey(),sourceSavings);
+            Entry<Integer, List<Map.Entry<String, Double>>> listEntryToSave = new AbstractMap.SimpleEntry<>(e.getKey(),sourceSavings);
             finalSavings.add(listEntryToSave);
         }
 

@@ -7,8 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
-import encrona.domain.heatingEnergySource;
-import encrona.domain.improvement;
 
 public class finalYearlySavingsFromElectricity extends componentAbstract<List<Map.Entry<Integer, Double>>> {
 
@@ -32,11 +30,11 @@ public class finalYearlySavingsFromElectricity extends componentAbstract<List<Ma
         Double electricityPrice = (Double) dependsOnMap.get("Electricty price").getValue();
         List<Map.Entry<Integer, Double>> electricityConsumptionList = (List<Map.Entry<Integer, Double>>) dependsOnMap.get("electricityOutput").getValue();
 
-        List<Map.Entry<Integer, Double>> finalSavings = new ArrayList<Map.Entry<Integer, Double>>();
+        List<Map.Entry<Integer, Double>> finalSavings = new ArrayList<>();
 
-        for (Map.Entry e : electricityConsumptionList) {
-            if ((Integer) e.getKey() != -1) {
-                Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer) e.getKey(), (electricityConsumptionList.get(electricityConsumptionList.size() -1).getValue() - (Double) e.getValue()) * electricityPrice);
+        for (Map.Entry<Integer, Double> e : electricityConsumptionList) {
+            if (e.getKey() != -1) {
+                Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<>(e.getKey(), (electricityConsumptionList.get(electricityConsumptionList.size() -1).getValue() - e.getValue()) * electricityPrice);
                 finalSavings.add(entry);
             }
         }

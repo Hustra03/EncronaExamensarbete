@@ -37,7 +37,7 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
         List<Map.Entry<improvement, Map<String, Double>>> improvementImpacts = (List<Map.Entry<improvement, Map<String, Double>>>) dependsOnMap.get("improvementImpact").getValue();
         List<heatingEnergySource> heatSources = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
-        List<Map.Entry<String, Double>> improvementROI = new ArrayList<Map.Entry<String, Double>>();
+        List<Map.Entry<String, Double>> improvementROI = new ArrayList<>();
 
         Double heatingBuildingKwhPrice=calculateHeatingSourceKwhPrice(heatSources);
         Double heatingWaterKwhPrice=calculateHeatingWaterSourceKwhPrice(heatSources);
@@ -45,7 +45,7 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
         for (Entry<improvement, Map<String, Double>> entry : improvementImpacts) {
 
             Double entryROIValue = calculateROI(aTemp, entry.getKey(), entry.getValue(), electricityPrice,waterPrice,heatingBuildingKwhPrice,heatingWaterKwhPrice);
-            Entry<String, Double> roiEntry = new AbstractMap.SimpleEntry<String, Double>(entry.getKey().getName(),entryROIValue);
+            Entry<String, Double> roiEntry = new AbstractMap.SimpleEntry<>(entry.getKey().getName(),entryROIValue);
             improvementROI.add(roiEntry);
         }
 
@@ -58,21 +58,23 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      * 
      * @param aTemp The area of the building
      * @param improvement The improvement to calculate for
-     * @param improvementImpact The impact of the improvement
-     * @param electrictyPrice The price per kwh 
-     * @param heatSources A list of heat sources for this building
+     * @param improvementImpact A map of the impact of the improvement for the 4 different categories [electricity,buildingHeating,waterHeating,water]
+     * @param electricityPrice The price of electricity per kwh 
+     * @param waterPrice The price of water per m3
+     * @param heatingSourceKwhPrice The price per kwh for building heating
+     * @param heatingWaterSourceKwhPrice The price per kwh for heating water
      * 
      * @return The number of years until investment is repayed (assumes all prices rise at the same rate the investment would)
-     * @throws Exception
      */
     private Double calculateROI(Double aTemp, improvement improvement, Map<String, Double> improvementImpact,
-            Double electricityPrice,Double waterPrice, Double HeatingSourceKwhPrice, Double HeatingWaterSourceKwhPrice) throws Exception {
+            Double electricityPrice,Double waterPrice, Double heatingSourceKwhPrice, Double heatingWaterSourceKwhPrice) {
+
         Double totalCost = improvement.getCostPerM2() * aTemp;
 
         Double totalYearlySavings=(improvementImpact.get("electricity") * electricityPrice)+
-        (improvementImpact.get("buildingHeating") * HeatingSourceKwhPrice)
+        (improvementImpact.get("buildingHeating") * heatingSourceKwhPrice)
         +
-        (improvementImpact.get("waterHeating") * HeatingWaterSourceKwhPrice)
+        (improvementImpact.get("waterHeating") * heatingWaterSourceKwhPrice)
         +
         (improvementImpact.get("water")*waterPrice)
         ;
@@ -87,9 +89,7 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      */
     private Double calculateHeatingSourceKwhPrice(List<heatingEnergySource> heatSources)
     {
-
         Double price=0.0;
-
         Double sumKWH=0.0;
 
         for (heatingEnergySource heatingEnergySource : heatSources) {
@@ -101,6 +101,7 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
 
         return price/sumKWH;
     }
+
     /**
      * This method calculates the weighted average price per kwh for the specified heating sources, for heating the water
      * @param heatSources The heating sources for the current building
@@ -108,11 +109,9 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      */
     private Double calculateHeatingWaterSourceKwhPrice(List<heatingEnergySource> heatSources)
     {
-
         Double price=0.0;
-
         Double sumKWH=0.0;
-
+        
         for (heatingEnergySource heatingEnergySource : heatSources) {
             price+=heatingEnergySource.getKwhPerYearHeatingWater()*heatingEnergySource.getCostPerKwh();
             sumKWH+=heatingEnergySource.getKwhPerYearHeatingWater();

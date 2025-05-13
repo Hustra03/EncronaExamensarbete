@@ -3,11 +3,9 @@ package encrona.components.output;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
@@ -39,9 +37,9 @@ public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Ma
 
         List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = (List<Map.Entry<Integer, List<heatingEnergySource>>>) dependsOnMap.get("heatingOutput").getValue();
 
-        List<Map.Entry<Integer, List<Map.Entry<String, Double>>>> finalSavings = new ArrayList<Map.Entry<Integer, List<Map.Entry<String, Double>>>>();
+        List<Map.Entry<Integer, List<Map.Entry<String, Double>>>> finalSavings = new ArrayList<>();
 
-        Map<String,heatingEnergySource> originalSourceMap=new HashMap<String,heatingEnergySource>();
+        Map<String,heatingEnergySource> originalSourceMap=new HashMap<>();
 
         for (heatingEnergySource source : baseValues) {
             originalSourceMap.put(source.getName(), source);
@@ -49,17 +47,17 @@ public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Ma
 
         for (Map.Entry<Integer, List<heatingEnergySource>> e : heatingConsumptionList) {
 
-            List<Map.Entry<String, Double>> sourceSavings = new ArrayList<Map.Entry<String, Double>>();
+            List<Map.Entry<String, Double>> sourceSavings = new ArrayList<>();
 
             for (heatingEnergySource sources : e.getValue()) {
 
                 Double savingsGenerated =  (originalSourceMap.get(sources.getName()).getKwhPerYearHeating()-sources.getKwhPerYearHeating()) * sources.getCostPerKwh();
 
-                Entry<String, Double> listEntryToSave = new AbstractMap.SimpleEntry<String, Double>(sources.getName(),savingsGenerated);
+                Entry<String, Double> listEntryToSave = new AbstractMap.SimpleEntry<>(sources.getName(),savingsGenerated);
                 sourceSavings.add(listEntryToSave);
             }
 
-            Entry<Integer, List<Map.Entry<String, Double>>> listEntryToSave = new AbstractMap.SimpleEntry<Integer, List<Map.Entry<String, Double>>>((Integer) e.getKey(),sourceSavings);
+            Entry<Integer, List<Map.Entry<String, Double>>> listEntryToSave = new AbstractMap.SimpleEntry<>(e.getKey(),sourceSavings);
             finalSavings.add(listEntryToSave);
         }
 

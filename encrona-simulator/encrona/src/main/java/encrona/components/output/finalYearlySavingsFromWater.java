@@ -7,9 +7,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
-import encrona.domain.heatingEnergySource;
-import encrona.domain.improvement;
-
 
 public class finalYearlySavingsFromWater extends componentAbstract<List<Map.Entry<Integer,Double>>>{
 
@@ -32,12 +29,12 @@ public class finalYearlySavingsFromWater extends componentAbstract<List<Map.Entr
         Double waterPrice = (Double)dependsOnMap.get("Water price").getValue();
         List<Map.Entry<Integer,Double>> waterConsumptionList = (List<Map.Entry<Integer,Double>>)dependsOnMap.get("waterConsumption").getValue();
 
-        List<Map.Entry<Integer,Double>> finalSavings=new ArrayList<Map.Entry<Integer,Double>>();
+        List<Map.Entry<Integer,Double>> finalSavings=new ArrayList<>();
 
-        for (Map.Entry e : waterConsumptionList) {
-            if ((Integer) e.getKey() != -1) {
-            Double savedWaterM3=waterConsumptionList.get(waterConsumptionList.size() - 1).getValue()-(Double)e.getValue();
-            Entry<Integer,Double> entry = new AbstractMap.SimpleEntry<Integer, Double>((Integer)e.getKey(), savedWaterM3*waterPrice);
+        for (Map.Entry<Integer,Double> e : waterConsumptionList) {
+            if (e.getKey() != -1) {
+            Double savedWaterM3=waterConsumptionList.get(waterConsumptionList.size() - 1).getValue()-e.getValue();
+            Entry<Integer,Double> entry = new AbstractMap.SimpleEntry<>(e.getKey(), savedWaterM3*waterPrice);
             finalSavings.add(entry);
             }
         }

@@ -35,19 +35,19 @@ public class improvementImpact extends componentAbstract<List<Map.Entry<improvem
         Double aTemp = (Double)dependsOnMap.get("Atemp").getValue();
         List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();
 
-        List<Map.Entry<improvement,Map<String,Double>>> improvementImpact=new ArrayList<Map.Entry<improvement,Map<String,Double>>>();
+        List<Map.Entry<improvement,Map<String,Double>>> improvementImpact=new ArrayList<>();
 
         for (improvement improvement : improvements) {
             //We get m2 / years of service = yearly kwh impact
             Double impactMultiplication = (aTemp)/improvement.getYearsOfService();
-            Map<String,Double> improvementImpactMap = new HashMap<String,Double>();
+            Map<String,Double> improvementImpactMap = new HashMap<>();
 
             improvementImpactMap.put("buildingHeating", improvement.getKwhPerM2BuildingHeating()*impactMultiplication);
             improvementImpactMap.put("waterHeating", improvement.getKwhPerM2WaterHeating()*impactMultiplication);
             improvementImpactMap.put("electricity", improvement.getKwhPerM2Electricity()*impactMultiplication);
             improvementImpactMap.put("water", improvement.getM3PerM2Water()*impactMultiplication);
 
-            Entry<improvement,Map<String,Double>> entry = new AbstractMap.SimpleEntry<improvement, Map<String,Double>>((improvement)improvement,improvementImpactMap );
+            Entry<improvement,Map<String,Double>> entry = new AbstractMap.SimpleEntry<>(improvement,improvementImpactMap );
             improvementImpact.add(entry);
         }
         this.setValue(improvementImpact);

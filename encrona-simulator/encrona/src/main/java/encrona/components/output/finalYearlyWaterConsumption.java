@@ -44,11 +44,11 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
         // ends,impact value>
         // We always re-use the original values with <-1,original value> (So that we
         // store the orignal values for transfer to the simulator)
-        if (improvementImpacts.size() > 0) {
+        if (!improvementImpacts.isEmpty()) {
 
             // This creates a set of the unique years of service, aka the unique values we
             // need to find water for
-            Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
+            Set<Integer> uniqueYearsOfService = new HashSet<>();
 
             for (Entry<improvement, Map<String, Double>> entryForImprovementImpacts : improvementImpacts) {
                 if (entryForImprovementImpacts.getKey().getM3PerM2Water() > 0.0) {
@@ -56,8 +56,8 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
                 }
             }
 
-                int yearsOfService[] = new int[uniqueYearsOfService.size()];
-                Set<Double> improvementImpactList = new LinkedHashSet<Double>();
+                int[] yearsOfService = new int[uniqueYearsOfService.size()];
+                Set<Double> improvementImpactList = new LinkedHashSet<>();
 
                 for (int i = 0; i < yearsOfService.length; i++) {
 
@@ -69,14 +69,12 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
                     }
 
                     for (Entry<improvement, Map<String, Double>> entry : improvementImpacts) {
-                        if (entry.getKey().getM3PerM2Water() > 0.0) {
-                            if (entry.getKey().getYearsOfService() > min) {
+                        if (entry.getKey().getM3PerM2Water() > 0.0 && entry.getKey().getYearsOfService() > min) {
                                 if (entry.getKey().getYearsOfService() < currentMin) {
                                     currentMin = entry.getKey().getYearsOfService();
                                 }
                                 improvementImpact += (entry.getValue().get("water"));
                             }
-                        }
                     }
                     yearsOfService[i] = currentMin;
                     improvementImpactList.add(improvementImpact);
@@ -85,14 +83,14 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
                 int i = 0;
                 for (Double impact : improvementImpactList) {
                     // https://docs.oracle.com/javase/8/docs/api/java/util/Map.Entry.html
-                    Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(yearsOfService[i],
+                    Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<>(yearsOfService[i],
                             baseValue - impact);
 
                     waterConsumptionList.add(entry);
                     i++;
                 }
             
-            Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<Integer, Double>(-1, baseValue);
+            Entry<Integer, Double> entry = new AbstractMap.SimpleEntry<>(-1, baseValue);
             waterConsumptionList.add(entry);
 
             this.setValue(waterConsumptionList);
