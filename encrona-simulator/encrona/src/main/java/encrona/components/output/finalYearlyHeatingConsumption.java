@@ -22,7 +22,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      */
-    public finalYearlyHeatingConsumption(String name, String unit, Map<String, componentAbstract> dependsOn) {
+    public finalYearlyHeatingConsumption(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -32,11 +32,10 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
     /**
      * This method implements the calculate functionality for
      * finalElectricityConsumptionChange
-     * TODO confirm the calculation with Laszlo
      */
     public void calculate() throws Exception {
 
-        Map<String, componentAbstract> dependsOnMap = getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = getDependsOn();
 
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>) dependsOnMap.get("heatingSources").getValue();
         // We sort heat sources based on their kwh price, since we want to minimize

@@ -1,7 +1,6 @@
 package encrona.components.intermediate;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import encrona.domain.heatingEnergySource;
 import encrona.components.componentAbstract;
@@ -11,7 +10,6 @@ import encrona.components.componentAbstract;
  */
 public class fullOriginalElectricityConsumption extends componentAbstract<Double>{
 
-
     /**
      * This is a constructor for fullOriginalElectricityConsumption
      * 
@@ -19,14 +17,14 @@ public class fullOriginalElectricityConsumption extends componentAbstract<Double
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      */
-    public fullOriginalElectricityConsumption(String name, String unit, Map<String, componentAbstract> dependsOn) {
+    public fullOriginalElectricityConsumption(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
     }
     @Override
     public void calculate() throws Exception {
-        Map<String, componentAbstract> dependsOnMap = getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = getDependsOn();
 
 
         Double baseValue = (Double) dependsOnMap.get("Electricty consumption").getValue();

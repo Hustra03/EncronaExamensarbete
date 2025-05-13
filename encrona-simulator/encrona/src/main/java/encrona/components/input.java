@@ -29,7 +29,7 @@ public class input<T> extends componentAbstract<T>{
     }
 
     @Override
-    public Map<String, componentAbstract> getDependsOn() {
+    public Map<String, componentAbstract<?>> getDependsOn() {
         return null;
     }
 }

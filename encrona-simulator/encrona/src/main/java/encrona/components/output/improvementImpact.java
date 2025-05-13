@@ -21,7 +21,7 @@ public class improvementImpact extends componentAbstract<List<Map.Entry<improvem
      * @param unit The unit of this output
      * @param dependsOn the components this component depends on
      */
-    public improvementImpact(String name, String unit, Map<String,componentAbstract> dependsOn)
+    public improvementImpact(String name, String unit, Map<String,componentAbstract<?>> dependsOn)
     {   this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -30,7 +30,7 @@ public class improvementImpact extends componentAbstract<List<Map.Entry<improvem
     @Override
     public void calculate() throws Exception {
 
-        Map<String,componentAbstract> dependsOnMap = getDependsOn();
+        Map<String,componentAbstract<?>> dependsOnMap = getDependsOn();
 
         Double aTemp = (Double)dependsOnMap.get("Atemp").getValue();
         List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();

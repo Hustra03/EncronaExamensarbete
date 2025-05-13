@@ -16,7 +16,7 @@ public abstract class componentAbstract<T> implements componentInterface<T>, Run
     private Boolean complete = false; // By default complete is false
     private String unit;
 
-    private Map<String, componentAbstract> dependsOn; // TODO test if this works, does give a warning but if
+    private Map<String, componentAbstract<?>> dependsOn; // TODO test if this works, does give a warning but if
                                                       // parameterized then only those with the same value as the
                                                       // instance can be added
 
@@ -97,7 +97,7 @@ public abstract class componentAbstract<T> implements componentInterface<T>, Run
      * 
      * @return the instances dependsOn
      */
-    public Map<String, componentAbstract> getDependsOn() {
+    public Map<String, componentAbstract<?>> getDependsOn() {
         return dependsOn;
     }
 
@@ -106,7 +106,7 @@ public abstract class componentAbstract<T> implements componentInterface<T>, Run
      * 
      * @param newDependsOn the new dependsOn
      */
-    public void setDependsOn(Map<String, componentAbstract> newDependsOn) {
+    public void setDependsOn(Map<String, componentAbstract<?>> newDependsOn) {
         this.dependsOn = newDependsOn;
     }
 

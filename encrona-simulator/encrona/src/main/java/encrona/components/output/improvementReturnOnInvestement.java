@@ -19,7 +19,7 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      */
-    public improvementReturnOnInvestement(String name, String unit, Map<String, componentAbstract> dependsOn) {
+    public improvementReturnOnInvestement(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -28,7 +28,7 @@ public class improvementReturnOnInvestement extends componentAbstract<List<Map.E
     @Override
     public void calculate() throws Exception {
 
-        Map<String, componentAbstract> dependsOnMap = getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = getDependsOn();
 
         Double aTemp = (Double) dependsOnMap.get("Atemp").getValue();
         Double electricityPrice = (Double) dependsOnMap.get("Electricty price").getValue();

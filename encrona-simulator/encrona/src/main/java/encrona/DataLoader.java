@@ -110,32 +110,32 @@ public class DataLoader {
 
         //We then define the intermediate values, as in the calculated values which are not shown to the user directly
 
-        Map<String, componentAbstract> originalElectricityConsumptionDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> originalElectricityConsumptionDependsOn = new HashMap<String, componentAbstract<?>>();
         originalElectricityConsumptionDependsOn.put(electricityInput.getName(), electricityInput);
         originalElectricityConsumptionDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         fullOriginalElectricityConsumption originalElectricityConsumption = new fullOriginalElectricityConsumption(
                 "originalElectricityConsumption", "kwh", originalElectricityConsumptionDependsOn);
 
         // We then define the different outputs
-        Map<String, componentAbstract> improvementImpactDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> improvementImpactDependsOn = new HashMap<String, componentAbstract<?>>();
         improvementImpactDependsOn.put(aTempInput.getName(), aTempInput);
         improvementImpactDependsOn.put(improvementsToImplement.getName(), improvementsToImplement);
         improvementImpact improvementImpact = new improvementImpact("improvementImpact", "kwh",
                 improvementImpactDependsOn);
 
-        Map<String, componentAbstract> waterConsumptionDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> waterConsumptionDependsOn = new HashMap<String, componentAbstract<?>>();
         waterConsumptionDependsOn.put(waterConsumptionInput.getName(), waterConsumptionInput);
         waterConsumptionDependsOn.put(improvementImpact.getName(), improvementImpact);
         finalYearlyWaterConsumption waterConsumption = new finalYearlyWaterConsumption(
                 "waterConsumption", "m^3", waterConsumptionDependsOn);
 
-        Map<String, componentAbstract> waterSavingsDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> waterSavingsDependsOn = new HashMap<String, componentAbstract<?>>();
         waterSavingsDependsOn.put(waterConsumption.getName(), waterConsumption);
         waterSavingsDependsOn.put(waterPriceInput.getName(), waterPriceInput);
         finalYearlySavingsFromWater waterSavings = new finalYearlySavingsFromWater(
                         "waterSavings", "kr/year", waterSavingsDependsOn);
         
-        Map<String, componentAbstract> improvementReturnOnInvestementDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> improvementReturnOnInvestementDependsOn = new HashMap<String, componentAbstract<?>>();
         improvementReturnOnInvestementDependsOn.put(aTempInput.getName(), aTempInput);
         improvementReturnOnInvestementDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
         improvementReturnOnInvestementDependsOn.put(waterPriceInput.getName(), waterPriceInput);
@@ -144,31 +144,31 @@ public class DataLoader {
         improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement(
                 "improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn);
 
-        Map<String, componentAbstract> electricityOutputDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> electricityOutputDependsOn = new HashMap<String, componentAbstract<?>>();
         electricityOutputDependsOn.put(originalElectricityConsumption.getName(),originalElectricityConsumption);
         electricityOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
         finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput",
                 "kwh/year", electricityOutputDependsOn);
 
-        Map<String, componentAbstract> electricitySavingsDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> electricitySavingsDependsOn = new HashMap<String, componentAbstract<?>>();
         electricitySavingsDependsOn.put(electricityOutput.getName(), electricityOutput);
         electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
         finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity(
                 "electricitySavings", "kr/year", electricitySavingsDependsOn);
 
-        Map<String, componentAbstract> heatingOutputDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> heatingOutputDependsOn = new HashMap<String, componentAbstract<?>>();
         heatingOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
         heatingOutputDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyHeatingConsumption heatingOutput = new finalYearlyHeatingConsumption("heatingOutput",
                 "kwh/year", heatingOutputDependsOn);
 
-        Map<String, componentAbstract> heatingSavingsDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> heatingSavingsDependsOn = new HashMap<String, componentAbstract<?>>();
         heatingSavingsDependsOn.put(heatingOutput.getName(), heatingOutput);
         heatingSavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyBuildingHeatingSavings heatingSavings = new finalYearlyBuildingHeatingSavings("heatingSavings",
                 "kr/year", heatingSavingsDependsOn);
 
-        Map<String, componentAbstract> waterHeatingSavingsDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> waterHeatingSavingsDependsOn = new HashMap<String, componentAbstract<?>>();
         waterHeatingSavingsDependsOn.put(heatingOutput.getName(), heatingOutput);
         waterHeatingSavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyWaterHeatingSavings waterHeatingSavings = new finalYearlyWaterHeatingSavings("waterHeatingSavings",
@@ -204,7 +204,7 @@ public class DataLoader {
         input<Double[]> waterCurveInput = new input<Double[]>("waterCurve", "%", waterCurve);
         components.put(waterCurveInput.getName(), waterCurveInput);
 
-        Map<String, componentAbstract> dashboardDependsOn = new HashMap<String, componentAbstract>();
+        Map<String, componentAbstract<?>> dashboardDependsOn = new HashMap<String, componentAbstract<?>>();
         dashboardDependsOn.put(electricityCurveInput.getName(), electricityCurveInput);
         dashboardDependsOn.put(heatingCurveInput.getName(), heatingCurveInput);
         dashboardDependsOn.put(waterCurveInput.getName(), waterCurveInput);

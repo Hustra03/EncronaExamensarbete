@@ -19,7 +19,7 @@ public class finalYearlySavingsFromElectricity extends componentAbstract<List<Ma
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      */
-    public finalYearlySavingsFromElectricity(String name, String unit, Map<String, componentAbstract> dependsOn) {
+    public finalYearlySavingsFromElectricity(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -27,7 +27,7 @@ public class finalYearlySavingsFromElectricity extends componentAbstract<List<Ma
 
     @Override
     public void calculate() throws Exception {
-        Map<String, componentAbstract> dependsOnMap = this.getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = this.getDependsOn();
 
         Double electricityPrice = (Double) dependsOnMap.get("Electricty price").getValue();
         List<Map.Entry<Integer, Double>> electricityConsumptionList = (List<Map.Entry<Integer, Double>>) dependsOnMap.get("electricityOutput").getValue();

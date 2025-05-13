@@ -21,7 +21,7 @@ public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Ma
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      */
-    public finalYearlyBuildingHeatingSavings(String name, String unit, Map<String, componentAbstract> dependsOn) {
+    public finalYearlyBuildingHeatingSavings(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
@@ -33,7 +33,7 @@ public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Ma
      */
     public void calculate() throws Exception {
 
-        Map<String, componentAbstract> dependsOnMap = this.getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = this.getDependsOn();
 
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
