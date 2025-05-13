@@ -19,7 +19,7 @@ public class ReasoningEngine {
 
     public ReasoningEngine(Map<Map.Entry<String, String>, Double> numericalValues,java.util.List<heatingEnergySource> heatingEnergySources )
     {
-        this.rules=new ArrayList<Rule>();
+        this.rules=new ArrayList<>();
         this.model = new ExpertSystemModel(numericalValues,heatingEnergySources);
         generateRules();
     }
@@ -30,12 +30,12 @@ public class ReasoningEngine {
      */
     private void generateRules()
     {
-        Condition firstCondition = (model) -> {
+        Condition firstCondition = (lambdaModel) -> {
             return true;
         };
-        PostCondition firstPostCondition =(model)->
+        PostCondition firstPostCondition = (lambdaModel)->
         {
-            model.getSortedListOfImprovementsToConsider().forEach((item)->{
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
 
                 if (item.getKey().getName().equals("Berg Or Mark värme")) {
                     item.setValue(item.getValue()-100);
@@ -54,9 +54,9 @@ public class ReasoningEngine {
     public List<String> recommendations()
     {
 
-        List<String> recommendationStringList=new ArrayList<String>();
+        List<String> recommendationStringList=new ArrayList<>();
 
-        triggeredRules=new ArrayList<Rule>();
+        triggeredRules=new ArrayList<>();
         for (Rule rule : rules) {
             if (rule.testRule(model)) {
                 triggeredRules.add(rule);
@@ -66,7 +66,6 @@ public class ReasoningEngine {
             recommendationStringList.add(" " +queueValue.getKey().toString()+" = " +queueValue.getValue() +" score."); 
             
         }        
-        System.out.println(recommendationStringList.toString());
 
         return recommendationStringList;
     }

@@ -113,7 +113,7 @@ public class GUIImprovements extends JPanel {
         JTextField kwhPerM2TextField = new JTextField(improvement.getKwhPerM2BuildingHeating().toString(), 10);
         kwhPerM2BuildingHeatingPage.add(kwhPerM2TextField);
         String[] unitOptions = { kwhHeatingOverLifetimeUnit, kwhHeatingPerYearUnit };
-        JComboBox<String> unitSelection = new JComboBox<String>(unitOptions);
+        JComboBox<String> unitSelection = new JComboBox<>(unitOptions);
         unitSelection.setSelectedIndex(0);
         kwhPerM2BuildingHeatingPage.add(unitSelection);
         kwhPerM2BuildingHeatingPage.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -123,7 +123,7 @@ public class GUIImprovements extends JPanel {
         kwhPerM2WaterHeatingPage.add(kwhPerM2WaterHeatingTextField);
         String[] unitOptions2 = { kwhHeatingWaterOverLifetimeUnit,
                 kwhHeatingWaterPerYearUnit };
-        JComboBox<String> unitSelection2 = new JComboBox<String>(unitOptions2);
+        JComboBox<String> unitSelection2 = new JComboBox<>(unitOptions2);
         unitSelection2.setSelectedIndex(0);
         kwhPerM2WaterHeatingPage.add(unitSelection2);
         kwhPerM2WaterHeatingPage.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -132,7 +132,7 @@ public class GUIImprovements extends JPanel {
         JTextField kwhPerM2ElectricityTextField = new JTextField(improvement.getKwhPerM2Electricity().toString(), 10);
         kwhPerM2ElectricityPage.add(kwhPerM2ElectricityTextField);
         String[] unitOptions3 = { kwhElectricityOverLifetimeUnit, kwhElectricityPerYearUnit };
-        JComboBox<String> unitSelection3 = new JComboBox<String>(unitOptions3);
+        JComboBox<String> unitSelection3 = new JComboBox<>(unitOptions3);
         unitSelection3.setSelectedIndex(0);
         kwhPerM2ElectricityPage.add(unitSelection3);
         kwhPerM2ElectricityPage.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -141,7 +141,7 @@ public class GUIImprovements extends JPanel {
         JTextField m3TextField = new JTextField(improvement.getM3PerM2Water().toString(), 10);
         m3WaterPage.add(m3TextField);
         String[] unitOptions4 = { m3WaterOverImprovementLifetimeUnit, m3WaterPerYearUnit };
-        JComboBox<String> unitSelection4 = new JComboBox<String>(unitOptions4);
+        JComboBox<String> unitSelection4 = new JComboBox<>(unitOptions4);
         unitSelection4.setSelectedIndex(0);
         m3WaterPage.add(unitSelection4);
         m3WaterPage.setBorder(BorderFactory.createLineBorder(Color.black));
@@ -217,11 +217,11 @@ public class GUIImprovements extends JPanel {
      * 
      * @param aTemp the area of the building
      * @return A list of improvement with the provided values
-     * @throws Exception If something goes wrong, with the only expected case being
+     * @throws CustomUIException If something goes wrong, with the only expected case being
      *                   if the values provided are invalid
      */
-    public static java.util.List<improvement> collectFieldValues(Double aTemp) throws Exception {
-        List<improvement> improvementsCollected = new ArrayList<improvement>();
+    public static java.util.List<improvement> collectFieldValues(Double aTemp) throws CustomUIException {
+        List<improvement> improvementsCollected = new ArrayList<>();
 
         // This iterates over all of the heat source pages, and all of their components,
         // to retrive the user provided input
@@ -241,7 +241,7 @@ public class GUIImprovements extends JPanel {
             Boolean selected = selectBox.isSelected();
 
             // This confirms that the user selected this specific improvement
-            if (selected) {
+            if (Boolean.TRUE.equals(selected)) {
 
                 JLabel nameLabel = (JLabel) improvementJPanel.getComponent(1);
                 String name = nameLabel.getText();
@@ -251,10 +251,10 @@ public class GUIImprovements extends JPanel {
                     yearsOfService = Integer
                             .parseInt(((JTextField) yearsOfServicePage.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("years of service is not a valid number for " + name);
+                    throw new CustomUIException("years of service is not a valid number for " + name);
                 }
                 if (yearsOfService <= 0) {
-                    throw new Exception("years of service for " + name + " must be greater than 0");
+                    throw new CustomUIException("years of service for " + name + " must be greater than 0");
                 }
 
                 JPanel krPerM2Page = (JPanel) improvementJPanel.getComponent(2);
@@ -270,14 +270,14 @@ public class GUIImprovements extends JPanel {
                             krPerM2 = (krPerM2 * yearsOfService) / aTemp;
                             break;
                         default:
-                            throw new Exception("No valid unit selected for cost for " + name);
+                            throw new CustomUIException("No valid unit selected for cost for " + name);
                     }
 
                 } catch (Exception e) {
-                    throw new Exception("kr/m^2 not a valid number for " + name);
+                    throw new CustomUIException("kr/m^2 not a valid number for " + name);
                 }
                 if (krPerM2 <= 0.0) {
-                    throw new Exception("kr/m^2 for " + name + " must be greater than 0");
+                    throw new CustomUIException("kr/m^2 for " + name + " must be greater than 0");
                 }
 
                 JPanel kwhPerM2HeatingBuildingPage = (JPanel) improvementJPanel.getComponent(3);
@@ -292,14 +292,14 @@ public class GUIImprovements extends JPanel {
                             kwhPerM2HeatingBuilding = (kwhPerM2HeatingBuilding * yearsOfService) / aTemp;
                             break;
                         default:
-                            throw new Exception("no unit selected for improvement kwh " + name);
+                            throw new CustomUIException("no unit selected for improvement kwh " + name);
                     }
                 } catch (Exception e) {
                     System.out.println(e);
-                    throw new Exception("improvement kwh for heating the building is not a valid number for " + name);
+                    throw new CustomUIException("improvement kwh for heating the building is not a valid number for " + name);
                 }
                 if (kwhPerM2HeatingBuilding < 0.0) {
-                    throw new Exception("kwh heating the building for " + name + " must be non-negative");
+                    throw new CustomUIException("kwh heating the building for " + name + " must be non-negative");
                 }
 
                 JPanel kwhPerM2HeatingWaterPage = (JPanel) improvementJPanel.getComponent(4);
@@ -313,14 +313,14 @@ public class GUIImprovements extends JPanel {
                             kwhPerM2HeatingWater = (kwhPerM2HeatingWater * yearsOfService) / aTemp;
                             break;
                         default:
-                            throw new Exception("no unit selected for improvement kwh " + name);
+                            throw new CustomUIException("no unit selected for improvement kwh " + name);
                     }
                 } catch (Exception e) {
                     System.out.println(e);
-                    throw new Exception("improvement kwh heating water not a valid number for " + name);
+                    throw new CustomUIException("improvement kwh heating water not a valid number for " + name);
                 }
                 if (kwhPerM2HeatingWater < 0.0) {
-                    throw new Exception("kwh heating water for " + name + " must be non-negative");
+                    throw new CustomUIException("kwh heating water for " + name + " must be non-negative");
                 }
                 JPanel kwhPerM2ElectricityPage = (JPanel) improvementJPanel.getComponent(5);
                 try {
@@ -333,14 +333,14 @@ public class GUIImprovements extends JPanel {
                             kwhPerM2Electricity = (kwhPerM2Electricity * yearsOfService) / aTemp;
                             break;
                         default:
-                            throw new Exception("no unit selected for improvement kwh " + name);
+                            throw new CustomUIException("no unit selected for improvement kwh " + name);
                     }
                 } catch (Exception e) {
                     System.out.println(e);
-                    throw new Exception("improvement kwh for electricity not a valid number for " + name);
+                    throw new CustomUIException("improvement kwh for electricity not a valid number for " + name);
                 }
                 if (kwhPerM2Electricity < 0.0) {
-                    throw new Exception("kwh for electricity for " + name + " must be non-negative");
+                    throw new CustomUIException("kwh for electricity for " + name + " must be non-negative");
                 }
 
                 JPanel m3PerM2Page = (JPanel) improvementJPanel.getComponent(6);
@@ -353,14 +353,14 @@ public class GUIImprovements extends JPanel {
                             m3WaterPerM2 = (m3WaterPerM2 * yearsOfService) / aTemp;
                             break;
                         default:
-                            throw new Exception("no unit selected for improvement kwh " + name);
+                            throw new CustomUIException("no unit selected for improvement kwh " + name);
                     }
                 } catch (Exception e) {
                     System.out.println(e);
-                    throw new Exception("improvement m^3 not a valid number for " + name);
+                    throw new CustomUIException("improvement m^3 not a valid number for " + name);
                 }
                 if (m3WaterPerM2 < 0.0) {
-                    throw new Exception("m^3 for " + name + " must be non-negative");
+                    throw new CustomUIException("m^3 for " + name + " must be non-negative");
                 }
 
                 improvementsCollected.add(new improvement(name, kwhPerM2HeatingBuilding, kwhPerM2HeatingWater,
@@ -369,7 +369,7 @@ public class GUIImprovements extends JPanel {
         }
 
         if (improvementsCollected.isEmpty()) {
-            throw new Exception("No improvements selected, please select one or more");
+            throw new CustomUIException("No improvements selected, please select one or more");
         }
 
         return improvementsCollected;

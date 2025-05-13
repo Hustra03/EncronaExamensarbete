@@ -27,11 +27,11 @@ public class GUIMain extends JPanel {
 
     private JButton runButton;
     private JButton expertButton;
-    private static JButton clipboardButton;
+    private static JButton clipboardButton=new JButton("Copy to clipboard");;
     private static String clipboardString;
 
     private static JFrame theMainFrame;
-    private static JTabbedPane tabbedPane;
+    private static JTabbedPane tabbedPane=new JTabbedPane();
     private static JPanel outputPage;
 
     public GUIMain() {
@@ -45,7 +45,6 @@ public class GUIMain extends JPanel {
         expertButton.setActionCommand(expertString);
         expertButton.addActionListener(new ExpertListner());
 
-        clipboardButton=new JButton("Copy to clipboard");
         clipboardButton.addActionListener(new clipboardListener());
 
         // Create a panel that uses BoxLayout.
@@ -53,8 +52,6 @@ public class GUIMain extends JPanel {
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(runButton);
         buttonPane.add(expertButton);
-
-        tabbedPane = new JTabbedPane();
 
         // This adds the numerical value specification tab
         String toolTip2 = "<html>This is where you specify numeric values</html>";
@@ -83,7 +80,7 @@ public class GUIMain extends JPanel {
     private static void createAndShowGUI() {
         // Create and set up the window.
         theMainFrame = new JFrame("Encrona Simulator");
-        theMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        theMainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         // Create and set up the content pane.
         JComponent newContentPane = new GUIMain();
@@ -91,7 +88,7 @@ public class GUIMain extends JPanel {
         theMainFrame.setContentPane(newContentPane);
         try {
             theMainFrame.setIconImage(ImageIO.read(new File("encrona-simulator\\encrona\\src\\main\\resources\\Encrona.png")));
-        } catch (IOException e) {
+        } catch (IOException _) {
             System.out.println("Unable to set icon");
         }
 
@@ -128,7 +125,7 @@ public class GUIMain extends JPanel {
             java.util.List<heatingEnergySource> heatingEnergySources,
             java.util.List<improvement> improvementsCollected) {
         // This is the tooltip for the heat source page
-        String toolTip = new String("<html>This is where the output is shown</html>");
+        String toolTip = "<html>This is where the output is shown</html>";
 
         outputPage = new JPanel();
 
@@ -138,11 +135,10 @@ public class GUIMain extends JPanel {
 
         inputSectionPage.add(new JLabel("Provided input"));
 
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
 
-        for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
-            listModel.addElement(
-                    entry.getKey() + " was set to " + mapOfNumericalVariables.get(entry) + " " + entry.getValue());
+        for (Map.Entry<Map.Entry<String,String>,Double> entry : mapOfNumericalVariables.entrySet()) {
+            listModel.addElement(entry.getKey().getKey() + " was set to " + entry.getValue() + " " + entry.getKey().getValue());
         }
 
         for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
@@ -154,7 +150,7 @@ public class GUIMain extends JPanel {
         }
 
         // Create the list and put it in a scroll pane.
-        JList<String> list = new JList<String>(listModel);
+        JList<String> list = new JList<>(listModel);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
@@ -183,10 +179,10 @@ public class GUIMain extends JPanel {
                 mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
 
                 Double aTemp = 1.0;
-                for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
+                for (Map.Entry<Map.Entry<String,String>,Double> entry : mapOfNumericalVariables.entrySet()) {
 
-                    if (entry.getKey().equals("Atemp")) {
-                        aTemp = mapOfNumericalVariables.get(entry);
+                    if (entry.getKey().getKey().equals("Atemp")) {
+                        aTemp = entry.getValue();
                     }
 
                 }
@@ -236,16 +232,18 @@ public class GUIMain extends JPanel {
         // Link to example used for this
         // https://blog.idrsolutions.com/tutorial-copy-text-javafx-swing/#Copying_Text_in_Swing
 
-        clipboardString="";
-        for (String listItem : outputLists.get("clipboard")) {
-            clipboardString += listItem;
-        }
+        StringBuilder bld = new StringBuilder();
 
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        for (String listItem : outputLists.get("clipboard")) {
+            bld.append(listItem);
+        }
+        clipboardString=bld.toString();
+
+        DefaultListModel<String> listModel = new DefaultListModel<>();
         for (String listItem : outputLists.get("output")) {
             listModel.addElement(listItem);
         }
-        JList<String> list = new JList<String>(listModel);
+        JList<String> list = new JList<>(listModel);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
@@ -294,7 +292,7 @@ public class GUIMain extends JPanel {
             java.util.List<Rule> triggeredRules) {
 
         // This is the tooltip for the heat source page
-        String toolTip = new String("<html>This is where the expert system output is shown</html>");
+        String toolTip = "<html>This is where the expert system output is shown</html>";
 
         JPanel expertPage = new JPanel();
 
@@ -317,7 +315,7 @@ public class GUIMain extends JPanel {
 
         expertPage.add(new Box.Filler(minSize, prefSize, maxSize));
 
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
 
         index = 1;
         for (Rule rule : triggeredRules) {
@@ -326,7 +324,7 @@ public class GUIMain extends JPanel {
         }
 
         // Create the list and put it in a scroll pane.
-        JList<String> list = new JList<String>(listModel);
+        JList<String> list = new JList<>(listModel);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
