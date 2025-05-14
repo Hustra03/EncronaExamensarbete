@@ -12,6 +12,7 @@ import {
 import { useActionState, useEffect, useState } from 'react';
 import { Textarea } from './ui/text-area';
 import Spinner from './spinner';
+import { toast } from 'sonner';
 
 export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   const [buildings, setBuildings] = useState([]);
@@ -34,6 +35,16 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   useEffect(() => {
     fetchBuildings();
   }, []);
+
+
+    useEffect(() => {
+        if(functionReturnValue=='ok')
+    {toast("Simulation resultat skickat");}
+      else
+    {
+toast(functionReturnValue);
+    }
+  }, [functionReturnValue]);
 
   if (loading) {
     return <Spinner />;
@@ -84,11 +95,6 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
         />
       </div>
       <hr />
-      {functionReturnValue && functionReturnValue !== 'ok' && (
-        <p className="text-center text-sm text-red-500">
-          {functionReturnValue}
-        </p>
-      )}
       <button type="submit">Submit</button>
     </form>
   );
