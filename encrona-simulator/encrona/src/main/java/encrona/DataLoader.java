@@ -20,7 +20,7 @@ import encrona.components.output.*;
  */
 public class DataLoader {
 
-    private Map<String, componentAbstract> components;
+    private Map<String,componentAbstract> components;
 
     /**
      * This instantiates the database loader
@@ -47,7 +47,7 @@ public class DataLoader {
             List<improvement> improvement, List<heatingEnergySource> heatingEnergySources) {
         // We first instantiate the map
         // https://docs.oracle.com/javase/8/docs/api/java/util/HashMap.html
-        components = new HashMap<String, componentAbstract>();
+        components = new HashMap<>();
 
         // We then fill the maps with relevant data
         createComponents(mapOfNumericalVariables, improvement, heatingEnergySources);
@@ -72,26 +72,22 @@ public class DataLoader {
         input<Double> waterConsumptionInput = null;
         input<Double> waterPriceInput = null;
 
-        for (Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
-            switch (entry.getKey()) {
+        for (Entry<Map.Entry<String, String>, Double> entry : mapOfNumericalVariables.entrySet()) {
+            switch (entry.getKey().getKey()) {
                 case "Atemp":
-                    aTempInput = new input<Double>("Atemp", entry.getValue(), mapOfNumericalVariables.get(entry));
+                    aTempInput = new input<>("Atemp", entry.getKey().getValue(), entry.getValue());
                     break;
                 case "Electricty consumption":
-                    electricityInput = new input<Double>("Electricty consumption", entry.getValue(),
-                            mapOfNumericalVariables.get(entry));
+                    electricityInput = new input<>("Electricty consumption", entry.getKey().getValue(),entry.getValue());
                     break;
                 case "Electricty price":
-                    electrictyPriceInput = new input<Double>("Electricty price", entry.getValue(),
-                            mapOfNumericalVariables.get(entry));
+                    electrictyPriceInput = new input<>("Electricty price", entry.getKey().getValue(),entry.getValue());
                     break;
                 case "Water consumption":
-                    waterConsumptionInput = new input<Double>("Water consumption", entry.getValue(),
-                            mapOfNumericalVariables.get(entry));
+                    waterConsumptionInput = new input<>("Water consumption", entry.getKey().getValue(),entry.getValue());
                     break;
                 case "Water price":
-                    waterPriceInput = new input<Double>("Water price", entry.getValue(),
-                            mapOfNumericalVariables.get(entry));
+                    waterPriceInput = new input<>("Water price", entry.getKey().getValue(),entry.getValue());
                     break;
                 default:
                     break;
@@ -101,41 +97,41 @@ public class DataLoader {
 
         // We then add the improvements which were selected
 
-        input<List<improvement>> improvementsToImplement = new input<List<improvement>>("improvements", "",
+        input<List<improvement>> improvementsToImplement = new input<>("improvements", "",
                 improvement);
 
         // We then add the different sources of heating energy
-        input<List<heatingEnergySource>> heatingSourcesInput = new input<List<heatingEnergySource>>("heatingSources",
+        input<List<heatingEnergySource>> heatingSourcesInput = new input<>("heatingSources",
                 "", heatingEnergySources);
 
         //We then define the intermediate values, as in the calculated values which are not shown to the user directly
 
-        Map<String, componentAbstract<?>> originalElectricityConsumptionDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> originalElectricityConsumptionDependsOn = new HashMap<>();
         originalElectricityConsumptionDependsOn.put(electricityInput.getName(), electricityInput);
         originalElectricityConsumptionDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         fullOriginalElectricityConsumption originalElectricityConsumption = new fullOriginalElectricityConsumption(
                 "originalElectricityConsumption", "kwh", originalElectricityConsumptionDependsOn);
 
         // We then define the different outputs
-        Map<String, componentAbstract<?>> improvementImpactDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> improvementImpactDependsOn = new HashMap<>();
         improvementImpactDependsOn.put(aTempInput.getName(), aTempInput);
         improvementImpactDependsOn.put(improvementsToImplement.getName(), improvementsToImplement);
         improvementImpact improvementImpact = new improvementImpact("improvementImpact", "kwh",
                 improvementImpactDependsOn);
 
-        Map<String, componentAbstract<?>> waterConsumptionDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> waterConsumptionDependsOn = new HashMap<>();
         waterConsumptionDependsOn.put(waterConsumptionInput.getName(), waterConsumptionInput);
         waterConsumptionDependsOn.put(improvementImpact.getName(), improvementImpact);
         finalYearlyWaterConsumption waterConsumption = new finalYearlyWaterConsumption(
                 "waterConsumption", "m^3", waterConsumptionDependsOn);
 
-        Map<String, componentAbstract<?>> waterSavingsDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> waterSavingsDependsOn = new HashMap<>();
         waterSavingsDependsOn.put(waterConsumption.getName(), waterConsumption);
         waterSavingsDependsOn.put(waterPriceInput.getName(), waterPriceInput);
         finalYearlySavingsFromWater waterSavings = new finalYearlySavingsFromWater(
                         "waterSavings", "kr/year", waterSavingsDependsOn);
         
-        Map<String, componentAbstract<?>> improvementReturnOnInvestementDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> improvementReturnOnInvestementDependsOn = new HashMap<>();
         improvementReturnOnInvestementDependsOn.put(aTempInput.getName(), aTempInput);
         improvementReturnOnInvestementDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
         improvementReturnOnInvestementDependsOn.put(waterPriceInput.getName(), waterPriceInput);
@@ -144,31 +140,31 @@ public class DataLoader {
         improvementReturnOnInvestement improvementReturnOnInvestement = new improvementReturnOnInvestement(
                 "improvementReturnOnInvestement", "years", improvementReturnOnInvestementDependsOn);
 
-        Map<String, componentAbstract<?>> electricityOutputDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> electricityOutputDependsOn = new HashMap<>();
         electricityOutputDependsOn.put(originalElectricityConsumption.getName(),originalElectricityConsumption);
         electricityOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
         finalYearlyElectricityConsumption electricityOutput = new finalYearlyElectricityConsumption("electricityOutput",
                 "kwh/year", electricityOutputDependsOn);
 
-        Map<String, componentAbstract<?>> electricitySavingsDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> electricitySavingsDependsOn = new HashMap<>();
         electricitySavingsDependsOn.put(electricityOutput.getName(), electricityOutput);
         electricitySavingsDependsOn.put(electrictyPriceInput.getName(), electrictyPriceInput);
         finalYearlySavingsFromElectricity electricitySavings = new finalYearlySavingsFromElectricity(
                 "electricitySavings", "kr/year", electricitySavingsDependsOn);
 
-        Map<String, componentAbstract<?>> heatingOutputDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> heatingOutputDependsOn = new HashMap<>();
         heatingOutputDependsOn.put(improvementImpact.getName(), improvementImpact);
         heatingOutputDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyHeatingConsumption heatingOutput = new finalYearlyHeatingConsumption("heatingOutput",
                 "kwh/year", heatingOutputDependsOn);
 
-        Map<String, componentAbstract<?>> heatingSavingsDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> heatingSavingsDependsOn = new HashMap<>();
         heatingSavingsDependsOn.put(heatingOutput.getName(), heatingOutput);
         heatingSavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyBuildingHeatingSavings heatingSavings = new finalYearlyBuildingHeatingSavings("heatingSavings",
                 "kr/year", heatingSavingsDependsOn);
 
-        Map<String, componentAbstract<?>> waterHeatingSavingsDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> waterHeatingSavingsDependsOn = new HashMap<>();
         waterHeatingSavingsDependsOn.put(heatingOutput.getName(), heatingOutput);
         waterHeatingSavingsDependsOn.put(heatingSourcesInput.getName(), heatingSourcesInput);
         finalYearlyWaterHeatingSavings waterHeatingSavings = new finalYearlyWaterHeatingSavings("waterHeatingSavings",
@@ -185,26 +181,24 @@ public class DataLoader {
         components.put(heatingSavings.getName(), heatingSavings);
         components.put(waterHeatingSavings.getName(), waterHeatingSavings);
 
-
-
         // TODO note below is where the hard-coded ranges are defined, and will need to
         // be removed if it should be changed
         Double[] electricityCurve = { (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0),
                 (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0) };
-        input<Double[]> electricityCurveInput = new input<Double[]>("electricityCurve", "%", electricityCurve);
+        input<Double[]> electricityCurveInput = new input<>("electricityCurve", "%", electricityCurve);
         components.put(electricityCurveInput.getName(), electricityCurveInput);
 
         Double[] heatingCurve = { 0.14, 0.14, 0.14, (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0), (3.0 / 70.0),
                 (3.0 / 70.0), (3.0 / 70.0), 0.14, 0.14 };
-        input<Double[]> heatingCurveInput = new input<Double[]>("heatingCurve", "%", heatingCurve);
+        input<Double[]> heatingCurveInput = new input<>("heatingCurve", "%", heatingCurve);
         components.put(heatingCurveInput.getName(), heatingCurveInput);
 
         Double[] waterCurve = { (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0),
                 (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0) };
-        input<Double[]> waterCurveInput = new input<Double[]>("waterCurve", "%", waterCurve);
+        input<Double[]> waterCurveInput = new input<>("waterCurve", "%", waterCurve);
         components.put(waterCurveInput.getName(), waterCurveInput);
 
-        Map<String, componentAbstract<?>> dashboardDependsOn = new HashMap<String, componentAbstract<?>>();
+        Map<String, componentAbstract<?>> dashboardDependsOn = new HashMap<>();
         dashboardDependsOn.put(electricityCurveInput.getName(), electricityCurveInput);
         dashboardDependsOn.put(heatingCurveInput.getName(), heatingCurveInput);
         dashboardDependsOn.put(waterCurveInput.getName(), waterCurveInput);
@@ -228,7 +222,7 @@ public class DataLoader {
         // We then add the relevant heating sources (currently just district heating)
         heatingEnergySource districtHeating = new heatingEnergySource("districtHeating", 174812.0, 26850.0, 0.0, 0.9);
         heatingEnergySource gasHeating = new heatingEnergySource("gasHeating", 2000.0, 0.0, 0.0, 30.0);
-        List<heatingEnergySource> initialListOfHeatSources = new ArrayList<heatingEnergySource>();
+        List<heatingEnergySource> initialListOfHeatSources = new ArrayList<>();
         initialListOfHeatSources.add(districtHeating);
         initialListOfHeatSources.add(gasHeating);
 
@@ -257,7 +251,7 @@ public class DataLoader {
         improvement EconomicalFlush = new improvement("Snålpolande armatur", 0.0,100.0,0.0,0.0, 45.0, 15 );
         improvement EfficentLighting = new improvement("Belysning", 0.0,0.0,30.0,0.0, 15.0, 15 );
 
-        List<improvement> initialListOfImprovements = new ArrayList<improvement>();
+        List<improvement> initialListOfImprovements = new ArrayList<>();
         initialListOfImprovements.add(BergOrMarkHeating);
         initialListOfImprovements.add(FTX);
         initialListOfImprovements.add(ChangeWindows);

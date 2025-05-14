@@ -37,7 +37,7 @@ public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entr
 
         // Note that we use Map.Entry<Integer,Double> to represent years of service and
         // yearly consumption
-        List<Map.Entry<Integer, Double>> waterConsumptionList = new ArrayList<Map.Entry<Integer, Double>>();
+        List<Map.Entry<Integer, Double>> waterConsumptionList = new ArrayList<>();
 
         // We check if there are any improvements affecting water, if so we calculate
         // the impact of improvements in ranges in the format <year this range

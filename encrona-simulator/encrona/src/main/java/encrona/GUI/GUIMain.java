@@ -7,12 +7,14 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.datatransfer.StringSelection;//
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import encrona.DataLoader;
 import encrona.Model;
+import encrona.components.input;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 import encrona.expertSystem.ReasoningEngine;
@@ -66,6 +68,11 @@ public class GUIMain extends JPanel {
         String tooltip4 = "<html>This is where you specify improvements</html>";
         tabbedPane.addTab("Improvements", null, new GUIImprovements(DataLoader.createInitialListOfImprovements()),
                 tooltip4);
+
+        // This adds the improvement tab
+        String tooltip5 = "<html>This is where you specify the additional inputs to the expert system</html>";
+        tabbedPane.addTab("Expert system inputs", null, new GUIExpertSystemInput(),
+        tooltip5);
 
         add(tabbedPane);
 
@@ -264,10 +271,12 @@ public class GUIMain extends JPanel {
             removeTab(expertSystemTabName);
             final Map<Map.Entry<String, String>, Double> mapOfNumericalVariables;
             final java.util.List<heatingEnergySource> heatingEnergySources;
+            final Map<String,input<?>> expertSystemInput;
 
             try {
                 mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
                 heatingEnergySources = GUIHeatingSources.collectFieldValues();
+                expertSystemInput=GUIExpertSystemInput.collectFieldValues();
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",
                         JOptionPane.PLAIN_MESSAGE);
@@ -280,15 +289,15 @@ public class GUIMain extends JPanel {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     ReasoningEngine reasoningEngine = new ReasoningEngine(mapOfNumericalVariables,
-                            heatingEnergySources);
-                    java.util.List<String> resultList = reasoningEngine.recommendations();
+                            heatingEnergySources,expertSystemInput);
+                    java.util.List<Entry<String,Integer>> resultList = reasoningEngine.recommendations();
                     addExpertSystemOutputTab(resultList, reasoningEngine.getTriggeredRules());
                 }
             });
         }
     }
 
-    public static void addExpertSystemOutputTab(java.util.List<String> resultList,
+    public static void addExpertSystemOutputTab(java.util.List<Entry<String,Integer>> resultList,
             java.util.List<Rule> triggeredRules) {
 
         // This is the tooltip for the heat source page
@@ -301,11 +310,14 @@ public class GUIMain extends JPanel {
         JPanel resultPage = new JPanel();
         resultPage.setLayout(new BoxLayout(resultPage, BoxLayout.PAGE_AXIS));
 
-        Integer index = 1;
-        for (String resultString : resultList) {
-            resultPage.add(new JLabel(index + " : " + resultString));
-            index += 1;
+        Integer index=1;
+        for (int i = 1; i < resultList.size()+1; i++) {
+            Entry<String,Integer> result = resultList.get(i-1);
+            resultPage.add(new JLabel(index + " : " + result.getKey() +" = " + result.getValue()));
+            if(i<resultList.size() && resultList.get(i).getValue()<result.getValue())
+            {index+=1;}
         }
+
         Dimension minSize = new Dimension(5, 100);
         Dimension prefSize = new Dimension(5, 100);
         Dimension maxSize = new Dimension(Short.MAX_VALUE, 100);

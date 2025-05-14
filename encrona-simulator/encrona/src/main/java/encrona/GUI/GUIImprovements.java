@@ -28,17 +28,17 @@ public class GUIImprovements extends JPanel {
     List<improvement> improvements;
     static JPanel improvementSpecificationPage;
 
-    final static String kwhHeatingOverLifetimeUnit = "kwh/m^2 over the improvements lifetime for building heating";
-    final static String kwhHeatingPerYearUnit = "kwh per year for building heating";
-    final static String kwhHeatingWaterOverLifetimeUnit = "kwh/m^2 over the improvements lifetime for heating water";
-    final static String kwhHeatingWaterPerYearUnit = "kwh per year for water heating";
-    final static String kwhElectricityOverLifetimeUnit = "kwh/m^2 over the improvements lifetime for electricity";
-    final static String kwhElectricityPerYearUnit = "kwh per year for electricity";
-    final static String m3WaterOverImprovementLifetimeUnit = "m^3 water/m^2 Atemp over the improvements lifetime for water";
-    final static String m3WaterPerYearUnit = "m^3 per year for water";
-    final static String costKrPerM2LifetimeUnit = "kr/m² over the improvements lifetime";
-    final static String costkrPerYearUnit = "kr per year";
-    final static String costTotalUnit = "total cost";
+    static final String kwhHeatingOverLifetimeUnit = "kwh/m^2 over the improvements lifetime for building heating";
+    static final String kwhHeatingPerYearUnit = "kwh per year for building heating";
+    static final String kwhHeatingWaterOverLifetimeUnit = "kwh/m^2 over the improvements lifetime for heating water";
+    static final String kwhHeatingWaterPerYearUnit = "kwh per year for water heating";
+    static final String kwhElectricityOverLifetimeUnit = "kwh/m^2 over the improvements lifetime for electricity";
+    static final String kwhElectricityPerYearUnit = "kwh per year for electricity";
+    static final String m3WaterOverImprovementLifetimeUnit = "m^3 water/m^2 Atemp over the improvements lifetime for water";
+    static final String m3WaterPerYearUnit = "m^3 per year for water";
+    static final String costKrPerM2LifetimeUnit = "kr/m² over the improvements lifetime";
+    static final String costkrPerYearUnit = "kr per year";
+    static final String costTotalUnit = "total cost";
 
     public GUIImprovements(List<improvement> initialImprovements) {
         super(new GridBagLayout());

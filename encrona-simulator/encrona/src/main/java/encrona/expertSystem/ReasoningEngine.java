@@ -1,10 +1,12 @@
 package encrona.expertSystem;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import encrona.components.input;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 
@@ -17,10 +19,10 @@ public class ReasoningEngine {
     private List<Rule> rules;
     private List<Rule> triggeredRules;
 
-    public ReasoningEngine(Map<Map.Entry<String, String>, Double> numericalValues,java.util.List<heatingEnergySource> heatingEnergySources )
+    public ReasoningEngine(Map<Map.Entry<String, String>, Double> numericalValues,java.util.List<heatingEnergySource> heatingEnergySources,Map<String,input<?>> expertSystemInput )
     {
         this.rules=new ArrayList<>();
-        this.model = new ExpertSystemModel(numericalValues,heatingEnergySources);
+        this.model = new ExpertSystemModel(numericalValues,heatingEnergySources,expertSystemInput);
         generateRules();
     }
 
@@ -31,30 +33,32 @@ public class ReasoningEngine {
     private void generateRules()
     {
         Condition firstCondition = (lambdaModel) -> {
-            return true;
+            return lambdaModel.getExpertSystemInput().get("naturalVentilation").getValue().equals(true);
         };
         PostCondition firstPostCondition = (lambdaModel)->
         {
             lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
 
-                if (item.getKey().getName().equals("Berg Or Mark värme")) {
-                    item.setValue(item.getValue()-100);
+                if (item.getKey().getName().equals("FTX")) {
+                    item.setValue(item.getValue()+1);
                 }
 
             });
         };
-        Rule exampleRule = new Rule("Basic static rule","It decreases the priority of Berg or Mark Heating", firstCondition, firstPostCondition, null);
-        rules.add(exampleRule);
+        Rule rule1 = new Rule("Natural ventilation","If there is natural ventilation, then FTX has a higher priority", firstCondition, firstPostCondition, null);
+        rules.add(rule1);
+
+
     }
 
     /**
      * This method is called to start the expert system execution, and will return a sorted list of improvements (which is the current recommendation)
      * @return A a sorted list of improvements as a list
      */
-    public List<String> recommendations()
+    public List<Entry<String,Integer>> recommendations()
     {
 
-        List<String> recommendationStringList=new ArrayList<>();
+        List<Entry<String,Integer>> recommendationStringList=new ArrayList<>();
 
         triggeredRules=new ArrayList<>();
         for (Rule rule : rules) {
@@ -63,8 +67,7 @@ public class ReasoningEngine {
             }
         }
         for (Entry<improvement,Integer> queueValue : model.getSortedListOfImprovementsToConsider()) {
-            recommendationStringList.add(" " +queueValue.getKey().toString()+" = " +queueValue.getValue() +" score."); 
-            
+            recommendationStringList.add(new AbstractMap.SimpleEntry<>(queueValue.getKey().getName(),queueValue.getValue())); 
         }        
 
         return recommendationStringList;
