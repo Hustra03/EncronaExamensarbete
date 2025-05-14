@@ -183,8 +183,9 @@ public class DataLoader {
 
         // TODO note below is where the hard-coded ranges are defined, and will need to
         // be removed if it should be changed
-        Double[] electricityCurve = { (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0),
-                (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0), (1.0 / 12.0) };
+        //Electricity curve is sourced from Sveby https://www.sveby.org/wp-content/uploads/2024/11/Bakgrund_Brukarindata_bostadshus_241108.pdf
+        Double[] electricityCurve = { (1.43 / 14.7), (1.31 / 14.7), (1.34 / 14.7), (1.18 / 14.7), (1.11 / 14.7),
+                (1.02 / 14.7), (.98 / 14.7), (1.08 / 14.7), (1.13 / 14.7), (1.27 / 14.7), (1.34 / 14.7), (1.5 / 14.7) };
         input<Double[]> electricityCurveInput = new input<>("electricityCurve", "%", electricityCurve);
         components.put(electricityCurveInput.getName(), electricityCurveInput);
 
