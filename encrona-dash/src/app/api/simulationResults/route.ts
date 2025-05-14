@@ -154,7 +154,7 @@ export async function POST(request: Request) {
 
   let electricityCurve;
   try {
-    electricityCurve = parsedSimulationResults.waterCurve;
+    electricityCurve = parsedSimulationResults.electricityCurve;
     if (electricityCurve.length != 12) {
       return new Response(
         JSON.stringify({
