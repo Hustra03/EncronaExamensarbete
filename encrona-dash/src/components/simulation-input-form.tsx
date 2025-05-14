@@ -20,7 +20,7 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   const [selectedBuildingValue, setSelectedBuildingValue] = useState('4');
   const [textArea, setTextArea] = useState('');
 
-  const [functionReturnValue, formAction] = useActionState(handleSubmit, null);
+  const [functionReturnValue, formAction,isPending] = useActionState(handleSubmit, null);
 
   async function fetchBuildings() {
     const res = await fetch('/api/buildings');
@@ -36,15 +36,15 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
     fetchBuildings();
   }, []);
 
-
-    useEffect(() => {
-        if(functionReturnValue=='ok')
-    {toast("Simulation resultat skickat");}
-      else
+  useEffect(() => {
+    if(!isPending)
     {
-toast(functionReturnValue);
-    }
-  }, [functionReturnValue]);
+    if (functionReturnValue == 'ok') {
+      toast('Simulation resultat skickat');
+    } else {
+      toast(functionReturnValue);
+    }}
+  }, [isPending]);
 
   if (loading) {
     return <Spinner />;
@@ -95,7 +95,7 @@ toast(functionReturnValue);
         />
       </div>
       <hr />
-      <button type="submit">Submit</button>
+      <button type="submit" disabled={isPending}>Submit</button>
     </form>
   );
 }
