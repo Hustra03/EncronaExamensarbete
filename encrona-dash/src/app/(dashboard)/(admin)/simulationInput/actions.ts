@@ -14,7 +14,7 @@ export async function handleSubmit(_: unknown, formData: FormData) {
   if (response.status.toLocaleString().includes('204')) {
     return 'ok';
   } else {
-    const jsonValue=await response.json();
+    const jsonValue = await response.json();
     return jsonValue['message'];
   }
 }

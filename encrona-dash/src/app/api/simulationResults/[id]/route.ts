@@ -312,7 +312,6 @@ function checkAndPotentiallyCreateEstimates(
 
       spaceHeatingkWh = spaceHeatingkWh * currentHeatingCurveValue.toNumber();
 
-
       const currentWaterCurveValue =
         simulationResults.waterCurve.curve[dateToAddEstimateFor.getMonth()];
       const totalWaterM3 =
@@ -320,7 +319,7 @@ function checkAndPotentiallyCreateEstimates(
         currentWaterCurveValue.toNumber();
 
       waterHeatingkWh = waterHeatingkWh * currentWaterCurveValue.toNumber();
-      
+
       const totalEnergykWh = waterHeatingkWh + spaceHeatingkWh + electricitykWh;
 
       //TODO add cost calculation here, based on above values, once cost is calculatable
