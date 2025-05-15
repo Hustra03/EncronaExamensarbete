@@ -310,16 +310,18 @@ function checkAndPotentiallyCreateEstimates(
       const currentHeatingCurveValue =
         simulationResults.heatCurve.curve[dateToAddEstimateFor.getMonth()];
 
-      waterHeatingkWh = waterHeatingkWh * currentHeatingCurveValue.toNumber();
       spaceHeatingkWh = spaceHeatingkWh * currentHeatingCurveValue.toNumber();
 
-      const totalEnergykWh = waterHeatingkWh + spaceHeatingkWh + electricitykWh;
 
       const currentWaterCurveValue =
         simulationResults.waterCurve.curve[dateToAddEstimateFor.getMonth()];
       const totalWaterM3 =
         simulationResults.waterEstimation[waterIndex].consumption.toNumber() *
         currentWaterCurveValue.toNumber();
+
+      waterHeatingkWh = waterHeatingkWh * currentWaterCurveValue.toNumber();
+      
+      const totalEnergykWh = waterHeatingkWh + spaceHeatingkWh + electricitykWh;
 
       //TODO add cost calculation here, based on above values, once cost is calculatable
 
