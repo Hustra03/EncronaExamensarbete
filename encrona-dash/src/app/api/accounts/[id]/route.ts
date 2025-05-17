@@ -6,8 +6,8 @@ import { NextRequest } from 'next/server';
 const prisma = new PrismaClient();
 
 export async function PUT(
-  req: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: { id: string } }
 ) {
   const { id: idParam } = await params;
 
@@ -18,8 +18,8 @@ export async function PUT(
     });
   }
 
-  const id = parseInt(idParam);
-  const body = await req.json();
+  const { id } = await params;
+  const body = await request.json();
   const { email, name, role, password, companyId } = body;
 
   try {
