@@ -198,12 +198,10 @@ function checkAndPotentiallyCreateEstimates(
         }
       }
       if (add) {
-        datesToAdd.push(new Date(dateToAdd.toLocaleDateString()));
+        datesToAdd.push(new Date(Date.UTC(year, month, 1)));
       }
       add = true;
     }
-
-    console.log(datesToAdd);
 
     const buildingEstimation: EstimateInterface[] = [];
 
