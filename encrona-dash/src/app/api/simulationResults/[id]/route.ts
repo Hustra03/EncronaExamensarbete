@@ -1,4 +1,5 @@
 import { auth, isAdmin } from '@/lib/auth';
+import { recalculateBuildingCosts } from '@/lib/recalculateBuildingCosts';
 import { BuildingDataType, Prisma, PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
@@ -27,11 +28,6 @@ interface EstimateInterface {
   waterHeatingkWh: number;
   electricitykWh: number;
   totalWaterM3: number;
-
-  totalEnergyCost: number;
-  spaceHeatingCost: number;
-  waterHeatingCost: number;
-  electricityCost: number;
 }
 
 /**
@@ -126,11 +122,23 @@ export async function GET(
     return new Response('Building has no simulation results', { status: 404 });
   }
 
-  return checkAndPotentiallyCreateEstimates(
+  const newEstimates = await checkAndPotentiallyCreateEstimates(
     buildingId,
     building,
     simulationResults
   );
+
+  // Only recalculate if we added any new rows
+  if (newEstimates.length > 0) {
+    await Promise.all([
+      recalculateBuildingCosts(buildingId, 'HEATING'),
+      recalculateBuildingCosts(buildingId, 'WATERHEATING'),
+      recalculateBuildingCosts(buildingId, 'ELECTRICITY'),
+      recalculateBuildingCosts(buildingId, 'WATERUSAGE'),
+    ]);
+  }
+
+  return new Response(JSON.stringify({ newEstimates }), { status: 200 });
 }
 
 //This transaction function is used to ensure only one set of new estimate is created
@@ -152,58 +160,35 @@ function checkAndPotentiallyCreateEstimates(
       orderBy: { date: 'asc' },
     });
 
+    const existingDates = new Set(
+      estimate.map(
+        e => new Date(e.date).toISOString().slice(0, 7) // 'YYYY-MM'
+      )
+    );
+
     const datesToAdd: Date[] = [];
-    let year = building.installedAt.getFullYear();
-    let month = building.installedAt.getMonth();
-    const dateToAdd: Date = new Date();
-    dateToAdd.setUTCHours(0, 0, 0, 0); //This removes hour,minute,second and millisecond information from estimates
-    const dateToReach: { year: number; month: number } = {
-      year: dateToAdd.getUTCFullYear() + 1,
-      month: dateToAdd.getUTCMonth(),
-    };
 
-    //We then, using the estimate array and the buildings installedAt date, define which months are currently lacking an estimate
-    let arrayIndex: number = 0;
-    let add = true;
+    let year = building.installedAt.getUTCFullYear();
+    let month = building.installedAt.getUTCMonth();
 
-    dateToAdd.setUTCFullYear(year, month, 1);
+    const now = new Date();
+    const endYear = now.getUTCFullYear() + 1;
+    const endMonth = now.getUTCMonth();
 
-    while (year < dateToReach.year || month <= dateToReach.month) {
-      //This checks, as long as there are more estimates and we did not just find a match,
-      //if the current index estimate is older than the currently investigated date,
-      // if so increment index, but if it is not and it is this year we set add to false (since this date already has an estimate)
-      if (arrayIndex < estimate.length) {
-        if (
-          dateToAdd.getFullYear() >= estimate[arrayIndex].date.getFullYear() &&
-          dateToAdd.getMonth() > estimate[arrayIndex].date.getMonth()
-        ) {
-          arrayIndex += 1;
-        } else {
-          if (
-            dateToAdd.getFullYear() ==
-              estimate[arrayIndex].date.getFullYear() &&
-            dateToAdd.getMonth() == estimate[arrayIndex].date.getMonth()
-          ) {
-            arrayIndex += 1;
-            add = false;
-          }
-        }
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+      const date = new Date(Date.UTC(year, month, 1));
+      const key = date.toISOString().slice(0, 7);
+
+      if (!existingDates.has(key)) {
+        datesToAdd.push(date);
       }
-      if (add) {
-        datesToAdd.push(new Date(dateToAdd.toLocaleDateString()));
-      }
-      add = true;
+
       month += 1;
-      if (month == 12) {
-        year += 1;
+      if (month > 11) {
         month = 0;
-        dateToAdd.setUTCFullYear(year, month);
-      } else {
-        dateToAdd.setUTCMonth(month);
+        year += 1;
       }
     }
-
-    console.log(datesToAdd);
 
     const buildingEstimation: EstimateInterface[] = [];
 
@@ -334,25 +319,16 @@ function checkAndPotentiallyCreateEstimates(
         waterHeatingkWh,
         electricitykWh,
         totalWaterM3,
-
-        //TODO add cost calculation, based on above values, once cost is calculatable (currently just set to 0 since it needs to have a value here to work correctly)
-        totalEnergyCost: 0,
-        spaceHeatingCost: 0,
-        waterHeatingCost: 0,
-        electricityCost: 0,
       });
     });
+
+    console.log(buildingEstimation);
 
     //We finally store the newly created estimates and return 200 ok
     await tx.buildingData.createMany({
       data: buildingEstimation,
     });
 
-    return new Response(
-      JSON.stringify({
-        newEstimates: buildingEstimation,
-      }),
-      { status: 200 }
-    );
+    return buildingEstimation;
   });
 }
