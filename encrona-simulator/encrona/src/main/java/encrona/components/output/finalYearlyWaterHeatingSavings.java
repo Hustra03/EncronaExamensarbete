@@ -11,7 +11,6 @@ import java.util.Set;
 
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
-import encrona.modifiers.modifierAbstract;
 
 public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.Entry<Integer, List<Map.Entry<String, Double>>>>> {
     
@@ -21,14 +20,11 @@ public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.E
      * @param name      The name of this output
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
-     * @param modifiers the modifiers which should be applied to this component
      */
-    public finalYearlyWaterHeatingSavings(String name, String unit, Map<String, componentAbstract> dependsOn,
-            List<modifierAbstract<List<Map.Entry<Integer, List<Map.Entry<String, Double>>>>>> modifiers) {
+    public finalYearlyWaterHeatingSavings(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
-        this.setModifiers(modifiers);
     }
 
     @Override
@@ -37,15 +33,15 @@ public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.E
      */
     public void calculate() throws Exception {
 
-        Map<String, componentAbstract> dependsOnMap = this.getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = this.getDependsOn();
 
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>)dependsOnMap.get("heatingSources").getValue();
 
         List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = (List<Map.Entry<Integer, List<heatingEnergySource>>>) dependsOnMap.get("heatingOutput").getValue();
 
-        List<Map.Entry<Integer, List<Map.Entry<String, Double>>>> finalSavings = new ArrayList<Map.Entry<Integer, List<Map.Entry<String, Double>>>>();
+        List<Map.Entry<Integer, List<Map.Entry<String, Double>>>> finalSavings = new ArrayList<>();
 
-        Map<String,heatingEnergySource> originalSourceMap=new HashMap<String,heatingEnergySource>();
+        Map<String,heatingEnergySource> originalSourceMap=new HashMap<>();
 
         for (heatingEnergySource source : baseValues) {
             originalSourceMap.put(source.getName(), source);
@@ -53,17 +49,17 @@ public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.E
 
         for (Map.Entry<Integer, List<heatingEnergySource>> e : heatingConsumptionList) {
 
-            List<Map.Entry<String, Double>> sourceSavings = new ArrayList<Map.Entry<String, Double>>();
+            List<Map.Entry<String, Double>> sourceSavings = new ArrayList<>();
 
             for (heatingEnergySource sources : e.getValue()) {
 
                 Double savingsGenerated =  (originalSourceMap.get(sources.getName()).getKwhPerYearHeatingWater()-sources.getKwhPerYearHeatingWater()) * sources.getCostPerKwh();
 
-                Entry<String, Double> listEntryToSave = new AbstractMap.SimpleEntry<String, Double>(sources.getName(),savingsGenerated);
+                Entry<String, Double> listEntryToSave = new AbstractMap.SimpleEntry<>(sources.getName(),savingsGenerated);
                 sourceSavings.add(listEntryToSave);
             }
 
-            Entry<Integer, List<Map.Entry<String, Double>>> listEntryToSave = new AbstractMap.SimpleEntry<Integer, List<Map.Entry<String, Double>>>((Integer) e.getKey(),sourceSavings);
+            Entry<Integer, List<Map.Entry<String, Double>>> listEntryToSave = new AbstractMap.SimpleEntry<>(e.getKey(),sourceSavings);
             finalSavings.add(listEntryToSave);
         }
 

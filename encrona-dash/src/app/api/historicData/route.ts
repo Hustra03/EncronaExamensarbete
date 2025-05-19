@@ -51,10 +51,19 @@ export async function POST(req: NextRequest) {
         { status: 400 }
       );
     }
-    const totalEnergykWh = (spaceHeatingkWh||0.0 + waterHeatingkWh||0.0 + electricitykWh||0.0)||undefined;
+    const totalEnergykWh =
+      spaceHeatingkWh ||
+      0.0 + waterHeatingkWh ||
+      0.0 + electricitykWh ||
+      0.0 ||
+      undefined;
 
-    
-    const totalEnergyCost =(spaceHeatingCost||0.0 + waterHeatingCost||0.0 + electricityCost||0.0)||undefined;
+    const totalEnergyCost =
+      spaceHeatingCost ||
+      0.0 + waterHeatingCost ||
+      0.0 + electricityCost ||
+      0.0 ||
+      undefined;
 
     const result = await prisma.buildingData.upsert({
       where: {
@@ -64,8 +73,8 @@ export async function POST(req: NextRequest) {
           date: buildingDate,
         },
       },
-      create: {        
-        building:{connect:{id:buildingId}},
+      create: {
+        building: { connect: { id: buildingId } },
         type: 'ACTUAL',
         date: buildingDate,
         totalEnergykWh,

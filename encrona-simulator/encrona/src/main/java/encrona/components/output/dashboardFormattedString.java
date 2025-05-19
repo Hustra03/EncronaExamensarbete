@@ -21,17 +21,16 @@ public class dashboardFormattedString extends componentAbstract<String>{
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
      */
-    public dashboardFormattedString(String name, String unit, Map<String, componentAbstract> dependsOn) {
+    public dashboardFormattedString(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
-        this.setModifiers(null);
     }
 
     @Override
     public void calculate() throws Exception {
 
-        Map<String, componentAbstract> dependsOnMap = getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = getDependsOn();
 
         Double[] electricityCurve=(Double[]) dependsOnMap.get("electricityCurve").getValue();
         Double[] heatingCurve=(Double[]) dependsOnMap.get("heatingCurve").getValue();
@@ -91,9 +90,6 @@ public class dashboardFormattedString extends componentAbstract<String>{
 
         for (Map.Entry<Integer, List<heatingEnergySource>> sourceEntriesAtPointInTime : heatSourcesAfterConsumption) {
             
-            JSONObject heatSourceAtPointInTime=new JSONObject();
-
-            JSONArray heatSourceInfoAtPointInTimeArray = new JSONArray();
             for (heatingEnergySource source : sourceEntriesAtPointInTime.getValue()) {
 
                 heatingEnergySource originalSource=null;

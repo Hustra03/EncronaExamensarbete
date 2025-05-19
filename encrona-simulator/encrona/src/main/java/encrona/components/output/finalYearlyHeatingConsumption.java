@@ -2,9 +2,7 @@ package encrona.components.output;
 
 import java.util.AbstractMap;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -13,7 +11,6 @@ import java.util.Set;
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
-import encrona.modifiers.modifierAbstract;
 
 public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.Entry<Integer, List<heatingEnergySource>>>> {
     /**
@@ -22,25 +19,21 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
      * @param name      The name of this output
      * @param unit      The unit of this output
      * @param dependsOn the components this component depends on
-     * @param modifiers the modifiers which should be applied to this component
      */
-    public finalYearlyHeatingConsumption(String name, String unit, Map<String, componentAbstract> dependsOn,
-            List<modifierAbstract<List<Entry<Integer, List<heatingEnergySource>>>>> modifiers) {
+    public finalYearlyHeatingConsumption(String name, String unit, Map<String, componentAbstract<?>> dependsOn) {
         this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
-        this.setModifiers(modifiers);
     }
 
     @Override
     /**
      * This method implements the calculate functionality for
      * finalElectricityConsumptionChange
-     * TODO confirm the calculation with Laszlo
      */
     public void calculate() throws Exception {
 
-        Map<String, componentAbstract> dependsOnMap = getDependsOn();
+        Map<String, componentAbstract<?>> dependsOnMap = getDependsOn();
 
         List<heatingEnergySource> baseValues = (List<heatingEnergySource>) dependsOnMap.get("heatingSources").getValue();
         // We sort heat sources based on their kwh price, since we want to minimize
@@ -51,28 +44,28 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
 
 
         // Note that we use Map.Entry<Integer,List<heatingEnergySource>> to represent a ranges and heat sources
-        List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = new ArrayList<Map.Entry<Integer, List<heatingEnergySource>>>();
+        List<Map.Entry<Integer, List<heatingEnergySource>>> heatingConsumptionList = new ArrayList<>();
 
         // We check if there are any improvements affecting heating, if so we calculate
         // the impact of improvements in ranges in the format <year this range ends,heat
         // source list after impact is distributed>
         // We also re-use the original values with <-1,heat source list>, for the dashboard
-        if (improvementImpacts.size() > 0) {
+        if (!improvementImpacts.isEmpty()) {
 
         // This creates a set of the unique years of service, aka the unique values we
         // need to find electricity for
-        Set<Integer> uniqueYearsOfService = new HashSet<Integer>();
+        Set<Integer> uniqueYearsOfService = new HashSet<>();
 
         for (Map.Entry<improvement,Map<String,Double>> entry : improvementImpacts) {
             uniqueYearsOfService.add(entry.getKey().getYearsOfService());
         }
-        int yearsOfService[] = new int[uniqueYearsOfService.size()];
+        int[] yearsOfService = new int[uniqueYearsOfService.size()];
 
             for (int i = 0; i < yearsOfService.length; i++) {
 
                 Integer min = 0;
                 Integer currentMin = Integer.MAX_VALUE;
-                List<Entry<improvement, Map<String,Double>>> improvementsStillActive = new ArrayList<Entry<improvement, Map<String,Double>>>();
+                List<Entry<improvement, Map<String,Double>>> improvementsStillActive = new ArrayList<>();
                 if (i > 0) {
                     min = yearsOfService[i - 1];
                 }
@@ -82,17 +75,17 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
                         if (entry.getKey().getYearsOfService() < currentMin) {
                             currentMin = entry.getKey().getYearsOfService();
                         }
-                        improvementsStillActive.add(new AbstractMap.SimpleEntry<improvement,Map<String,Double>>(entry.getKey(),entry.getValue()));
+                        improvementsStillActive.add(new AbstractMap.SimpleEntry<>(entry.getKey(),entry.getValue()));
                     }
                 }
                 yearsOfService[i] = currentMin;
                 List<heatingEnergySource> updatedHeatingSources = distributeImpact(baseValues, improvementsStillActive);
-                Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<Integer, List<heatingEnergySource>>(
+                Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<>(
                         yearsOfService[i], updatedHeatingSources);
                 heatingConsumptionList.add(entry);
             }
         }
-        Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<Integer, List<heatingEnergySource>>(
+        Entry<Integer, List<heatingEnergySource>> entry = new AbstractMap.SimpleEntry<>(
             -1, baseValues);
     heatingConsumptionList.add(entry);
         this.setValue(heatingConsumptionList);
@@ -101,8 +94,6 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
     /**
      * This function will distribute the impact from the measure between the
      * different sources of heat
-     * TODO potentially update this to only modify certain sources for certain
-     * improvements(?)
      * 
      * @return A modifier list of heating sources, with the impact distributed
      *         between them
@@ -122,7 +113,7 @@ public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.En
 
         // We then create a copy of heatSources, which we can modify to represent this
         // specific year ranges values
-        List<heatingEnergySource> copyOfHeatSources = new ArrayList<heatingEnergySource>();
+        List<heatingEnergySource> copyOfHeatSources = new ArrayList<>();
         for (heatingEnergySource heatingEnergySource : heatSources) {
             copyOfHeatSources.add(new heatingEnergySource(heatingEnergySource));
         }

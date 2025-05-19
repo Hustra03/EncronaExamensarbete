@@ -9,7 +9,6 @@ import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
 import encrona.domain.improvement;
-import encrona.modifiers.modifierAbstract;
 
 /**
  * This creates a list for the impact every individual improvement will have per year in kwh
@@ -21,37 +20,34 @@ public class improvementImpact extends componentAbstract<List<Map.Entry<improvem
      * @param name The name of this output
      * @param unit The unit of this output
      * @param dependsOn the components this component depends on
-     * @param modifiers the modifiers which should be applied to this component
      */
-    public improvementImpact(String name, String unit, Map<String,componentAbstract> dependsOn, 
-    List<modifierAbstract<List<Entry<improvement, Map<String,Double>>>>> modifiers)
+    public improvementImpact(String name, String unit, Map<String,componentAbstract<?>> dependsOn)
     {   this.setName(name);
         this.setUnit(unit);
         this.setDependsOn(dependsOn);
-        this.setModifiers(modifiers);
     }
 
     @Override
     public void calculate() throws Exception {
 
-        Map<String,componentAbstract> dependsOnMap = getDependsOn();
+        Map<String,componentAbstract<?>> dependsOnMap = getDependsOn();
 
         Double aTemp = (Double)dependsOnMap.get("Atemp").getValue();
         List<improvement> improvements=(List<improvement>)dependsOnMap.get("improvements").getValue();
 
-        List<Map.Entry<improvement,Map<String,Double>>> improvementImpact=new ArrayList<Map.Entry<improvement,Map<String,Double>>>();
+        List<Map.Entry<improvement,Map<String,Double>>> improvementImpact=new ArrayList<>();
 
         for (improvement improvement : improvements) {
             //We get m2 / years of service = yearly kwh impact
             Double impactMultiplication = (aTemp)/improvement.getYearsOfService();
-            Map<String,Double> improvementImpactMap = new HashMap<String,Double>();
+            Map<String,Double> improvementImpactMap = new HashMap<>();
 
             improvementImpactMap.put("buildingHeating", improvement.getKwhPerM2BuildingHeating()*impactMultiplication);
             improvementImpactMap.put("waterHeating", improvement.getKwhPerM2WaterHeating()*impactMultiplication);
             improvementImpactMap.put("electricity", improvement.getKwhPerM2Electricity()*impactMultiplication);
             improvementImpactMap.put("water", improvement.getM3PerM2Water()*impactMultiplication);
 
-            Entry<improvement,Map<String,Double>> entry = new AbstractMap.SimpleEntry<improvement, Map<String,Double>>((improvement)improvement,improvementImpactMap );
+            Entry<improvement,Map<String,Double>> entry = new AbstractMap.SimpleEntry<>(improvement,improvementImpactMap );
             improvementImpact.add(entry);
         }
         this.setValue(improvementImpact);

@@ -15,7 +15,7 @@ export async function DELETE(
 
   try {
     const newsId = parseInt(id);
-    await prisma.newsEntry.delete({ where: { id:newsId } });
+    await prisma.newsEntry.delete({ where: { id: newsId } });
 
     return new Response(null, { status: 204 });
   } catch (error) {

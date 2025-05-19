@@ -7,12 +7,14 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.datatransfer.StringSelection;//
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
 import encrona.DataLoader;
 import encrona.Model;
+import encrona.components.input;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 import encrona.expertSystem.ReasoningEngine;
@@ -27,11 +29,11 @@ public class GUIMain extends JPanel {
 
     private JButton runButton;
     private JButton expertButton;
-    private static JButton clipboardButton;
+    private static JButton clipboardButton=new JButton("Copy to clipboard");;
     private static String clipboardString;
 
     private static JFrame theMainFrame;
-    private static JTabbedPane tabbedPane;
+    private static JTabbedPane tabbedPane=new JTabbedPane();
     private static JPanel outputPage;
 
     public GUIMain() {
@@ -45,7 +47,6 @@ public class GUIMain extends JPanel {
         expertButton.setActionCommand(expertString);
         expertButton.addActionListener(new ExpertListner());
 
-        clipboardButton=new JButton("Copy to clipboard");
         clipboardButton.addActionListener(new clipboardListener());
 
         // Create a panel that uses BoxLayout.
@@ -53,8 +54,6 @@ public class GUIMain extends JPanel {
         buttonPane.setLayout(new BoxLayout(buttonPane, BoxLayout.LINE_AXIS));
         buttonPane.add(runButton);
         buttonPane.add(expertButton);
-
-        tabbedPane = new JTabbedPane();
 
         // This adds the numerical value specification tab
         String toolTip2 = "<html>This is where you specify numeric values</html>";
@@ -70,6 +69,11 @@ public class GUIMain extends JPanel {
         tabbedPane.addTab("Improvements", null, new GUIImprovements(DataLoader.createInitialListOfImprovements()),
                 tooltip4);
 
+        // This adds the improvement tab
+        String tooltip5 = "<html>This is where you specify the additional inputs to the expert system</html>";
+        tabbedPane.addTab("Expert system inputs", null, new GUIExpertSystemInput(),
+        tooltip5);
+
         add(tabbedPane);
 
         add(buttonPane, BorderLayout.PAGE_END);
@@ -83,7 +87,7 @@ public class GUIMain extends JPanel {
     private static void createAndShowGUI() {
         // Create and set up the window.
         theMainFrame = new JFrame("Encrona Simulator");
-        theMainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        theMainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         // Create and set up the content pane.
         JComponent newContentPane = new GUIMain();
@@ -91,7 +95,7 @@ public class GUIMain extends JPanel {
         theMainFrame.setContentPane(newContentPane);
         try {
             theMainFrame.setIconImage(ImageIO.read(new File("encrona-simulator\\encrona\\src\\main\\resources\\Encrona.png")));
-        } catch (IOException e) {
+        } catch (IOException _) {
             System.out.println("Unable to set icon");
         }
 
@@ -128,7 +132,7 @@ public class GUIMain extends JPanel {
             java.util.List<heatingEnergySource> heatingEnergySources,
             java.util.List<improvement> improvementsCollected) {
         // This is the tooltip for the heat source page
-        String toolTip = new String("<html>This is where the output is shown</html>");
+        String toolTip = "<html>This is where the output is shown</html>";
 
         outputPage = new JPanel();
 
@@ -138,11 +142,10 @@ public class GUIMain extends JPanel {
 
         inputSectionPage.add(new JLabel("Provided input"));
 
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
 
-        for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
-            listModel.addElement(
-                    entry.getKey() + " was set to " + mapOfNumericalVariables.get(entry) + " " + entry.getValue());
+        for (Map.Entry<Map.Entry<String,String>,Double> entry : mapOfNumericalVariables.entrySet()) {
+            listModel.addElement(entry.getKey().getKey() + " was set to " + entry.getValue() + " " + entry.getKey().getValue());
         }
 
         for (heatingEnergySource heatingEnergySource : heatingEnergySources) {
@@ -154,7 +157,7 @@ public class GUIMain extends JPanel {
         }
 
         // Create the list and put it in a scroll pane.
-        JList<String> list = new JList<String>(listModel);
+        JList<String> list = new JList<>(listModel);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
@@ -183,10 +186,10 @@ public class GUIMain extends JPanel {
                 mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
 
                 Double aTemp = 1.0;
-                for (Map.Entry<String, String> entry : mapOfNumericalVariables.keySet()) {
+                for (Map.Entry<Map.Entry<String,String>,Double> entry : mapOfNumericalVariables.entrySet()) {
 
-                    if (entry.getKey().equals("Atemp")) {
-                        aTemp = mapOfNumericalVariables.get(entry);
+                    if (entry.getKey().getKey().equals("Atemp")) {
+                        aTemp = entry.getValue();
                     }
 
                 }
@@ -236,16 +239,18 @@ public class GUIMain extends JPanel {
         // Link to example used for this
         // https://blog.idrsolutions.com/tutorial-copy-text-javafx-swing/#Copying_Text_in_Swing
 
-        clipboardString="";
-        for (String listItem : outputLists.get("clipboard")) {
-            clipboardString += listItem;
-        }
+        StringBuilder bld = new StringBuilder();
 
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        for (String listItem : outputLists.get("clipboard")) {
+            bld.append(listItem);
+        }
+        clipboardString=bld.toString();
+
+        DefaultListModel<String> listModel = new DefaultListModel<>();
         for (String listItem : outputLists.get("output")) {
             listModel.addElement(listItem);
         }
-        JList<String> list = new JList<String>(listModel);
+        JList<String> list = new JList<>(listModel);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);
@@ -266,10 +271,12 @@ public class GUIMain extends JPanel {
             removeTab(expertSystemTabName);
             final Map<Map.Entry<String, String>, Double> mapOfNumericalVariables;
             final java.util.List<heatingEnergySource> heatingEnergySources;
+            final Map<String,input<?>> expertSystemInput;
 
             try {
                 mapOfNumericalVariables = GUIStartValueSpecification.collectFieldValues();
                 heatingEnergySources = GUIHeatingSources.collectFieldValues();
+                expertSystemInput=GUIExpertSystemInput.collectFieldValues();
             } catch (Exception error) {
                 JOptionPane.showMessageDialog(theMainFrame, error.getMessage(), "The provided input is invalid",
                         JOptionPane.PLAIN_MESSAGE);
@@ -282,19 +289,19 @@ public class GUIMain extends JPanel {
             javax.swing.SwingUtilities.invokeLater(new Runnable() {
                 public void run() {
                     ReasoningEngine reasoningEngine = new ReasoningEngine(mapOfNumericalVariables,
-                            heatingEnergySources);
-                    java.util.List<String> resultList = reasoningEngine.recommendations();
+                            heatingEnergySources,expertSystemInput);
+                    java.util.List<Entry<String,Integer>> resultList = reasoningEngine.recommendations();
                     addExpertSystemOutputTab(resultList, reasoningEngine.getTriggeredRules());
                 }
             });
         }
     }
 
-    public static void addExpertSystemOutputTab(java.util.List<String> resultList,
+    public static void addExpertSystemOutputTab(java.util.List<Entry<String,Integer>> resultList,
             java.util.List<Rule> triggeredRules) {
 
         // This is the tooltip for the heat source page
-        String toolTip = new String("<html>This is where the expert system output is shown</html>");
+        String toolTip = "<html>This is where the expert system output is shown</html>";
 
         JPanel expertPage = new JPanel();
 
@@ -303,11 +310,14 @@ public class GUIMain extends JPanel {
         JPanel resultPage = new JPanel();
         resultPage.setLayout(new BoxLayout(resultPage, BoxLayout.PAGE_AXIS));
 
-        Integer index = 1;
-        for (String resultString : resultList) {
-            resultPage.add(new JLabel(index + " : " + resultString));
-            index += 1;
+        Integer index=1;
+        for (int i = 1; i < resultList.size()+1; i++) {
+            Entry<String,Integer> result = resultList.get(i-1);
+            resultPage.add(new JLabel(index + " : " + result.getKey() +" = " + result.getValue()));
+            if(i<resultList.size() && resultList.get(i).getValue()<result.getValue())
+            {index+=1;}
         }
+
         Dimension minSize = new Dimension(5, 100);
         Dimension prefSize = new Dimension(5, 100);
         Dimension maxSize = new Dimension(Short.MAX_VALUE, 100);
@@ -317,7 +327,7 @@ public class GUIMain extends JPanel {
 
         expertPage.add(new Box.Filler(minSize, prefSize, maxSize));
 
-        DefaultListModel<String> listModel = new DefaultListModel<String>();
+        DefaultListModel<String> listModel = new DefaultListModel<>();
 
         index = 1;
         for (Rule rule : triggeredRules) {
@@ -326,7 +336,7 @@ public class GUIMain extends JPanel {
         }
 
         // Create the list and put it in a scroll pane.
-        JList<String> list = new JList<String>(listModel);
+        JList<String> list = new JList<>(listModel);
         list.setSelectedIndex(0);
         list.setVisibleRowCount(5);
         JScrollPane listScrollPane = new JScrollPane(list);

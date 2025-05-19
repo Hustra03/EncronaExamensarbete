@@ -2,19 +2,21 @@ package encrona.GUI;
 
 import java.awt.*;
 import java.util.AbstractMap;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.swing.*;
 
+
+
 public class GUIStartValueSpecification extends JPanel {
 
-    static JTextField aTempField;
-    static JTextField electrictyPriceField;
-    static JTextField electricityConsumptionField;
-    static JTextField waterConsumptionField;
-    static JTextField waterPriceField;
+    public static final String atemp="Atemp";
+    static JTextField aTempField=new JTextField("1",20);;
+    static JTextField electrictyPriceField=new JTextField("1",20);;
+    static JTextField electricityConsumptionField=new JTextField("1",20);;
+    static JTextField waterConsumptionField=new JTextField("1",20);;
+    static JTextField waterPriceField = new JTextField("1",20);;
 
     public GUIStartValueSpecification() {
 
@@ -27,32 +29,27 @@ public class GUIStartValueSpecification extends JPanel {
 
         //Note that the label values must not be modified without changing those in the data loader, since the name is the key for the map!
         JPanel aTempRow = new JPanel();
-        aTempRow.add(new JLabel("Atemp"));
-        aTempField = new JTextField("1",20);
+        aTempRow.add(new JLabel(atemp));
         aTempRow.add(aTempField);
         aTempRow.add(new JLabel("m^2"));
 
         JPanel electrictyPriceRow = new JPanel();
         electrictyPriceRow.add(new JLabel("Electricty price"));
-        electrictyPriceField = new JTextField("1",20);
         electrictyPriceRow.add(electrictyPriceField);
         electrictyPriceRow.add(new JLabel("kr/kwh"));
 
         JPanel electricityConsumptionRow = new JPanel();
         electricityConsumptionRow.add(new JLabel("Electricty consumption"));
-        electricityConsumptionField = new JTextField("1",20);
         electricityConsumptionRow.add(electricityConsumptionField);
         electricityConsumptionRow.add(new JLabel("kwh/year"));
 
         JPanel waterConsumptionRow = new JPanel();
         waterConsumptionRow.add(new JLabel("Water consumption"));
-        waterConsumptionField = new JTextField("1",20);
         waterConsumptionRow.add(waterConsumptionField);
         waterConsumptionRow.add(new JLabel("m^3/year"));
 
         JPanel waterPriceRow = new JPanel();
         waterPriceRow.add(new JLabel("Water price"));
-        waterPriceField = new JTextField("1",20);
         waterPriceRow.add(waterPriceField);
         waterPriceRow.add(new JLabel("kr/m^3"));
 
@@ -75,16 +72,16 @@ public class GUIStartValueSpecification extends JPanel {
     }
 
     // This method collects the current values of the field
-    public static Map<Map.Entry<String,String>,Double> collectFieldValues() throws Exception {
+    public static Map<Map.Entry<String,String>,Double> collectFieldValues() throws CustomUIException {
         Double aTempValue;
         try {
 
             aTempValue = Double.parseDouble(aTempField.getText());
         } catch (Exception e) {
-            throw new Exception("Atemp is not a number!");
+            throw new CustomUIException("Atemp is not a number!");
         }
         if (aTempValue<=0.0) {
-            throw new Exception("Atemp must be more than 0!");
+            throw new CustomUIException("Atemp must be more than 0!");
         }
         
         Double electricityPriceValue;
@@ -92,10 +89,10 @@ public class GUIStartValueSpecification extends JPanel {
 
             electricityPriceValue = Double.parseDouble(electrictyPriceField.getText());
         } catch (Exception e) {
-            throw new Exception("Electricity price is not a number!");
+            throw new CustomUIException("Electricity price is not a number!");
         }
         if (electricityPriceValue<=0.0) {
-            throw new Exception("Electricity price must be greater than 0!");
+            throw new CustomUIException("Electricity price must be greater than 0!");
         }
 
         Double electrictyConsumptionValue;
@@ -103,10 +100,10 @@ public class GUIStartValueSpecification extends JPanel {
 
             electrictyConsumptionValue = Double.parseDouble(electricityConsumptionField.getText());
         } catch (Exception e) {
-            throw new Exception("Electricity consumption is not a number!");
+            throw new CustomUIException("Electricity consumption is not a number!");
         }
         if (electrictyConsumptionValue<=0.0) {
-            throw new Exception("Electricity consumption must be greater than 0!");
+            throw new CustomUIException("Electricity consumption must be greater than 0!");
         }
 
         Double waterConsumptionValue;
@@ -114,10 +111,10 @@ public class GUIStartValueSpecification extends JPanel {
 
             waterConsumptionValue = Double.parseDouble(waterConsumptionField.getText());
         } catch (Exception e) {
-            throw new Exception("Water consumption is not a number!");
+            throw new CustomUIException("Water consumption is not a number!");
         }
         if (electrictyConsumptionValue<=0.0) {
-            throw new Exception("Water consumption must be greater than 0!");
+            throw new CustomUIException("Water consumption must be greater than 0!");
         }
 
         Double waterPriceValue;
@@ -125,19 +122,19 @@ public class GUIStartValueSpecification extends JPanel {
 
             waterPriceValue = Double.parseDouble(waterPriceField.getText());
         } catch (Exception e) {
-            throw new Exception("Water price is not a number!");
+            throw new CustomUIException("Water price is not a number!");
         }
         if (electrictyConsumptionValue<=0.0) {
-            throw new Exception("Water price must be greater than 0!");
+            throw new CustomUIException("Water price must be greater than 0!");
         }
 
-        new AbstractMap.SimpleEntry<String, String>("Atemp","m^2");
-        Map<Map.Entry<String,String>,Double> map = new HashMap<Map.Entry<String,String>,Double>();
-        map.put(new AbstractMap.SimpleEntry<String, String>("Atemp","m^2"), aTempValue);
-        map.put(new AbstractMap.SimpleEntry<String, String>("Electricty price","kr/kwh"), electricityPriceValue);
-        map.put(new AbstractMap.SimpleEntry<String, String>("Electricty consumption","kwh/year"), electrictyConsumptionValue);
-        map.put(new AbstractMap.SimpleEntry<String, String>("Water consumption","m^3/year"), waterConsumptionValue);
-        map.put(new AbstractMap.SimpleEntry<String, String>("Water price","kr/m^3"), waterPriceValue);
+        new AbstractMap.SimpleEntry<String, String>(atemp,"m^2");
+        Map<Map.Entry<String,String>,Double> map = new HashMap<>();
+        map.put(new AbstractMap.SimpleEntry<>(atemp,"m^2"), aTempValue);
+        map.put(new AbstractMap.SimpleEntry<>("Electricty price","kr/kwh"), electricityPriceValue);
+        map.put(new AbstractMap.SimpleEntry<>("Electricty consumption","kwh/year"), electrictyConsumptionValue);
+        map.put(new AbstractMap.SimpleEntry<>("Water consumption","m^3/year"), waterConsumptionValue);
+        map.put(new AbstractMap.SimpleEntry<>("Water price","kr/m^3"), waterPriceValue);
 
         return map;
     }

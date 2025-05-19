@@ -61,9 +61,12 @@ public class GUIHeatingSources extends JPanel {
         add(infoPage, c);
 
         c.fill = GridBagConstraints.BOTH;
-        c.weighty = 0.10;
+        c.weighty = 0.10;        
+        c.weightx = 1;
+
         add(createNewHeatSourcePage, c);
         c.weighty = 0.90;
+        c.weightx = 0.9;
 
         add(scrollheatSourceSpecificationPage, c);
     }
@@ -157,10 +160,10 @@ public class GUIHeatingSources extends JPanel {
      * <p>
      * 
      * @return A list of heat sources with the provided values
-     * @throws Exception If something goes wrong, with the only expected case being
+     * @throws CustomUIException If something goes wrong, with the only expected case being
      *                   if the values provided are invalid
      */
-    public static java.util.List<heatingEnergySource> collectFieldValues() throws Exception {
+    public static java.util.List<heatingEnergySource> collectFieldValues() throws CustomUIException {
         List<heatingEnergySource> heatSources = new ArrayList<heatingEnergySource>();
 
         // This iterates over all of the heat source pages, and all of their components, to retrive the user provided input
@@ -186,20 +189,20 @@ public class GUIHeatingSources extends JPanel {
                 try {
                     costPerKWH = Double.parseDouble(((JTextField) pricePerKwhPanel.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("Kr/kwh is not a valid number for " + name);
+                    throw new CustomUIException("Kr/kwh is not a valid number for " + name);
                 }
                 if (costPerKWH<=0.0) {
-                    throw new Exception("Kr/kwh for " + name + " must be greater than 0");
+                    throw new CustomUIException("Kr/kwh for " + name + " must be greater than 0");
                 }
 
                 JPanel kwhPerYearPanel = (JPanel) heatSourceJPanel.getComponent(3);
                 try {
                     kwhHeatingPerYear = Double.parseDouble(((JTextField) kwhPerYearPanel.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("kwh per year for heating is not a valid number for " + name);
+                    throw new CustomUIException("kwh per year for heating is not a valid number for " + name);
                 }
                 if (kwhHeatingPerYear<0.0) {
-                    throw new Exception("kwh per year for heating for " + name + " must not be negative");
+                    throw new CustomUIException("kwh per year for heating for " + name + " must not be negative");
                 }
 
                 JPanel kwhPerYearWaterPanel = (JPanel) heatSourceJPanel.getComponent(4);
@@ -207,20 +210,20 @@ public class GUIHeatingSources extends JPanel {
                     kwhHeatingWaterPerYear = Double
                             .parseDouble(((JTextField) kwhPerYearWaterPanel.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("kwh per year for heating water is not a valid number for " + name);
+                    throw new CustomUIException("kwh per year for heating water is not a valid number for " + name);
                 }
                 if (kwhHeatingWaterPerYear<0.0) {
-                    throw new Exception("kwh per year for heating water for " + name + " must not be negative");
+                    throw new CustomUIException("kwh per year for heating water for " + name + " must not be negative");
                 }
 
                 JPanel kwhInElectricityPerYearPage = (JPanel) heatSourceJPanel.getComponent(5);
                 try {
                     kwhElectricityNeeded = Double.parseDouble(((JTextField) kwhInElectricityPerYearPage.getComponent(0)).getText());
                 } catch (Exception e) {
-                    throw new Exception("Electricity for heat source is not a valid number for " + name);
+                    throw new CustomUIException("Electricity for heat source is not a valid number for " + name);
                 }
                 if (kwhElectricityNeeded<0) {
-                    throw new Exception("Electricity for heat source for " + name + " must be greater than 0");
+                    throw new CustomUIException("Electricity for heat source for " + name + " must be greater than 0");
                 }
 
 
@@ -230,7 +233,7 @@ public class GUIHeatingSources extends JPanel {
         }
 
         if (heatSources.isEmpty()) {
-            throw new Exception("No heat source selected, please select one or more");
+            throw new CustomUIException("No heat source selected, please select one or more");
         }
 
         return heatSources;
