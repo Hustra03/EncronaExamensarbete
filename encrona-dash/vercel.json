@@ -1,5 +1,5 @@
 {
-  "cron": {
+  "crons": {
     "jobs": [
       {
         "path": "/api/cron/belimo",
