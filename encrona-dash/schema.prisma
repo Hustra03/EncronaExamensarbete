@@ -23,6 +23,13 @@ enum DeviceSource {
   MIVO
 }
 
+enum PriceType {
+  HEATING
+  ELECTRICITY
+  WATERHEATING
+  WATERUSAGE
+}
+
 model User {
   id             Int      @id @default(autoincrement())
   name           String
@@ -58,6 +65,7 @@ model Building {
   updatedAt      DateTime @updatedAt
   
   dataPoints  BuildingData[]
+  priceForecasts PriceForecast[]
   companiesWithAccess Company[] @relation("buildingCompany")
 }
 
@@ -98,6 +106,22 @@ model BuildingData {
   updatedAt   DateTime   @updatedAt
 
   @@unique([buildingId, type, date])
+}
+
+model PriceForecast {
+  id         Int       @id @default(autoincrement())
+  buildingId Int
+  building   Building  @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  dateFrom   DateTime 
+  price      Decimal
+  type       PriceType
+
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@unique([buildingId, dateFrom, type])
+  @@index([buildingId, dateFrom, type])
 }
 
 model Curve{
