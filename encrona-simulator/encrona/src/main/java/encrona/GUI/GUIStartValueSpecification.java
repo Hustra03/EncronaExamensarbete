@@ -63,9 +63,9 @@ public class GUIStartValueSpecification extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.25;
         c.weighty = 0;
-        add(aTempRow, c);
-        add(electrictyPriceRow, c);
+        add(aTempRow, c);        
         add(electricityConsumptionRow, c);
+        add(electrictyPriceRow, c);
         add(waterConsumptionRow, c);
         add(waterPriceRow, c);
 

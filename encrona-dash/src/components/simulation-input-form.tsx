@@ -13,6 +13,7 @@ import { useActionState, useEffect, useState } from 'react';
 import { Textarea } from './ui/text-area';
 import Spinner from './spinner';
 import { toast } from 'sonner';
+import { isStringObject } from 'node:util/types';
 
 export function SimulationInputForm({}: React.ComponentProps<'form'>) {
   const [buildings, setBuildings] = useState([]);
@@ -44,7 +45,9 @@ export function SimulationInputForm({}: React.ComponentProps<'form'>) {
       if (functionReturnValue == 'ok') {
         toast('Simulation resultat skickat');
       } else {
-        toast(functionReturnValue);
+        if (functionReturnValue != '' && isStringObject(functionReturnValue)) {
+          toast(functionReturnValue);
+        }
       }
     }
   }, [isPending]);
