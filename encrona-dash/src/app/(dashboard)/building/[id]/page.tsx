@@ -4,7 +4,6 @@ import * as React from 'react';
 import {
   Brush,
   CartesianGrid,
-  ErrorBar,
   Line,
   LineChart,
   BarChart,
@@ -191,10 +190,6 @@ export default function Building() {
         merged[`${key}Actual`] = actualValue;
         merged[`${key}Diff`] = diff;
         merged[`${key}RelativeError`] = relativeError;
-
-        if (estimateValue != null) {
-          merged[`${key}EstimateError`] = estimateValue * 0.1;
-        }
       });
 
       return merged;
@@ -291,13 +286,7 @@ export default function Building() {
                 strokeWidth={2}
                 name="Prognos"
                 strokeDasharray="4 2"
-              >
-                <ErrorBar
-                  dataKey={`${activeChart}EstimateError`}
-                  stroke={estimateColor}
-                  direction="y"
-                />
-              </Line>
+              ></Line>
               <Line
                 dataKey={`${activeChart}Actual`}
                 stroke={actualColor}
