@@ -169,6 +169,8 @@ public class GUIMain extends JPanel {
         JScrollPane scrollableOutputPage = new JScrollPane(outputPage);
 
         tabbedPane.addTab(outputTabName, null, scrollableOutputPage, toolTip);
+        tabbedPane.setSelectedComponent(scrollableOutputPage);
+
     }
 
     // This class is used to handle the runButton, with its method called when the
@@ -262,7 +264,6 @@ public class GUIMain extends JPanel {
 
         outputPage.add(simulatorOutputPage);
         outputPage.updateUI();
-
     }
 
     // This is used to handle the run expert system button
@@ -347,7 +348,7 @@ public class GUIMain extends JPanel {
         JScrollPane scrollableExpert = new JScrollPane(expertPage);
 
         tabbedPane.addTab(expertSystemTabName, null, scrollableExpert, toolTip);
-
-    }
+        tabbedPane.setSelectedComponent(scrollableExpert);
+    }   
 
 }

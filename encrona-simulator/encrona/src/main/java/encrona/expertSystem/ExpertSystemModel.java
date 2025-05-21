@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import encrona.DataLoader;
 import encrona.components.input;
@@ -78,19 +77,9 @@ public class ExpertSystemModel {
         List<improvement> improvements=DataLoader.createInitialListOfImprovements();
         
         for (improvement improvement : improvements) {
-            sortedListOfImprovementsToConsider.add(new AbstractMap.SimpleEntry<>(improvement,priorityFunction(improvement) ));
+            sortedListOfImprovementsToConsider.add(new AbstractMap.SimpleEntry<>(improvement,0));
         }
     }
 
-    public Integer priorityFunction(improvement improvement)
-    {
-        if(improvement.getName().equals("Berg Or Mark värme"))
-        {return 1;}
-        if(improvement.getName().equals(""))
-        {return 0;}
-
-
-        return 0;
-    }
 
 }

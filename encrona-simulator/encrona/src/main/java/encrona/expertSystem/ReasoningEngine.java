@@ -32,22 +32,328 @@ public class ReasoningEngine {
      */
     private void generateRules()
     {
-        Condition firstCondition = (lambdaModel) -> {
-            return lambdaModel.getExpertSystemInput().get("naturalVentilation").getValue().equals(true);
+        //We first define the rules which depend only on the system input, not on the systems generated suggestions
+        //First are the rules which depend on binary input variable
+        Condition hasFTXCondition = (lambdaModel) -> {
+            return lambdaModel.getExpertSystemInput().get("hasFTX").getValue().equals(true);
         };
-        PostCondition firstPostCondition = (lambdaModel)->
+
+        PostCondition hasFTXorFVPPostCondition = (lambdaModel)->
         {
             lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
 
                 if (item.getKey().getName().equals("FTX")) {
-                    item.setValue(item.getValue()+1);
+                    item.setValue(item.getValue()-5);
+                }
+                else
+                {
+                    if (item.getKey().getName().equals("FVP")) {
+                    item.setValue(item.getValue()-5);
+                }
+
                 }
 
             });
         };
-        Rule rule1 = new Rule("Natural ventilation","If there is natural ventilation, then FTX has a higher priority", firstCondition, firstPostCondition, null);
-        rules.add(rule1);
+        Rule hasFTXRule = new Rule("Has FTX","If the building already has FTX, then FTX and FVP have lower priority", hasFTXCondition, hasFTXorFVPPostCondition, null);
+        rules.add(hasFTXRule);
 
+        Condition hasFVPCondition = (lambdaModel) -> {
+            return lambdaModel.getExpertSystemInput().get("hasFVP").getValue().equals(true);
+        };        
+        Rule hasFVPRule = new Rule("Has FVP","If the building already has FVP, then FTX and FVP have lower priority", hasFVPCondition, hasFTXorFVPPostCondition, null);
+        rules.add(hasFVPRule);
+
+        Condition fvpSuitableCondition = (lambdaModel) -> {
+            return ((!lambdaModel.getExpertSystemInput().get("existingUnusedChute").getValue().equals(true))&&(lambdaModel.getExpertSystemInput().get("naturalVentilation").getValue().equals(true)));
+        };
+        PostCondition fvpSuitablePostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+
+                if (item.getKey().getName().equals("FTX")) {
+                    item.setValue(item.getValue()-3);
+                }
+                else
+                {
+                    if (item.getKey().getName().equals("FVP")) {
+                    item.setValue(item.getValue()+3);
+                }
+
+                }
+
+            });
+        };
+        Rule fvpSuitableRule = new Rule("FVP suitability","If the building has natural ventilation, but no existing unused chute, then FVP +3 and FTX -3", fvpSuitableCondition, fvpSuitablePostCondition, null);
+        rules.add(fvpSuitableRule);
+
+        Condition ftxSuitableCondition = (lambdaModel) -> {
+            return ((lambdaModel.getExpertSystemInput().get("existingUnusedChute").getValue().equals(true))&&(lambdaModel.getExpertSystemInput().get("naturalVentilation").getValue().equals(true))&&(lambdaModel.getExpertSystemInput().get("hasFromAndSupplyAir").getValue().equals(true)));
+        };
+        PostCondition ftxSuitablePostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+
+                if (item.getKey().getName().equals("FTX")) {
+                    item.setValue(item.getValue()+5);
+                }
+                else
+                {
+                    if (item.getKey().getName().equals("FVP")) {
+                    item.setValue(item.getValue()-3);
+                }
+
+                }
+
+            });
+        };
+        Rule ftxSuitableRule = new Rule("FTX suitability","If the building has natural ventilation, an existing unused chute and from and supply air (Från och tillluft) then FTX+5, FVP-3", ftxSuitableCondition, ftxSuitablePostCondition, null);
+        rules.add(ftxSuitableRule);
+
+        Condition windowLayersCondition = (lambdaModel) -> {
+            return ((lambdaModel.getExpertSystemInput().get("lessThan3LayersOfWindows").getValue().equals(true)));
+        };
+        PostCondition windowLayersPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Byt fönster")) {
+                    item.setValue(item.getValue()+100);
+                }
+            });
+        };
+        Rule windowLayersRule = new Rule("Window layers","If the building has windows with less than 3 layers, then changing windows is top priority", windowLayersCondition, windowLayersPostCondition, null);
+        rules.add(windowLayersRule);
+
+        Condition isPreservationOrderedCondition = (lambdaModel) -> {
+            return ((lambdaModel.getExpertSystemInput().get("isPreservationOrdered").getValue().equals(true)));
+        };
+        PostCondition isPreservationOrderedPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Solpaneler")) {
+                    item.setValue(item.getValue()-100);
+                }
+            });
+        };
+        Rule isPreservationOrderedRule = new Rule("Preservation order (K-märkt)","If the building has a preservation order, then certain improvements (ex. solar panels) are forbidden, so they should not be recommended", isPreservationOrderedCondition, isPreservationOrderedPostCondition, null);
+        rules.add(isPreservationOrderedRule);
+
+        
+        Condition notFulfillingIMDWarmWaterEnergyRequiermentCondition = (lambdaModel) -> {
+            return ((lambdaModel.getExpertSystemInput().get("notFulfillingIMDWarmWaterEnergyRequierment").getValue().equals(true)));
+        };
+        PostCondition notFulfillingIMDWarmWaterEnergyRequiermentPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("IMD Varmvatten")) {
+                    item.setValue(item.getValue()+100);
+                }
+            });
+        };
+        Rule notFulfillingIMDWarmWaterEnergyRequiermentRule = new Rule("IMD Warm water energy performance","If the building does not fulfill the energy performance metrics for IMD warm water, implementing it is a requierment by law, therefore it is a top priority", notFulfillingIMDWarmWaterEnergyRequiermentCondition, notFulfillingIMDWarmWaterEnergyRequiermentPostCondition, null);
+        rules.add(notFulfillingIMDWarmWaterEnergyRequiermentRule);
+
+
+        Condition ifNewlyBuiltCondition = (lambdaModel) -> {
+            return ((lambdaModel.getExpertSystemInput().get("newlyBuilt").getValue().equals(true)));
+        };
+        PostCondition ifNewlyBuiltPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("IMD El")) {
+                    item.setValue(item.getValue()+100);
+                }
+            });
+        };
+        Rule ifNewlyBuiltRule = new Rule("Newly built","If the building was newly built IMD Electricity should be implemented", ifNewlyBuiltCondition, ifNewlyBuiltPostCondition, null);
+        rules.add(ifNewlyBuiltRule);
+
+
+        Condition ifReplumbingCondition = (lambdaModel) -> {
+            return ((lambdaModel.getExpertSystemInput().get("replumbingNeeded").getValue().equals(true)));
+        };
+        PostCondition ifReplumbingPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("IMD Varmvatten")) {
+                    item.setValue(item.getValue()+100);
+                }
+            });
+        };
+        Rule ifReplumbingRule = new Rule("Replumbing","If replumbing needs to be done soon, then IMD warm water also needs to be installed ", ifReplumbingCondition, ifReplumbingPostCondition, null);
+        rules.add(ifReplumbingRule);
+
+
+        //Secondly, we define those which depend on numeric inputs
+
+        Condition heatingControlSystemCondition = (lambdaModel) -> {
+            return ((Double)(lambdaModel.getExpertSystemInput().get("heatingControlSystemAge").getValue())>=30.0);
+        };
+        PostCondition heatingControlSystemPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Berg Or Mark värme")) {
+                    item.setValue(item.getValue()+4);
+                }
+            });
+        };
+        Rule heatingControlSystemRule = new Rule("Old heating control system","If the buildings heating control system is older than 30 years, geo-thermal energy +4", heatingControlSystemCondition, heatingControlSystemPostCondition, null);
+        rules.add(heatingControlSystemRule);
+
+        Condition lightingInstallationCondition = (lambdaModel) -> {
+            return ((Double)(lambdaModel.getExpertSystemInput().get("lightingInstallationAge").getValue())>=20.0);
+        };
+        PostCondition lightingInstallationPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Belysning")) {
+                    item.setValue(item.getValue()+100);
+                }
+            });
+        };
+        Rule lightingInstallationRule = new Rule("Old lighting Installation","If the lighting installation is older than 20 years, it is top priority ", lightingInstallationCondition, lightingInstallationPostCondition, null);
+        rules.add(lightingInstallationRule);
+
+        Condition facadeInsulationCondition = (lambdaModel) -> {
+            return ((Double)(lambdaModel.getExpertSystemInput().get("facadeInsulationAge").getValue())>=40.0);
+        };
+        PostCondition facadeInsulationPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Fasadisolering")) {
+                    item.setValue(item.getValue()+3);
+                }
+            });
+        };
+        Rule facadeInsulationRule = new Rule("Old facade insulation","If the facade insulation is older than 40 years, increase its priority by +3 ", facadeInsulationCondition, facadeInsulationPostCondition, null);
+        rules.add(facadeInsulationRule);
+
+        Condition atticInsulationCondition = (lambdaModel) -> {
+            return ((Double)(lambdaModel.getExpertSystemInput().get("atticInsulationAge").getValue())>=40.0);
+        };
+        PostCondition atticInsulationPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Vindisolering")) {
+                    item.setValue(item.getValue()+3);
+                }
+            });
+        };
+        Rule atticInsulationRule = new Rule("Old attic insulation","If the attic insulation is older than 40 years, increase its priority by +3 ", atticInsulationCondition, atticInsulationPostCondition, null);
+        rules.add(atticInsulationRule);
+
+
+        //Thirdly, we define those which depend on the other recommendations
+
+        Condition recommendingGeothermalCondition = (lambdaModel) -> {
+
+            for (Entry<improvement, Integer> entry : lambdaModel.getSortedListOfImprovementsToConsider()) {
+                if (entry.getKey().getName().equals("Berg Or Mark värme") && entry.getValue().intValue()>=3)
+                {return true;}
+            }
+            return false;
+        };
+        PostCondition recommendingGeothermalPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Fasadisolering")) {
+                    item.setValue(item.getValue()+3);
+                }
+            });
+        };
+        Rule recommendingGeothermalRule = new Rule("Recommending geothermal","If geo-thermal heating is recommended, then facade insulation is given higher priority (+3)", recommendingGeothermalCondition, recommendingGeothermalPostCondition, null);
+        rules.add(recommendingGeothermalRule);
+
+        Condition recommendingFTXFVPCondition = (lambdaModel) -> {
+
+            for (Entry<improvement, Integer> entry : lambdaModel.getSortedListOfImprovementsToConsider()) {
+                if (((entry.getKey().getName().equals("FTX"))||(entry.getKey().getName().equals("FVP"))) && entry.getValue().intValue()>=3)
+                {return true;}
+            }
+            return false;
+        };
+        PostCondition recommendingFTXFVPPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Vindisolering")) {
+                    item.setValue(item.getValue()+100);
+                }
+            });
+        };
+        Rule recommendingFTXFVPRule = new Rule("Recommending FTX/FVP","If FTX or FVP is recommended, then attic insulation is given higher priority (+3)", recommendingFTXFVPCondition, recommendingFTXFVPPostCondition, null);
+        rules.add(recommendingFTXFVPRule);
+
+
+        Condition recommendingFVPCondition = (lambdaModel) -> {
+
+            for (Entry<improvement, Integer> entry : lambdaModel.getSortedListOfImprovementsToConsider()) {
+                if ((entry.getKey().getName().equals("FVP")) && entry.getValue().intValue()>=3)
+                {return true;}
+            }
+            return false;
+        };
+        PostCondition recommendingFVPPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Solpaneler")) {
+                    item.setValue(item.getValue()+2);
+                }
+            });
+        };
+        Rule recommendingFVPRule = new Rule("Recommending FVP","If FVP is recommended, then attic insulation is given higher priority (+3)", recommendingFVPCondition, recommendingFVPPostCondition, null);
+        rules.add(recommendingFVPRule);
+
+        Condition recommendingSolarPanelsCondition = (lambdaModel) -> {
+
+            for (Entry<improvement, Integer> entry : lambdaModel.getSortedListOfImprovementsToConsider()) {
+                if ((entry.getKey().getName().equals("Solpaneler")) && entry.getValue().intValue()>=3)
+                {return true;}
+            }
+            return false;
+        };
+        PostCondition recommendingSolarPanelsPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("FVP")) {
+                    item.setValue(item.getValue()+3);
+                }
+                else
+                {
+                if (item.getKey().getName().equals("IMD El")) {
+                    item.setValue(item.getValue()+100);
+                }
+                }
+
+            });
+        };
+        Rule recommendingSolarPanelsRule = new Rule("Recommending Solar Panels","If Solar Panels are recommended, then FVP given higher priority (+3) and IMD Electricity is a top priority (to measure who uses what)", recommendingSolarPanelsCondition, recommendingSolarPanelsPostCondition, null);
+        rules.add(recommendingSolarPanelsRule);
+
+        Condition recommendingReplaceWindowsCondition = (lambdaModel) -> {
+
+            for (Entry<improvement, Integer> entry : lambdaModel.getSortedListOfImprovementsToConsider()) {
+                if ((entry.getKey().getName().equals("Byt fönster")) && entry.getValue().intValue()>=3)
+                {return true;}
+            }
+            return false;
+        };
+        PostCondition recommendingReplaceWindowsPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Regel och Styr")||item.getKey().getName().equals("Termostat+Inljustering")) {
+                    item.setValue(item.getValue()+5);
+                }
+                else
+                {
+                if (item.getKey().getName().equals("IMD El")) {
+                    item.setValue(item.getValue()+100);
+                }
+                }
+
+            });
+        };
+        Rule recommendingReplaceWindowsRule = new Rule("Recommending Solar Panels","If Solar Panels are recommended, then FVP given higher priority (+3) and IMD Electricity is a top priority (to measure who uses what)", recommendingReplaceWindowsCondition, recommendingReplaceWindowsPostCondition, null);
+        rules.add(recommendingReplaceWindowsRule);
 
     }
 
