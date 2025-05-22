@@ -19,6 +19,12 @@ public class ReasoningEngine {
     private List<Rule> rules;
     private List<Rule> triggeredRules;
 
+    /**
+     * This instantiates the reasoning engine
+     * @param numericalValues A list of numerical variables to include in the system model
+     * @param heatingEnergySources A list of heat sources to include in the system model
+     * @param expertSystemInput A map of inputs to the expert system to include in the system model
+     */
     public ReasoningEngine(Map<Map.Entry<String, String>, Double> numericalValues,java.util.List<heatingEnergySource> heatingEnergySources,Map<String,input<?>> expertSystemInput )
     {
         this.rules=new ArrayList<>();

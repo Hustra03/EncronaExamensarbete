@@ -10,6 +10,9 @@ import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 
+/**
+ * This class is used to calculate the return on investment time for all of the improvements
+ */
 public class improvementReturnOnInvestement extends componentAbstract<List<Map.Entry<String, Double>>> {
 
     /**

@@ -16,9 +16,7 @@ public abstract class componentAbstract<T> implements componentInterface<T>, Run
     private Boolean complete = false; // By default complete is false
     private String unit;
 
-    private Map<String, componentAbstract<?>> dependsOn; // TODO test if this works, does give a warning but if
-                                                      // parameterized then only those with the same value as the
-                                                      // instance can be added
+    private Map<String, componentAbstract<?>> dependsOn;
 
     // https://docs.oracle.com/javase/8/docs/api/java/util/Map.html
 

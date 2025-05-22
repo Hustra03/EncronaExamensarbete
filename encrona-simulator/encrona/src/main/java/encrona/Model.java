@@ -17,6 +17,10 @@ import encrona.domain.improvement;
 public class Model {
     static DataLoader dataLoader;
 
+    private Model() {
+        throw new IllegalStateException("The model should never be instantiated, only used to run the simulator");
+    }
+
     /**
      * This method is responsible for running the simulation, which consists of
      * instantiating relevant data, scheduling tasks, executing tasks and then
@@ -28,7 +32,8 @@ public class Model {
      * @param heatingEnergySources    The list of heat sources
      * @return A map of string lists, which contains different types of output
      */
-    public static Map<String, List<String>> runSimulation(Map<Map.Entry<String, String>, Double> mapOfNumericalVariables,
+    public static Map<String, List<String>> runSimulation(
+            Map<Map.Entry<String, String>, Double> mapOfNumericalVariables,
             List<improvement> improvement,
             List<heatingEnergySource> heatingEnergySources) {
         // We instantiate the data
@@ -49,10 +54,10 @@ public class Model {
         for (componentAbstract<?> componentAbstract : componentsToCalculate) {
 
             if (componentAbstract.getName().equals("dashboardString")) {
-                clipboardList.add((String)componentAbstract.getValue());
+                clipboardList.add((String) componentAbstract.getValue());
             } else {
                 String printString = toStringFunction(componentAbstract);
-                if (!printString.equals( "")) {
+                if (!printString.equals("")) {
                     outputList.add(printString);
                 }
             }
@@ -70,46 +75,44 @@ public class Model {
      * @return The components value string
      */
     public static String toStringFunction(componentAbstract<?> componentAbstract) {
-        String printString = "";
+
+        StringBuilder stringBuilder = new StringBuilder();
 
         if (componentAbstract.getValue() instanceof List l) {
-            if (l.size() != 0) {
-                printString += (componentAbstract.getName() + " equals : [ ");
-
+            if (!l.isEmpty()) {
+                stringBuilder.append(componentAbstract.getName() + " equals : [ ");
                 for (Object a : l) {
-                    printString += (a.toString() + ", ");
+                    stringBuilder.append(a.toString() + ", ");
                 }
-                printString += (" ]");
+                stringBuilder.append(" ]");
             }
         } else {
 
             if (componentAbstract.getValue() instanceof Object[] o) {
-                printString += (componentAbstract.getName() + " equals : [ ");
-
-                for (int i = 0; i < ((Object[]) o).length; i++) {
-                    printString += (((Object[]) o)[i].toString() + ", ");
+                stringBuilder.append(componentAbstract.getName() + " equals : [ ");
+                for (int i = 0; i < (o).length; i++) {
+                    stringBuilder.append((o)[i].toString() + ", ");
                 }
-                printString += (" ]");
+                stringBuilder.append(" ]");
 
             } else {
-
-                printString += (componentAbstract.getName() + " equals ");
-                printString += (componentAbstract.getValue().toString());
+                stringBuilder.append(componentAbstract.getName() + " equals ");
+                stringBuilder.append(componentAbstract.getValue().toString());
 
                 if (!(componentAbstract.getUnit().equals("") || componentAbstract.getUnit() == null)) {
-                    printString += (" " + componentAbstract.getUnit());
+                    stringBuilder.append(" " + componentAbstract.getUnit());
                 }
             }
         }
 
-        return printString;
+        return stringBuilder.toString();
     }
 
     /**
-     * This method recursivly adds components to the execution set, first adding its
-     * dependencies before adding itself
+     * This method recursivly runs components, first running its (not yet completed)
+     * dependencies before running itself
      * 
-     * @param component The component to add
+     * @param component The component to run
      */
     public static void recursiveRun(componentAbstract<?> component) {
         Map<String, componentAbstract<?>> dependsOnMap = (Map<String, componentAbstract<?>>) component.getDependsOn();

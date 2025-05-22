@@ -20,6 +20,9 @@ import encrona.domain.improvement;
 import encrona.expertSystem.ReasoningEngine;
 import encrona.expertSystem.Rule;
 
+/**
+ * This class is the main class for the GUI, and handles some of the basic portions and placing the other components
+ */
 public class GUIMain extends JPanel {
 
     private static final String runString = "Run Simulation";
@@ -36,6 +39,9 @@ public class GUIMain extends JPanel {
     private static JTabbedPane tabbedPane=new JTabbedPane();
     private static JPanel outputPage;
 
+    /**
+     * This creates the GUI, and is responsible for handling the GUI classes
+     */
     public GUIMain() {
         super(new BorderLayout());
 
@@ -104,6 +110,10 @@ public class GUIMain extends JPanel {
         theMainFrame.setVisible(true);
     }
 
+    /**
+     * This is the method used to invoke the GUI
+     * @param args
+     */
     public static void main(String[] args) {
         // Schedule a job for the event-dispatching thread:
         // creating and showing this application's GUI.
@@ -126,8 +136,12 @@ public class GUIMain extends JPanel {
         }
     }
 
-    // This method creates the output tab, along with its contents, based on the
-    // input and the results from the simulation
+    /**
+     * This method creates the output tab, along with its contents, based on the input and the results from the simulation
+     * @param mapOfNumericalVariables A map of numerical values
+     * @param heatingEnergySources A list of heat sources
+     * @param improvementsCollected A list of improvements
+     */
     public static void createOutputTab(Map<Map.Entry<String, String>, Double> mapOfNumericalVariables,
             java.util.List<heatingEnergySource> heatingEnergySources,
             java.util.List<improvement> improvementsCollected) {
@@ -173,10 +187,16 @@ public class GUIMain extends JPanel {
 
     }
 
-    // This class is used to handle the runButton, with its method called when the
-    // runButton is clicked, and should collect the relevant information and start
-    // the simulation with it
+    /**
+     * This class is used to handle the runButton, 
+     * with its method called when the runButton is clicked, 
+     * and should collect the relevant information and startthe simulation with it
+     */
     class RunListener implements ActionListener {
+        /**
+        * This method is called once the action, in this case a button being clicked, is triggered
+        * @param e The event which caused this
+        */
         public void actionPerformed(ActionEvent e) {
             removeTab(outputTabName);
 
@@ -220,20 +240,26 @@ public class GUIMain extends JPanel {
         }
     }
 
-        // This class is used to handle the toClipboard button
-        class clipboardListener implements ActionListener {
-            public void actionPerformed(ActionEvent e) {
-                StringSelection clipboardOutput = new StringSelection(clipboardString);
-                Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardOutput, null);
-                JOptionPane.showMessageDialog(theMainFrame, "Copied dashboard string to clipboard", "Copied to clipboard",
-                JOptionPane.PLAIN_MESSAGE);
-            }
+    /**
+    * This class is used to handle the toClipboard button
+    */ 
+    class clipboardListener implements ActionListener {
+        /**
+        * This method is called once the action, in this case a button being clicked, is triggered
+        * @param e The event which caused this
+        */
+        public void actionPerformed(ActionEvent e) {
+            StringSelection clipboardOutput = new StringSelection(clipboardString);
+            Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardOutput, null);
+               JOptionPane.showMessageDialog(theMainFrame, "Copied dashboard string to clipboard", "Copied to clipboard",
+               JOptionPane.PLAIN_MESSAGE);
         }
+    }
 
     /**
      * This adds a section to the output tab with the output from the simulator
      * 
-     * @param outputList
+     * @param outputList The list of outputs to display to the user
      */
     public static void addSimulatorOutputToOutput(Map<String, java.util.List<String>> outputLists) {
         JPanel simulatorOutputPage = new JPanel();
@@ -266,8 +292,14 @@ public class GUIMain extends JPanel {
         outputPage.updateUI();
     }
 
-    // This is used to handle the run expert system button
+    /**
+     * This is used to handle the run expert system button
+     */
     class ExpertListner implements ActionListener {
+        /**
+        * This method is called once the action, in this case a button being clicked, is triggered
+        * @param e The event which caused this
+        */
         public void actionPerformed(ActionEvent e) {
             removeTab(expertSystemTabName);
             final Map<Map.Entry<String, String>, Double> mapOfNumericalVariables;
@@ -298,6 +330,11 @@ public class GUIMain extends JPanel {
         }
     }
 
+    /**
+     * This method creates the expert system output page
+     * @param resultList A list of results, in this case a sorted list of improvements
+     * @param triggeredRules A list of the rules which were triggered
+     */
     public static void addExpertSystemOutputTab(java.util.List<Entry<String,Integer>> resultList,
             java.util.List<Rule> triggeredRules) {
 
