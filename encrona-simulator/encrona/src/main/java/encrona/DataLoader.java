@@ -251,6 +251,7 @@ public class DataLoader {
         improvement EconomicalFlush = new improvement("Snålpolande armatur", 0.0,100.0,0.0,0.0, 45.0, 15 );
         improvement EfficentLighting = new improvement("Belysning", 0.0,0.0,30.0,0.0, 15.0, 15 );
         improvement IMDEl = new improvement("IMD El", 0.0,0.0,0.0,0.0, 85.0, 10 );
+        improvement roofReplacement = new improvement("Takbyte", 0.0,0.0,0.0,0.0, 85.0, 10 );
 
 
         List<improvement> initialListOfImprovements = new ArrayList<>();
@@ -267,6 +268,7 @@ public class DataLoader {
         initialListOfImprovements.add(EconomicalFlush);
         initialListOfImprovements.add(EfficentLighting);
         initialListOfImprovements.add(IMDEl);
+        initialListOfImprovements.add(roofReplacement);
         return initialListOfImprovements;
     }
 

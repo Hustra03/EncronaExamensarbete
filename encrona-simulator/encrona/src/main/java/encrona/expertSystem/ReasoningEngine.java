@@ -214,6 +214,20 @@ public class ReasoningEngine {
         Rule lightingInstallationRule = new Rule("Old lighting Installation","If the lighting installation is older than 20 years, it is top priority ", lightingInstallationCondition, lightingInstallationPostCondition, null);
         rules.add(lightingInstallationRule);
 
+                Condition roofAgeCondition = (lambdaModel) -> {
+            return ((Double)(lambdaModel.getExpertSystemInput().get("roofAge").getValue())<=30.0);
+        };
+        PostCondition roofAgePostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Takbyte")) {
+                    item.setValue(item.getValue()-100);
+                }
+            });
+        };
+        Rule roofAgeRule = new Rule("New roof","If the roof is younger than 30 years, replacing it is much less relevant (-100) ", roofAgeCondition, roofAgePostCondition, null);
+        rules.add(roofAgeRule);
+
         Condition facadeInsulationCondition = (lambdaModel) -> {
             return ((Double)(lambdaModel.getExpertSystemInput().get("facadeInsulationAge").getValue())>=40.0);
         };
@@ -275,13 +289,33 @@ public class ReasoningEngine {
         PostCondition recommendingFTXFVPPostCondition = (lambdaModel)->
         {
             lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
-                if (item.getKey().getName().equals("Vindisolering")) {
+                if (item.getKey().getName().equals("Vindisolering")||item.getKey().getName().equals("Takbyte")) {
                     item.setValue(item.getValue()+100);
                 }
             });
         };
-        Rule recommendingFTXFVPRule = new Rule("Recommending FTX/FVP","If FTX or FVP is recommended, then attic insulation is given higher priority (+3)", recommendingFTXFVPCondition, recommendingFTXFVPPostCondition, null);
+        Rule recommendingFTXFVPRule = new Rule("Recommending FTX/FVP","If FTX or FVP is recommended, then attic insulation and roof replacement is top priority (+100)", recommendingFTXFVPCondition, recommendingFTXFVPPostCondition, null);
         rules.add(recommendingFTXFVPRule);
+
+        
+        Condition recommendingRoofReplacementCondition = (lambdaModel) -> {
+
+            for (Entry<improvement, Integer> entry : lambdaModel.getSortedListOfImprovementsToConsider()) {
+                if ((entry.getKey().getName().equals("Takbyte")) && entry.getValue().intValue()>=3)
+                {return true;}
+            }
+            return false;
+        };
+        PostCondition recommendingRoofReplacementPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Solpaneler")) {
+                    item.setValue(item.getValue()+3);
+                }
+            });
+        };
+        Rule recommendingRoofReplacementRule = new Rule("Recommending roof replacement","If roof replacement is recommended, then solar panels are a higher priority (+3)", recommendingRoofReplacementCondition, recommendingRoofReplacementPostCondition, null);
+        rules.add(recommendingRoofReplacementRule);
 
 
         Condition recommendingFVPCondition = (lambdaModel) -> {
@@ -314,7 +348,7 @@ public class ReasoningEngine {
         PostCondition recommendingSolarPanelsPostCondition = (lambdaModel)->
         {
             lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
-                if (item.getKey().getName().equals("FVP")) {
+                if (item.getKey().getName().equals("FVP")||item.getKey().getName().equals("Takbyte")) {
                     item.setValue(item.getValue()+3);
                 }
                 else
@@ -326,7 +360,7 @@ public class ReasoningEngine {
 
             });
         };
-        Rule recommendingSolarPanelsRule = new Rule("Recommending Solar Panels","If Solar Panels are recommended, then FVP given higher priority (+3) and IMD Electricity is a top priority (to measure who uses what)", recommendingSolarPanelsCondition, recommendingSolarPanelsPostCondition, null);
+        Rule recommendingSolarPanelsRule = new Rule("Recommending Solar Panels","If Solar Panels are recommended, then FVP and roof replacement is given higher priority (+3), while IMD Electricity is a top priority (+100, to measure who uses what)", recommendingSolarPanelsCondition, recommendingSolarPanelsPostCondition, null);
         rules.add(recommendingSolarPanelsRule);
 
         Condition recommendingReplaceWindowsCondition = (lambdaModel) -> {
