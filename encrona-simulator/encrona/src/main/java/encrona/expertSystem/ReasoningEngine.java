@@ -402,7 +402,7 @@ public class ReasoningEngine {
 
         triggeredRules=new ArrayList<>();
         for (Rule rule : rules) {
-            if (rule.testRule(model)) {
+            if (Boolean.TRUE.equals(rule.testRule(model))) {
                 triggeredRules.add(rule);
             }
         }

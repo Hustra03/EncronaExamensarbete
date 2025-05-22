@@ -63,7 +63,7 @@ public class GUIExpertSystemInput extends JPanel{
         preservationOrderedRow.add(isPreservationOrderedCheckbox);
 
         JPanel imdWarmWaterEnergyRequiermentRow = new JPanel();
-        imdWarmWaterEnergyRequiermentRow.add(new JLabel("Does the building not fulfill the energy requierment for IMD warm water?"));
+        imdWarmWaterEnergyRequiermentRow.add(new JLabel("Does the building not fulfill the energy requierment to avoid IMD warm water?"));
         imdWarmWaterEnergyRequiermentRow.add(notFulfillingIMDWarmWaterEnergyRequiermentCheckbox);
 
         JPanel newlyBuiltRow = new JPanel();
