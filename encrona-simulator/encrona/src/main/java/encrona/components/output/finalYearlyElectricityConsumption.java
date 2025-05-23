@@ -12,6 +12,9 @@ import java.util.Set;
 import encrona.components.componentAbstract;
 import encrona.domain.improvement;
 
+/**
+ * This class is responsible for calculating how much electricity is consumed, after the improvements are applied
+ */
 public class finalYearlyElectricityConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>> {
 
     /**

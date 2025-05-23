@@ -12,6 +12,9 @@ import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
 import encrona.domain.improvement;
 
+/**
+ * This class is responsible for calculating how much heating (both building and water) is needed from each heat source in each heat range, after all of the improvements are applied
+ */
 public class finalYearlyHeatingConsumption extends componentAbstract<List<Map.Entry<Integer, List<heatingEnergySource>>>> {
     /**
      * This is a constructor for finalElectricityConsumptionChange
