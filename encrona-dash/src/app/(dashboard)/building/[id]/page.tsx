@@ -11,7 +11,6 @@ import {
   ReferenceLine,
   XAxis,
   YAxis,
-  Legend,
 } from 'recharts';
 
 import { Switch } from '@/components/ui/switch';
