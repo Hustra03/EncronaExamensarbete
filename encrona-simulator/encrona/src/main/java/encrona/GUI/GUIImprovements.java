@@ -23,10 +23,13 @@ import javax.swing.JTextField;
 
 import encrona.domain.improvement;
 
+/**
+ * This class is responsible for handling the improvements page, along with returning the current values if they are requested
+ */
 public class GUIImprovements extends JPanel {
 
-    List<improvement> improvements;
-    static JPanel improvementSpecificationPage;
+    private transient List<improvement> improvements; //This is to handle serialization
+    static JPanel improvementSpecificationPage=new JPanel();
 
     static final String kwhHeatingOverLifetimeUnit = "kwh/m^2 over the improvements lifetime for building heating";
     static final String kwhHeatingPerYearUnit = "kwh per year for building heating";
@@ -40,6 +43,10 @@ public class GUIImprovements extends JPanel {
     static final String costkrPerYearUnit = "kr per year";
     static final String costTotalUnit = "total cost";
 
+    /**
+     * This defines the improvement page
+     * @param initialImprovements This is a list of improvements, which are to be displayed
+     */
     public GUIImprovements(List<improvement> initialImprovements) {
         super(new GridBagLayout());
 
@@ -47,7 +54,6 @@ public class GUIImprovements extends JPanel {
         infoPage.add(new JLabel("Here you give the values for improvements for the building"));
         improvements = initialImprovements;
 
-        improvementSpecificationPage = new JPanel();
         JScrollPane scrollimprovementSpecificationPage = new JScrollPane(improvementSpecificationPage);
         improvementSpecificationPage.setLayout(new BoxLayout(improvementSpecificationPage, BoxLayout.PAGE_AXIS));
         scrollimprovementSpecificationPage.getVerticalScrollBar().setUnitIncrement(10);

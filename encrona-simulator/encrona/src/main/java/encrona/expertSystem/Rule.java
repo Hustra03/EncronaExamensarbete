@@ -28,21 +28,25 @@ public class Rule {
         this.postConditionIfNotCondition=postConditionIfNotCondition;
     }
 
+    /**
+     * This tests the rule, which means that the condition is verified, and if a valid postcondition exists the model state will update
+     * @param currentState The current system model, which may be modified when testing the rule
+     * @return A boolean for if the rule was true or not
+     */
     public Boolean testRule(ExpertSystemModel currentState)
     {
 
         Boolean conditionStatus=condition.testCondition(currentState);
 
-        if (conditionStatus) {
+        if (Boolean.TRUE.equals(conditionStatus)) {
             postConditionIfCondition.makeStateChange(currentState);
             return true;
         }
         else
         {
-            if (!conditionStatus&&postConditionIfNotCondition!=null) {
+            if (postConditionIfNotCondition!=null) {
                 postConditionIfNotCondition.makeStateChange(currentState);
                 return true;
-
             }
         }
 

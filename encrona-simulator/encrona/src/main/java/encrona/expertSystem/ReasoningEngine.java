@@ -19,6 +19,12 @@ public class ReasoningEngine {
     private List<Rule> rules;
     private List<Rule> triggeredRules;
 
+    /**
+     * This instantiates the reasoning engine
+     * @param numericalValues A list of numerical variables to include in the system model
+     * @param heatingEnergySources A list of heat sources to include in the system model
+     * @param expertSystemInput A map of inputs to the expert system to include in the system model
+     */
     public ReasoningEngine(Map<Map.Entry<String, String>, Double> numericalValues,java.util.List<heatingEnergySource> heatingEnergySources,Map<String,input<?>> expertSystemInput )
     {
         this.rules=new ArrayList<>();
@@ -377,16 +383,9 @@ public class ReasoningEngine {
                 if (item.getKey().getName().equals("Regel och Styr")||item.getKey().getName().equals("Termostat+Inljustering")) {
                     item.setValue(item.getValue()+5);
                 }
-                else
-                {
-                if (item.getKey().getName().equals("IMD El")) {
-                    item.setValue(item.getValue()+100);
-                }
-                }
-
             });
         };
-        Rule recommendingReplaceWindowsRule = new Rule("Recommending Solar Panels","If Solar Panels are recommended, then FVP given higher priority (+3) and IMD Electricity is a top priority (to measure who uses what)", recommendingReplaceWindowsCondition, recommendingReplaceWindowsPostCondition, null);
+        Rule recommendingReplaceWindowsRule = new Rule("Window replacement","If window replacement is recommended, then both Thermometer Reconfiguration and Heating Control System Reconfiguration are a high priority (+5)", recommendingReplaceWindowsCondition, recommendingReplaceWindowsPostCondition, null);
         rules.add(recommendingReplaceWindowsRule);
 
     }

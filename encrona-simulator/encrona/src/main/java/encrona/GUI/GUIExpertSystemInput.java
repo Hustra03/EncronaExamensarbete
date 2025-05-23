@@ -6,6 +6,10 @@ import java.util.Map;
 import javax.swing.*;
 
 import encrona.components.input;
+
+    /**
+     * This class is responsible for defining and collecting the values from the expert system input page
+     */
 public class GUIExpertSystemInput extends JPanel{
     
     static JCheckBox hasFTXCheckbox=new JCheckBox();
@@ -25,6 +29,9 @@ public class GUIExpertSystemInput extends JPanel{
     static JTextField atticInsulationAgeField=new JTextField("1",20);
     static JTextField roofAgeField=new JTextField("1",20);
 
+    /**
+     * This defines the expert input GUI page
+     */
     public GUIExpertSystemInput() {
 
         this.setLayout(new GridBagLayout());

@@ -20,12 +20,18 @@ import javax.swing.JTextField;
 
 import encrona.domain.heatingEnergySource;
 
-
+/**
+ * This class is responsible for creating and collecting the values from the heat source GUI page
+ */
 public class GUIHeatingSources extends JPanel {
 
-    List<heatingEnergySource> energySources;
-    static JPanel heatSourceSpecificationPage;
+    private transient List<heatingEnergySource> energySources; //This is to handle serialization
+    static JPanel heatSourceSpecificationPage=new JPanel();
 
+    /**
+     * This defines the heat source GUI page
+     * @param initialHeatingEnergySources This is the list of heat sources to display initialliy
+     */
     public GUIHeatingSources(List<heatingEnergySource> initialHeatingEnergySources) {
         super(new GridBagLayout());
 
@@ -33,7 +39,6 @@ public class GUIHeatingSources extends JPanel {
         infoPage.add(new JLabel("Here you give the values for heat sources for the building"));
         energySources = initialHeatingEnergySources;
 
-        heatSourceSpecificationPage = new JPanel();
         JScrollPane scrollheatSourceSpecificationPage = new JScrollPane(heatSourceSpecificationPage);
         heatSourceSpecificationPage.setLayout(new BoxLayout(heatSourceSpecificationPage, BoxLayout.PAGE_AXIS));
 
@@ -71,6 +76,11 @@ public class GUIHeatingSources extends JPanel {
         add(scrollheatSourceSpecificationPage, c);
     }
 
+    /**
+     * This creates a new heat source component
+     * @param source The heat source to create a component for
+     * @return The newly created JPanel component
+     */
     private JPanel createHeatSourcePage(heatingEnergySource source) {
         JPanel heatSourcePage = new JPanel();
 
@@ -180,7 +190,7 @@ public class GUIHeatingSources extends JPanel {
             Boolean selected = selectBox.isSelected();
 
             // This confirms that the user selected this specific heat source 
-            if (selected) {
+            if (Boolean.TRUE.equals(selected)) {
 
                 JLabel nameField = (JLabel) heatSourceJPanel.getComponent(1);
                 String name = nameField.getText();
