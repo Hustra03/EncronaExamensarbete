@@ -11,6 +11,7 @@ import {
   ReferenceLine,
   XAxis,
   YAxis,
+  Legend,
 } from 'recharts';
 
 import { Switch } from '@/components/ui/switch';
@@ -274,7 +275,19 @@ export default function Building() {
                   })
                 }
               />
-              <YAxis tickMargin={8} allowDecimals={false} />
+              <YAxis
+                tickMargin={8}
+                allowDecimals={false}
+                unit={unitMap[activeChart]}
+                tickFormatter={value => {
+                  if (Math.abs(value) >= 1_000_000)
+                    return `${(value / 1_000_000).toFixed(1)}M `;
+                  if (Math.abs(value) >= 1_000)
+                    return `${(value / 1_000).toFixed(1)}k `;
+                  return value;
+                }}
+                padding={{ top: 10 }}
+              />
               <ChartTooltip
                 content={
                   <ChartTooltipContent className="w-[150px]" hideLabel />
@@ -284,14 +297,14 @@ export default function Building() {
                 dataKey={`${activeChart}Estimate`}
                 stroke={estimateColor}
                 strokeWidth={2}
-                name="Prognos"
+                name="Estimate"
                 strokeDasharray="4 2"
               ></Line>
               <Line
                 dataKey={`${activeChart}Actual`}
                 stroke={actualColor}
                 strokeWidth={2}
-                name="Faktisk"
+                name="Actual"
               />
               {data?.installedAt && (
                 <ReferenceLine
