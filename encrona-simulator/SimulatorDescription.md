@@ -2,13 +2,15 @@
 
 This is a Java-based simulation platform, with a modular architecture, since the intention is that specific aspects can be further developed when they become relevant. 
 
+## System description
+
 Below is a description of the different parts of the system.
 
-## Misc
+### Misc
 
 These are the parts of the system which are unique, such as the Main class, responsible for starting the program, or the Model class, which contains the entire simulation and is responsible for handling it. 
 
-## Components
+### Components
 
 Component classes represent the parts of the system which are calculated, and/or used to calculate another component. This includes the input values, the intermediate values and the output values. 
 
@@ -16,12 +18,32 @@ Their common values and those common methods whose implementation is static are 
 
 To be specific, the current value is calculated using the specific classes overwritten 'calculate' method, which will use the list of components it is dependent on (which is empty for input variables) to, in some way, set the current value. Afterwards any applicable modifiers will be applied, and then the complete function is called and this component is finished executing. 
 
-## Domain
+### Domain
 
 Domain classes represent the domain-specific data types, as in the specific things which have certain specific properties. 
 
 These generally extend the abstract class objectAbstract, which provides some common values and methods. 
 
-## GUI
+### GUI
 
 This will store the classes related to the simulator GUI (Graphic User Interface), with this using the Swing library to implement a basic user interface to allow a user of the simulator to specify relevant parameters for the simulation, and to view the simulation results in a more user-friendly manner (when compared with the raw output generated for use by the real time estimation system).
+
+### expertSystem
+
+These classes are responsible for handling the logic of the expert system component, which is used to generate suggestions about which improvements to implement first. This uses a rules-based methodology, with the rules consiting of a condition and one or two post-conditions, with the former being responsible for verifying that the system model state fulfills certain criteria, while the latter is reponsible for modifying the system model, with this modification depending on if the condition was true or not. 
+
+## How to use
+
+### Basic usage
+
+The basic 
+
+### Modifications
+
+#### GUI
+
+#### New improvements/heating sources
+
+#### New rules
+
+#### New components/variables in the simulation
