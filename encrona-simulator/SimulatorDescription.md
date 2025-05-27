@@ -2,7 +2,7 @@
 
 This is a Java-based simulation platform, with a modular architecture, since the intention is that specific aspects can be further developed when they become relevant. 
 
-Below is a description of the different parts of the system
+Below is a description of the different parts of the system.
 
 ## Misc
 
@@ -25,11 +25,3 @@ These generally extend the abstract class objectAbstract, which provides some co
 ## GUI
 
 This will store the classes related to the simulator GUI (Graphic User Interface), with this using the Swing library to implement a basic user interface to allow a user of the simulator to specify relevant parameters for the simulation, and to view the simulation results in a more user-friendly manner (when compared with the raw output generated for use by the real time estimation system).
-
-## Modifiers
-
-Modifier classes represent the part of the system that impacts another part, specifically one or more components. 
-
-Their common values and those common methods whose implementation is static are are defined in the abstract class modifierAbstract. The methods whose implementation varies is defined in the interface modifierAbstract. 
-
-Each modifier will implement the 'modify' function, which will accept a value of a specific data type and then return a value of that same data type, with the details being implementation specific. 

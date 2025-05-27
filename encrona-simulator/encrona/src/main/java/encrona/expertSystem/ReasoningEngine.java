@@ -186,10 +186,23 @@ public class ReasoningEngine {
                 }
             });
         };
-        Rule ifReplumbingRule = new Rule("Replumbing","If replumbing needs to be done soon, then IMD warm water also needs to be installed ", ifReplumbingCondition, ifReplumbingPostCondition, null);
+        Rule ifReplumbingRule = new Rule("Replumbing","If replumbing needs to be done soon, then IMD warm water also needs to be installed (+100)", ifReplumbingCondition, ifReplumbingPostCondition, null);
         rules.add(ifReplumbingRule);
 
 
+        Condition ifThermometerConfiguredCondition = (lambdaModel) -> {
+            return ((lambdaModel.getExpertSystemInput().get("thermometerConfigured").getValue().equals(false)));
+        };
+        PostCondition ifThermometerConfiguredPostCondition = (lambdaModel)->
+        {
+            lambdaModel.getSortedListOfImprovementsToConsider().forEach((item)->{
+                if (item.getKey().getName().equals("Regel och Styr")||item.getKey().getName().equals("Termostat+Inljustering")) {
+                    item.setValue(item.getValue()+100);
+                }
+            });
+        };
+        Rule ifThermometerConfiguredRule = new Rule("Heating misconfiguration","If the heating system is not correctly configured, then Thermometer Reconfiguration and Heating Control System Reconfiguration are a top priority (+100)  ", ifThermometerConfiguredCondition, ifThermometerConfiguredPostCondition, null);
+        rules.add(ifThermometerConfiguredRule);
         //Secondly, we define those which depend on numeric inputs
 
         Condition heatingControlSystemCondition = (lambdaModel) -> {
@@ -340,7 +353,7 @@ public class ReasoningEngine {
                 }
             });
         };
-        Rule recommendingFVPRule = new Rule("Recommending FVP","If FVP is recommended, then attic insulation is given higher priority (+3)", recommendingFVPCondition, recommendingFVPPostCondition, null);
+        Rule recommendingFVPRule = new Rule("Recommending FVP","If FVP is recommended, then solar panels are given higher priority (+2)", recommendingFVPCondition, recommendingFVPPostCondition, null);
         rules.add(recommendingFVPRule);
 
         Condition recommendingSolarPanelsCondition = (lambdaModel) -> {

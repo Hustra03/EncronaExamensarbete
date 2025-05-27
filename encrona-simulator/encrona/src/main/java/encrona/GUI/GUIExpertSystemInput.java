@@ -22,6 +22,8 @@ public class GUIExpertSystemInput extends JPanel{
     static JCheckBox notFulfillingIMDWarmWaterEnergyRequiermentCheckbox=new JCheckBox();
     static JCheckBox newlyBuiltCheckbox=new JCheckBox();
     static JCheckBox replumbingNeededCheckbox=new JCheckBox();
+    static JCheckBox thermometerConfiguredCheckbox=new JCheckBox();
+
 
     static JTextField heatingControlSystemAgeField=new JTextField("1",20);
     static JTextField lightingInstallationAgeField=new JTextField("1",20);
@@ -70,7 +72,7 @@ public class GUIExpertSystemInput extends JPanel{
         preservationOrderedRow.add(isPreservationOrderedCheckbox);
 
         JPanel imdWarmWaterEnergyRequiermentRow = new JPanel();
-        imdWarmWaterEnergyRequiermentRow.add(new JLabel("Does the building not fulfill the energy requierment to avoid IMD warm water?"));
+        imdWarmWaterEnergyRequiermentRow.add(new JLabel("Does the building not fulfill the energy requirement to avoid IMD warm water?"));
         imdWarmWaterEnergyRequiermentRow.add(notFulfillingIMDWarmWaterEnergyRequiermentCheckbox);
 
         JPanel newlyBuiltRow = new JPanel();
@@ -81,6 +83,10 @@ public class GUIExpertSystemInput extends JPanel{
         reblumbingRow.add(new JLabel("Does the building need replumbing soon?"));
         reblumbingRow.add(replumbingNeededCheckbox);
 
+        JPanel thermometerConfiguredRow = new JPanel();
+        thermometerConfiguredRow.add(new JLabel("Is the heating control system configuration up to date?"));
+        thermometerConfiguredRow.add(thermometerConfiguredCheckbox);
+        
         //Here we create the panels for the 
 
         JPanel heatCentralAgeRow = new JPanel();
@@ -130,6 +136,7 @@ public class GUIExpertSystemInput extends JPanel{
         add(imdWarmWaterEnergyRequiermentRow, c);
         add(newlyBuiltRow, c);
         add(reblumbingRow, c);
+        add(thermometerConfiguredRow, c);
 
         //Here are the text fields
         add(heatCentralAgeRow, c);
@@ -213,6 +220,7 @@ public class GUIExpertSystemInput extends JPanel{
         map.put("notFulfillingIMDWarmWaterEnergyRequierment", new input<>("notFulfillingIMDWarmWaterEnergyRequierment", "N/A", (notFulfillingIMDWarmWaterEnergyRequiermentCheckbox.isSelected())));
         map.put("newlyBuilt", new input<>("newlyBuilt", "N/A", (newlyBuiltCheckbox.isSelected())));
         map.put("replumbingNeeded", new input<>("replumbingNeeded", "N/A", (replumbingNeededCheckbox.isSelected())));
+        map.put("thermometerConfigured", new input<>("thermometerConfigured", "N/A", (thermometerConfiguredCheckbox.isSelected())));
 
         return map;
     }
