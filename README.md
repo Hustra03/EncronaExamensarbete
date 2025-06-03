@@ -11,3 +11,13 @@ mdih16: Emanuel Wilches Brandt,
 ## Systems
 
 The project consists of a number of different interconnected systems, which each have their own readme files giving more information about them.
+
+## How to install basic dependencies
+
+### Java
+
+### Git
+
+### An IDE
+
+The following is a link to how to install visual studio code, which is the IDE used for this project: https://code.visualstudio.com/download  
