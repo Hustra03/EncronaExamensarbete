@@ -16,8 +16,21 @@ The project consists of a number of different interconnected systems, which each
 
 ### Java
 
+For Java, it is suggested to download the latest JDK from Oracle, which can generally be found at the following link: https://www.oracle.com/java/technologies/downloads/ 
+
+Installation instructions: https://docs.oracle.com/en/java/javase/24/install/overview-jdk-installation.html 
+
 ### Git
+
+Git is the tool used to download this repository, and it can either be installed manually or from Visual Studio Code. 
+
+Link to instructions: https://github.com/git-guides/install-git 
 
 ### An IDE
 
 The following is a link to how to install visual studio code, which is the IDE used for this project: https://code.visualstudio.com/download  
+
+The following extensions are suggested: 
+- Extension Pack for Java by Microsoft : https://marketplace.visualstudio.com/items?itemName=vscjava.vscode-java-pack
+- Prisma by Prisma : https://marketplace.visualstudio.com/items?itemName=Prisma.prisma
+  
