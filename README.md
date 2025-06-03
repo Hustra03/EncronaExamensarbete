@@ -19,6 +19,7 @@ The project consists of a number of different interconnected systems, which each
 For Java, it is suggested to download the latest JDK from Oracle, which can generally be found at the following link: https://www.oracle.com/java/technologies/downloads/ 
 
 Installation instructions: https://docs.oracle.com/en/java/javase/24/install/overview-jdk-installation.html 
+Set-up Java-Home instructions: https://azimuahamed.medium.com/java-environment-variables-setup-windows-11-58fe71e43b5e 
 
 ### Git
 
