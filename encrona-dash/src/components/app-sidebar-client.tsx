@@ -13,6 +13,7 @@ import {
   HistoryIcon,
   MessageSquareQuoteIcon,
   Leaf,
+  Unplug,
 } from 'lucide-react';
 
 import {
@@ -75,6 +76,11 @@ const sidebar = {
       title: 'Historisk Data',
       url: '/historic-data',
       icon: HistoryIcon,
+    },
+    {
+      title: 'Extern Data',
+      url: '/devices',
+      icon: Unplug,
     },
     {
       title: 'Simulation',
