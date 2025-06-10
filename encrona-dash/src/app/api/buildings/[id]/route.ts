@@ -30,12 +30,6 @@ export async function PUT(
     });
   }
 
-  if (companiesWithAccess.length == 0) {
-    return new Response(JSON.stringify({ message: 'No company specified' }), {
-      status: 400,
-    });
-  }
-
   const companiesWithAccessTyped: number[] = companiesWithAccess;
 
   installedAt = new Date(installedAt).toISOString();

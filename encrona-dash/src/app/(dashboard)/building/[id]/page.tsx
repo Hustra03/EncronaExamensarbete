@@ -73,6 +73,11 @@ export default function Building() {
   const [activeChart, setActiveChart] =
     useState<AllMetricKey>('electricitykWh');
   const { id } = useParams();
+  const [showActualLine, setShowActualLine] = useState<boolean>(true);
+  const [showEstimateLine, setShowEstimateLine] = useState<boolean>(true);
+  const [showNormalizedLine, setShowNormalizedLine] = useState<boolean>(false);
+  const [showPreInstallationTrendLine, setShowPreInstallationTrendLine] = useState<boolean>(false);
+
 
   const chartMetricToggleMap: Record<string, AllMetricKey> = {
     electricitykWh: 'electricityCost',
@@ -237,7 +242,14 @@ export default function Building() {
               )}
             </CardDescription>
             <Button onClick={refreshEstimates}>Förnya skattningar</Button>
+          </div>          
+          <div className="flex flex-col gap-1 px-6 py-5 sm:py-6">
+            <Button onClick={()=>setShowActualLine(!showActualLine)}>Växla verkliga linjen</Button>
+            <Button onClick={()=>setShowEstimateLine(!showEstimateLine)}>Växla skattnings linjen</Button>
+            <Button onClick={()=>setShowActualLine(!showActualLine)}>Växla verklig linje</Button>
+            <Button onClick={()=>setShowActualLine(!showActualLine)}>Växla verklig linje</Button>
           </div>
+
           <div className="grid grid-cols-3 px-6 lg:flex">
             {Object.keys(chartConfig).map(key => (
               <button
@@ -292,19 +304,21 @@ export default function Building() {
                   <ChartTooltipContent className="w-[150px]" hideLabel />
                 }
               />
-              <Line
+              {showEstimateLine&&(<Line
                 dataKey={`${activeChart}Estimate`}
                 stroke={estimateColor}
                 strokeWidth={2}
                 name="Estimate"
                 strokeDasharray="4 2"
-              ></Line>
-              <Line
+              ></Line>)}
+
+              {showActualLine&&(<Line
                 dataKey={`${activeChart}Actual`}
                 stroke={actualColor}
                 strokeWidth={2}
                 name="Actual"
-              />
+              />)}
+
               {data?.installedAt && (
                 <ReferenceLine
                   x={data.installedAt}
