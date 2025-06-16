@@ -527,13 +527,12 @@ export async function POST(request: Request) {
     });
     //We then remove any existing estimates for the future, so that they can be re-generated using the new simulation
 
-   const {count}= await prisma.buildingData.deleteMany({
+   await prisma.buildingData.deleteMany({
         where: {
         type:BuildingDataType.ESTIMATE,
         date:{gte: new Date().toISOString()}
         },
   })
-  //console.log("Deleted "+count);
       return new Response(null, { status: 204 });
 
   }
