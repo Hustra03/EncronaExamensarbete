@@ -526,11 +526,11 @@ export async function POST(request: Request) {
       },
     });
 
-    //TODO remove estimates here, if that is to be done
+    //We then remove any existing estimates for the future, so that they can be re-generated using the new simulation
 
     prisma.buildingData.deleteMany({
         where: {
-        type:BuildingDataType.ACTUAL,
+        type:BuildingDataType.ESTIMATE,
         date:{gte: new Date().toISOString()}
         },
   })
