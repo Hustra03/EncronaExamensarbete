@@ -244,34 +244,30 @@ export default function Building() {
             <Button onClick={refreshEstimates}>Förnya skattningar</Button>
           </div>          
           <div className="flex flex-col gap-1 px-6 py-5 sm:py-6">
-                <>
+                
                   <span className="text-xs">Visa verkliga linjen</span>
                   <Switch
                     checked={showActualLine}
                     onCheckedChange={()=>setShowActualLine(!showActualLine)}
                   />
-                </>
-                                <>
-                  <span className="text-xs">Visa Växla skattningslinjen</span>
+                        
+                  <span className="text-xs">Visa skattningslinjen</span>
                   <Switch
                     checked={showEstimateLine}
                     onCheckedChange={()=>setShowEstimateLine(!showEstimateLine)}
                   />
-                </>
-                                <>
+                         
                   <span className="text-xs">Visa normaliserad linje</span>
                   <Switch
                     checked={showNormalizedLine}
                     onCheckedChange={()=>setShowNormalizedLine(!showNormalizedLine)}
                   />
-                </>
-                                <>
+                                 
                   <span className="text-xs">Visa trend-linje</span>
                   <Switch
                     checked={showPreInstallationTrendLine}
                     onCheckedChange={()=>setShowPreInstallationTrendLine(!showPreInstallationTrendLine)}
                   />
-                </>
           </div>
 
           <div className="grid grid-cols-3 px-6 lg:flex">
