@@ -9,7 +9,7 @@ export async function handleSubmit(_: unknown, formData: FormData) {
     body: JSON.stringify({ id, simulationResults }),
   });
 
-  if (response.status.toLocaleString().includes('204')) {
+  if (response.status.toLocaleString().includes('204')||response.status.toLocaleString().includes('201')) {
     return 'ok';
   } else {
     const jsonValue = await response.json();

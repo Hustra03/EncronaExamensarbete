@@ -41,12 +41,14 @@ model Building {
   devices             Device[]
   priceForecasts      PriceForecast[]
   companiesWithAccess Company[]           @relation("buildingCompany")
-  historicTrendId Int? @unique
+  /*historicTrendId Int? @unique
   historicTrend YearlyData? @relation("historicTrend",fields: [historicTrendId], references: [id])
   normalizedConsumptionId Int? @unique
   normalizedConsumption YearlyData? @relation("normalizedConsumption",fields: [normalizedConsumptionId], references: [id])
-}
+  */
+  }
 
+/*
 model YearlyData{
   id Int @id @default(autoincrement())
   january Float            @default(0)
@@ -64,7 +66,7 @@ model YearlyData{
   buildingWhereHistoricTrend Building? @relation("historicTrend")
   buildingWhereNormalizedConsumption Building? @relation("normalizedConsumption")
 
-}
+}*/
 
 model Device {
   id         Int          @id @default(autoincrement())
