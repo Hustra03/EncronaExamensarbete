@@ -32,9 +32,6 @@ public class improvement extends objectAbstract {
         this.yearsOfService=yearsOfService;
     }
 
-    /**
-     * Creates a string for this improvement
-     */
     public String toString()
     {
         String improvementString=this.getName()+ " saves ";
@@ -51,7 +48,6 @@ public class improvement extends objectAbstract {
             improvementString+=m3PerM2Water + " m^3 per m2 in water ";
         }
         return improvementString + " for the cost "+ costPerM2 + " per m2 over the course of " + yearsOfService;
-        
     }
 
     /**

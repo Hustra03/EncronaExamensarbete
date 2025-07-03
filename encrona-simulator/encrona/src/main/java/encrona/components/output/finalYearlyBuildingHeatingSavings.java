@@ -10,6 +10,9 @@ import java.util.Map.Entry;
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
 
+/**
+ * This class is responsible for calculating how much money is saved from building heating reductions for each heat source, in each year range
+ */
 public class finalYearlyBuildingHeatingSavings extends componentAbstract<List<Map.Entry<Integer, List<Map.Entry<String, Double>>>>> {
     
     /** 

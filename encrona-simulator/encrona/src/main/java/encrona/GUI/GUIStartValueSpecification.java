@@ -8,16 +8,21 @@ import java.util.Map;
 import javax.swing.*;
 
 
-
+/**
+ * This class is responsible for the start value (or numerical input) GUI page
+ */
 public class GUIStartValueSpecification extends JPanel {
 
     public static final String atemp="Atemp";
-    static JTextField aTempField=new JTextField("1",20);;
-    static JTextField electrictyPriceField=new JTextField("1",20);;
-    static JTextField electricityConsumptionField=new JTextField("1",20);;
-    static JTextField waterConsumptionField=new JTextField("1",20);;
-    static JTextField waterPriceField = new JTextField("1",20);;
+    static JTextField aTempField=new JTextField("1",20);
+    static JTextField electrictyPriceField=new JTextField("1",20);
+    static JTextField electricityConsumptionField=new JTextField("1",20);
+    static JTextField waterConsumptionField=new JTextField("1",20);
+    static JTextField waterPriceField = new JTextField("1",20);
 
+    /**
+     * This creates the start value (or numerical input) GUI page
+     */
     public GUIStartValueSpecification() {
 
         this.setLayout(new GridBagLayout());
@@ -63,15 +68,19 @@ public class GUIStartValueSpecification extends JPanel {
         c.fill = GridBagConstraints.BOTH;
         c.weightx = 0.25;
         c.weighty = 0;
-        add(aTempRow, c);
-        add(electrictyPriceRow, c);
+        add(aTempRow, c);        
         add(electricityConsumptionRow, c);
+        add(electrictyPriceRow, c);
         add(waterConsumptionRow, c);
         add(waterPriceRow, c);
 
     }
 
-    // This method collects the current values of the field
+    /**
+     * This collects the current numerical values
+     * @return A map, where each entry consists of <<name,unit>,value>
+     * @throws CustomUIException If something goes wrong, this exception is thrown (to be handled by the main class)
+     */
     public static Map<Map.Entry<String,String>,Double> collectFieldValues() throws CustomUIException {
         Double aTempValue;
         try {

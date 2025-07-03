@@ -236,9 +236,8 @@ public class DataLoader {
      * @return A list of improvements to include initially
      */
     public static List<improvement> createInitialListOfImprovements() {
-        // We first create the representation for those improvements which are treated
-        // in a "binary" manner, and which are applied, and then add them to the data
-        // loader for objects
+        // We first create the representation for those improvements
+        //Note that the names here must also be updated in ReasoningEngine if they are modified, since that uses the literal names to find the correct ones
         improvement BergOrMarkHeating = new improvement("Berg Or Mark värme", 940.0,0.0,0.0,0.0, 570.0, 15 );
         improvement FTX = new improvement("FTX", 860.0,0.0,0.0,0.0, 620.0, 15 );
         improvement ChangeWindows = new improvement("Byt fönster", 770.0,0.0,0.0,0.0, 445.0, 40 );
@@ -246,11 +245,13 @@ public class DataLoader {
         improvement FVP = new improvement("FVP", 600.00,0.0,0.0,0.0, 290.0, 20 );
         improvement InsulateAttic = new improvement("Vindisolering", 330.0,0.0,0.0,0.0, 100.0, 40 );
         improvement SolarPanels = new improvement("Solpaneler", 0.0,0.0,220.0,0.0, 210.0, 15 );
-        improvement IMDWater = new improvement("IMD Vatten", 0.0,140.0,0.0,0.0, 85.0, 10 );
+        improvement IMDWarmWater = new improvement("IMD Varmvatten", 0.0,140.0,0.0,0.0, 85.0, 10 );
         improvement ControlSystem = new improvement("Regel och Styr", 0.0,100.0,0.0,0.0, 45.0, 10 );
         improvement ThermometerReconfiguration = new improvement("Termostat+Inljustering", 90.0,0.0,0.0,0.0, 50.0, 10 );
-        improvement EconomicalFlush = new improvement("Snålpolande armatur", 0.0,100.0,0.0,0.0, 45.0, 15 );
-        improvement EfficentLighting = new improvement("Belysning", 0.0,0.0,30.0,0.0, 15.0, 15 );
+        improvement EfficentLighting = new improvement("Belysning", 0.0,0.0,100.0,0.0, 45.0, 15 );
+        improvement IMDEl = new improvement("IMD El", 0.0,0.0,0.0,0.0, 85.0, 10 );
+        improvement roofReplacement = new improvement("Takbyte", 0.0,0.0,0.0,0.0, 85.0, 10 );
+
 
         List<improvement> initialListOfImprovements = new ArrayList<>();
         initialListOfImprovements.add(BergOrMarkHeating);
@@ -260,11 +261,12 @@ public class DataLoader {
         initialListOfImprovements.add(FVP);
         initialListOfImprovements.add(InsulateAttic);
         initialListOfImprovements.add(SolarPanels);
-        initialListOfImprovements.add(IMDWater);
+        initialListOfImprovements.add(IMDWarmWater);
         initialListOfImprovements.add(ControlSystem);
         initialListOfImprovements.add(ThermometerReconfiguration);
-        initialListOfImprovements.add(EconomicalFlush);
         initialListOfImprovements.add(EfficentLighting);
+        initialListOfImprovements.add(IMDEl);
+        initialListOfImprovements.add(roofReplacement);
         return initialListOfImprovements;
     }
 

@@ -3,15 +3,16 @@ package encrona.components.output;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import encrona.components.componentAbstract;
 import encrona.domain.heatingEnergySource;
 
+/**
+ * This class is responsible for calculating how much money is saved from water heating reductions for each heat source, in each year range
+ */
 public class finalYearlyWaterHeatingSavings extends componentAbstract<List<Map.Entry<Integer, List<Map.Entry<String, Double>>>>> {
     
     /** 

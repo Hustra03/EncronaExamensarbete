@@ -1,11 +1,170 @@
-datasource db {
-  provider = "postgresql"
-  url   = env("DATABASE_URL")
-}
-
 generator client {
   provider        = "prisma-client-js"
   previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  companyId Int?
+  company   Company? @relation("userCompany", fields: [companyId], references: [id])
+}
+
+model Company {
+  id        Int        @id @default(autoincrement())
+  name      String     @unique
+  createdAt DateTime   @default(now())
+  owner     String
+  users     User[]     @relation("userCompany")
+  buildings Building[] @relation("buildingCompany")
+}
+
+model Building {
+  id                  Int                 @id @default(autoincrement())
+  name                String
+  installedAt         DateTime
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  owner               String
+  dataPoints          BuildingData[]
+  simulation          BuildingSimulation? @relation("building")
+  devices             Device[]
+  priceForecasts      PriceForecast[]
+  companiesWithAccess Company[]           @relation("buildingCompany")
+  /*historicTrendId Int? @unique
+  historicTrend YearlyData? @relation("historicTrend",fields: [historicTrendId], references: [id])
+  normalizedConsumptionId Int? @unique
+  normalizedConsumption YearlyData? @relation("normalizedConsumption",fields: [normalizedConsumptionId], references: [id])
+  */
+  }
+
+/*
+model YearlyData{
+  id Int @id @default(autoincrement())
+  january Float            @default(0)
+  february Float            @default(0)
+  march Float            @default(0)
+  april Float            @default(0)
+  may Float            @default(0)
+  june Float            @default(0)
+  july Float            @default(0)
+  august Float            @default(0)
+  september Float            @default(0)
+  october Float            @default(0)
+  november Float            @default(0)
+  december Float            @default(0)
+  buildingWhereHistoricTrend Building? @relation("historicTrend")
+  buildingWhereNormalizedConsumption Building? @relation("normalizedConsumption")
+
+}*/
+
+model Device {
+  id         Int          @id @default(autoincrement())
+  buildingId Int
+  source     DeviceSource
+  externalId String
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  building   Building     @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  @@unique([source, externalId])
+}
+
+model BuildingData {
+  id               Int              @id @default(autoincrement())
+  buildingId       Int
+  type             BuildingDataType
+  date             DateTime
+  totalEnergykWh   Float            @default(0)
+  spaceHeatingkWh  Float            @default(0)
+  waterHeatingkWh  Float            @default(0)
+  electricitykWh   Float            @default(0)
+  totalWaterM3     Float            @default(0)
+  totalEnergyCost  Float            @default(0)
+  spaceHeatingCost Float            @default(0)
+  waterHeatingCost Float            @default(0)
+  electricityCost  Float            @default(0)
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  totalWaterCost   Float            @default(0)
+  building         Building         @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  @@unique([buildingId, type, date])
+}
+
+model PriceForecast {
+  id         Int       @id @default(autoincrement())
+  buildingId Int
+  dateFrom   DateTime
+  price      Decimal
+  type       PriceType
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  building   Building  @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  @@unique([buildingId, dateFrom, type])
+  @@index([buildingId, dateFrom, type])
+}
+
+model Curve {
+  id                                        Int                  @id @default(autoincrement())
+  curve                                     Decimal[]
+  simulationCurveIsUsedInAsElectricityCurve BuildingSimulation[] @relation("ElectricityCurve")
+  simulationCurveIsUsedInAsHeatCurve        BuildingSimulation[] @relation("HeatCurve")
+  simulationCurveIsUsedInAsWaterCurve       BuildingSimulation[] @relation("WaterCurve")
+}
+
+model ConsumptionEstimation {
+  id                                   Int                  @id @default(autoincrement())
+  year                                 Int
+  consumption                          Decimal
+  savings                              Decimal
+  simulationThisIsUsedInForElectricity BuildingSimulation[] @relation("electricityEstimation")
+  simulationThisIsUsedInForWater       BuildingSimulation[] @relation("waterEstimation")
+}
+
+model HeatSourceEstimation {
+  id                         Int                  @id @default(autoincrement())
+  year                       Int
+  name                       String
+  buildingHeatingConsumption Decimal
+  buildingHeatingSavings     Decimal
+  waterHeatingConsumption    Decimal
+  waterHeatingSavings        Decimal
+  simulationThisIsUsedIn     BuildingSimulation[] @relation("HeatSourceEstimation")
+}
+
+model BuildingSimulation {
+  id                    Int                     @id @default(autoincrement())
+  buildingId            Int                     @unique
+  heatCurveId           Int
+  waterCurveId          Int
+  electricityId         Int
+  building              Building                @relation("building", fields: [buildingId], references: [id], onDelete: Cascade)
+  electricityCurve      Curve                   @relation("ElectricityCurve", fields: [electricityId], references: [id])
+  heatCurve             Curve                   @relation("HeatCurve", fields: [heatCurveId], references: [id])
+  waterCurve            Curve                   @relation("WaterCurve", fields: [waterCurveId], references: [id])
+  HeatSourceEstimation  HeatSourceEstimation[]  @relation("HeatSourceEstimation")
+  electricityEstimation ConsumptionEstimation[] @relation("electricityEstimation")
+  waterEstimation       ConsumptionEstimation[] @relation("waterEstimation")
+}
+
+model NewsEntry {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 enum Role {
@@ -28,149 +187,4 @@ enum PriceType {
   ELECTRICITY
   WATERHEATING
   WATERUSAGE
-}
-
-model User {
-  id             Int      @id @default(autoincrement())
-  name           String
-  email          String   @unique
-  password       String
-  role           Role     @default(USER)
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt  
-  
-  companyId Int?
-  company Company? @relation("userCompany", fields: [companyId], references: [id], onDelete: SetNull)
-}
-
-model Company{
-  id             Int      @id @default(autoincrement())
-  name           String   @unique 
-  owner          String
-  createdAt      DateTime @default(now())
-  users          User[] @relation("userCompany")
-  buildings      Building[] @relation("buildingCompany")
-}
-
-model Building {
-  id    Int      @id @default(autoincrement())
-  simulation     BuildingSimulation? @relation("building")
-  name           String
-  owner          String 
-  installedAt    DateTime 
-
-  devices           Device[]
-
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  
-  dataPoints  BuildingData[]
-  priceForecasts PriceForecast[]
-  companiesWithAccess Company[] @relation("buildingCompany")
-}
-
-model Device {
-  id          Int           @id @default(autoincrement())
-  buildingId  Int
-  building    Building      @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-  
-  source      DeviceSource
-  externalId  String
-
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-
-  @@unique([source, externalId])
-}
-
-model BuildingData {
-  id          Int        @id @default(autoincrement())
-  building    Building   @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-  buildingId  Int
-  type        BuildingDataType
-  date        DateTime
-
-  totalEnergykWh        Float  @default(0)
-  spaceHeatingkWh       Float  @default(0)
-  waterHeatingkWh       Float  @default(0)
-  electricitykWh        Float  @default(0)
-  totalWaterM3          Float  @default(0)
-
-  totalEnergyCost       Float  @default(0)
-  spaceHeatingCost      Float  @default(0)
-  waterHeatingCost      Float  @default(0)
-  electricityCost       Float  @default(0)
-  totalWaterCost        Float  @default(0)
-
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-
-  @@unique([buildingId, type, date])
-}
-
-model PriceForecast {
-  id         Int       @id @default(autoincrement())
-  buildingId Int
-  building   Building  @relation(fields: [buildingId], references: [id], onDelete: Cascade)
-
-  dateFrom   DateTime 
-  price      Decimal
-  type       PriceType
-
-  createdAt  DateTime  @default(now())
-  updatedAt  DateTime  @updatedAt
-
-  @@unique([buildingId, dateFrom, type])
-  @@index([buildingId, dateFrom, type])
-}
-
-model Curve{
-  id Int @id @default(autoincrement())
-  curve Decimal[]
-  simulationCurveIsUsedInAsHeatCurve BuildingSimulation[] @relation("HeatCurve")
-  simulationCurveIsUsedInAsWaterCurve BuildingSimulation[] @relation("WaterCurve")
-  simulationCurveIsUsedInAsElectricityCurve BuildingSimulation[] @relation("ElectricityCurve")
-}
-
-model ConsumptionEstimation{
-  id Int @id @default(autoincrement())
-  year Int
-  consumption Decimal
-  savings Decimal
-  simulationThisIsUsedInForElectricity BuildingSimulation[] @relation("electricityEstimation")
-  simulationThisIsUsedInForWater BuildingSimulation[] @relation("waterEstimation")
-}
-
-model HeatSourceEstimation{
-  id Int @id @default(autoincrement())
-  simulationThisIsUsedIn BuildingSimulation[] @relation("HeatSourceEstimation")
-  year Int
-  name String
-  buildingHeatingConsumption Decimal
-  buildingHeatingSavings Decimal
-  waterHeatingConsumption Decimal
-  waterHeatingSavings Decimal
-}
-
-model BuildingSimulation{
-  id Int @id @default(autoincrement())
-  buildingId Int @unique
-  building Building @relation("building", fields: [buildingId], references: [id], onDelete: Cascade)
-  heatCurveId Int
-  heatCurve Curve @relation("HeatCurve", fields: [heatCurveId], references: [id])
-  waterCurveId Int
-  waterCurve Curve @relation("WaterCurve", fields: [waterCurveId], references: [id])
-  electricityId Int
-  electricityCurve Curve @relation("ElectricityCurve", fields: [electricityId], references: [id])
-  electricityEstimation ConsumptionEstimation[] @relation("electricityEstimation")
-  waterEstimation ConsumptionEstimation[] @relation("waterEstimation")
-  HeatSourceEstimation HeatSourceEstimation[] @relation("HeatSourceEstimation")
-}
-
-model NewsEntry {
-  id          Int      @id @default(autoincrement())
-  title       String
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
 }

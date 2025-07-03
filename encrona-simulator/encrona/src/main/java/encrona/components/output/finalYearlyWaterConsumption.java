@@ -12,6 +12,9 @@ import java.util.Set;
 import encrona.components.componentAbstract;
 import encrona.domain.improvement;
 
+/**
+ * This class is responsible for calculating how much water is consumed in each year range
+ */
 public class finalYearlyWaterConsumption extends componentAbstract<List<Map.Entry<Integer, Double>>> {
     /**
      * This is a constructor for fullOriginalElectricityConsumption

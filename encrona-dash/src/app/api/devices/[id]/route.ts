@@ -6,14 +6,15 @@ const prisma = new PrismaClient();
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const id = parseInt(params.id);
+  const { id: idParam } = await params;
+  const id = parseInt(idParam);
   if (isNaN(id)) return new Response('Invalid ID', { status: 400 });
 
   const devices = await prisma.device.findMany({
@@ -26,14 +27,15 @@ export async function GET(
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const session = await auth();
   if (!isAdmin(session)) {
     return new Response('Unauthorized', { status: 401 });
   }
 
-  const id = parseInt(params.id);
+  const { id: idParam } = await params;
+  const id = parseInt(idParam);
   if (isNaN(id)) return new Response('Invalid ID', { status: 400 });
 
   await prisma.device.delete({ where: { id } });

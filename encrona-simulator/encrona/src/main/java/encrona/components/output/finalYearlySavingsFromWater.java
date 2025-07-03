@@ -8,6 +8,9 @@ import java.util.Map.Entry;
 
 import encrona.components.componentAbstract;
 
+/**
+ * This class is responsible for calculating how much money is saved due to water consumption reduction
+ */
 public class finalYearlySavingsFromWater extends componentAbstract<List<Map.Entry<Integer,Double>>>{
 
     /**

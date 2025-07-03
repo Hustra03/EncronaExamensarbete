@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { BuildingDataType, PrismaClient } from '@prisma/client';
 import { auth, isAdmin } from '@/lib/auth';
 
 const prisma = new PrismaClient();
@@ -42,18 +42,6 @@ export async function POST(request: Request) {
     return new Response(JSON.stringify({ message: 'Building id is invalid' }), {
       status: 400,
     });
-  }
-
-  const previousValue = await prisma.buildingSimulation.findFirst({
-    where: { buildingId },
-  });
-  if (previousValue) {
-    return new Response(
-      JSON.stringify({
-        message: 'Simulation already exists for this building',
-      }),
-      { status: 409 }
-    );
   }
 
   //We first try parsin the simulation results as a json, to confirm it is in the correct format
@@ -466,6 +454,8 @@ export async function POST(request: Request) {
         data: electricityEstimation,
       });
 
+      console.log(electricityEstimationItem);
+
     const waterEstimationItem =
       await prisma.consumptionEstimation.createManyAndReturn({
         data: waterEstimation,
@@ -488,7 +478,67 @@ export async function POST(request: Request) {
     }
    })*/
 
-    //We then create the simulation object
+
+  const previousValue = await prisma.buildingSimulation.findFirst({
+    where: { buildingId },
+  });
+  if (previousValue) {
+    //We update the simulation object, since a previous one already existed
+
+    await prisma.buildingSimulation.update({
+          where:{
+          buildingId:buildingId
+          },
+      data: {
+        heatCurve: {
+          create: {
+            curve: heatCurve,
+          },
+        },
+        waterCurve: {
+          create: {
+            curve: waterCurve,
+          },
+        },
+        electricityCurve: {
+          create: {
+            curve: electricityCurve,
+          },
+        },
+        electricityEstimation: {
+          set: [], //This removes any existing relations
+          connect: electricityEstimationItem.map(estimation => ({
+            id: estimation.id,
+          })), // https://github.com/prisma/prisma/discussions/4709
+        },
+        waterEstimation: {
+          set: [], //This removes any existing relations
+          connect: waterEstimationItem.map(estimation => ({
+            id: estimation.id,
+          })),
+        },
+        HeatSourceEstimation: {
+          set: [], //This removes any existing relations
+          connect: heatSourceEstimationItem.map(estimation => ({
+            id: estimation.id,
+          })),
+        },
+      },
+    });
+    //We then remove any existing estimates for the future, so that they can be re-generated using the new simulation
+
+   await prisma.buildingData.deleteMany({
+        where: {
+        type:BuildingDataType.ESTIMATE,
+        date:{gte: new Date().toISOString()}
+        },
+  })
+      return new Response(null, { status: 204 });
+
+  }
+  else
+  {
+//We then create the simulation object since it did not exist
     await prisma.buildingSimulation.create({
       data: {
         building: {
@@ -528,8 +578,10 @@ export async function POST(request: Request) {
         },
       },
     });
+  }
 
-    return new Response(null, { status: 204 });
+  
+    return new Response(null, { status: 201 });
   } catch (err) {
     console.error('Error storing simulation:', err);
     return new Response(
