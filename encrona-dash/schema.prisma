@@ -41,32 +41,34 @@ model Building {
   devices             Device[]
   priceForecasts      PriceForecast[]
   companiesWithAccess Company[]           @relation("buildingCompany")
-  /*historicTrendId Int? @unique
-  historicTrend YearlyData? @relation("historicTrend",fields: [historicTrendId], references: [id])
-  normalizedConsumptionId Int? @unique
-  normalizedConsumption YearlyData? @relation("normalizedConsumption",fields: [normalizedConsumptionId], references: [id])
-  */
+  benchmarks Benchmark[]
   }
 
-/*
-model YearlyData{
-  id Int @id @default(autoincrement())
-  january Float            @default(0)
-  february Float            @default(0)
-  march Float            @default(0)
-  april Float            @default(0)
-  may Float            @default(0)
-  june Float            @default(0)
-  july Float            @default(0)
-  august Float            @default(0)
-  september Float            @default(0)
-  october Float            @default(0)
-  november Float            @default(0)
-  december Float            @default(0)
-  buildingWhereHistoricTrend Building? @relation("historicTrend")
-  buildingWhereNormalizedConsumption Building? @relation("normalizedConsumption")
+model Benchmark {
+  id          Int           @id @default(autoincrement())
+  building    Building      @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+  buildingId  Int
 
-}*/
+  type        BenchmarkType
+  energyType  EnergyCategory
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  january     Float         @default(0)
+  february    Float         @default(0)
+  march       Float         @default(0)
+  april       Float         @default(0)
+  may         Float         @default(0)
+  june        Float         @default(0)
+  july        Float         @default(0)
+  august      Float         @default(0)
+  september   Float         @default(0)
+  october     Float         @default(0)
+  november    Float         @default(0)
+  december    Float         @default(0)
+
+  @@unique([buildingId, type, energyType])
+}
 
 model Device {
   id         Int          @id @default(autoincrement())
@@ -187,4 +189,17 @@ enum PriceType {
   ELECTRICITY
   WATERHEATING
   WATERUSAGE
+}
+
+enum BenchmarkType {
+  NORMALIZED
+  PRE_ACTION
+}
+
+enum EnergyCategory {
+  TOTAL
+  SPACE_HEATING
+  WATER_HEATING
+  ELECTRICITY
+  WATER_USAGE
 }

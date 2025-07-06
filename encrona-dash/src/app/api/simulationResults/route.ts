@@ -454,7 +454,7 @@ export async function POST(request: Request) {
         data: electricityEstimation,
       });
 
-      console.log(electricityEstimationItem);
+    console.log(electricityEstimationItem);
 
     const waterEstimationItem =
       await prisma.consumptionEstimation.createManyAndReturn({
@@ -478,109 +478,104 @@ export async function POST(request: Request) {
     }
    })*/
 
-
-  const previousValue = await prisma.buildingSimulation.findFirst({
-    where: { buildingId },
-  });
-  if (previousValue) {
-    //We update the simulation object, since a previous one already existed
-
-    await prisma.buildingSimulation.update({
-          where:{
-          buildingId:buildingId
-          },
-      data: {
-        heatCurve: {
-          create: {
-            curve: heatCurve,
-          },
-        },
-        waterCurve: {
-          create: {
-            curve: waterCurve,
-          },
-        },
-        electricityCurve: {
-          create: {
-            curve: electricityCurve,
-          },
-        },
-        electricityEstimation: {
-          set: [], //This removes any existing relations
-          connect: electricityEstimationItem.map(estimation => ({
-            id: estimation.id,
-          })), // https://github.com/prisma/prisma/discussions/4709
-        },
-        waterEstimation: {
-          set: [], //This removes any existing relations
-          connect: waterEstimationItem.map(estimation => ({
-            id: estimation.id,
-          })),
-        },
-        HeatSourceEstimation: {
-          set: [], //This removes any existing relations
-          connect: heatSourceEstimationItem.map(estimation => ({
-            id: estimation.id,
-          })),
-        },
-      },
+    const previousValue = await prisma.buildingSimulation.findFirst({
+      where: { buildingId },
     });
-    //We then remove any existing estimates for the future, so that they can be re-generated using the new simulation
+    if (previousValue) {
+      //We update the simulation object, since a previous one already existed
 
-   await prisma.buildingData.deleteMany({
+      await prisma.buildingSimulation.update({
         where: {
-        type:BuildingDataType.ESTIMATE,
-        date:{gte: new Date().toISOString()}
+          buildingId: buildingId,
         },
-  })
+        data: {
+          heatCurve: {
+            create: {
+              curve: heatCurve,
+            },
+          },
+          waterCurve: {
+            create: {
+              curve: waterCurve,
+            },
+          },
+          electricityCurve: {
+            create: {
+              curve: electricityCurve,
+            },
+          },
+          electricityEstimation: {
+            set: [], //This removes any existing relations
+            connect: electricityEstimationItem.map(estimation => ({
+              id: estimation.id,
+            })), // https://github.com/prisma/prisma/discussions/4709
+          },
+          waterEstimation: {
+            set: [], //This removes any existing relations
+            connect: waterEstimationItem.map(estimation => ({
+              id: estimation.id,
+            })),
+          },
+          HeatSourceEstimation: {
+            set: [], //This removes any existing relations
+            connect: heatSourceEstimationItem.map(estimation => ({
+              id: estimation.id,
+            })),
+          },
+        },
+      });
+      //We then remove any existing estimates for the future, so that they can be re-generated using the new simulation
+
+      await prisma.buildingData.deleteMany({
+        where: {
+          type: BuildingDataType.ESTIMATE,
+          date: { gte: new Date().toISOString() },
+        },
+      });
       return new Response(null, { status: 204 });
+    } else {
+      //We then create the simulation object since it did not exist
+      await prisma.buildingSimulation.create({
+        data: {
+          building: {
+            connect: {
+              id: buildingId,
+            },
+          },
+          heatCurve: {
+            create: {
+              curve: heatCurve,
+            },
+          },
+          waterCurve: {
+            create: {
+              curve: waterCurve,
+            },
+          },
+          electricityCurve: {
+            create: {
+              curve: electricityCurve,
+            },
+          },
+          electricityEstimation: {
+            connect: electricityEstimationItem.map(estimation => ({
+              id: estimation.id,
+            })), // https://github.com/prisma/prisma/discussions/4709
+          },
+          waterEstimation: {
+            connect: waterEstimationItem.map(estimation => ({
+              id: estimation.id,
+            })),
+          },
+          HeatSourceEstimation: {
+            connect: heatSourceEstimationItem.map(estimation => ({
+              id: estimation.id,
+            })),
+          },
+        },
+      });
+    }
 
-  }
-  else
-  {
-//We then create the simulation object since it did not exist
-    await prisma.buildingSimulation.create({
-      data: {
-        building: {
-          connect: {
-            id: buildingId,
-          },
-        },
-        heatCurve: {
-          create: {
-            curve: heatCurve,
-          },
-        },
-        waterCurve: {
-          create: {
-            curve: waterCurve,
-          },
-        },
-        electricityCurve: {
-          create: {
-            curve: electricityCurve,
-          },
-        },
-        electricityEstimation: {
-          connect: electricityEstimationItem.map(estimation => ({
-            id: estimation.id,
-          })), // https://github.com/prisma/prisma/discussions/4709
-        },
-        waterEstimation: {
-          connect: waterEstimationItem.map(estimation => ({
-            id: estimation.id,
-          })),
-        },
-        HeatSourceEstimation: {
-          connect: heatSourceEstimationItem.map(estimation => ({
-            id: estimation.id,
-          })),
-        },
-      },
-    });
-  }
-
-  
     return new Response(null, { status: 201 });
   } catch (err) {
     console.error('Error storing simulation:', err);

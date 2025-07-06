@@ -69,6 +69,8 @@ type AllMetricKey =
 
 export default function Building() {
   const [data, setData] = useState<BuildingData | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [benchmarks, setBenchmarks] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeChart, setActiveChart] =
     useState<AllMetricKey>('electricitykWh');
@@ -76,8 +78,8 @@ export default function Building() {
   const [showActualLine, setShowActualLine] = useState<boolean>(true);
   const [showEstimateLine, setShowEstimateLine] = useState<boolean>(true);
   const [showNormalizedLine, setShowNormalizedLine] = useState<boolean>(false);
-  const [showPreInstallationTrendLine, setShowPreInstallationTrendLine] = useState<boolean>(false);
-
+  const [showPreInstallationTrendLine, setShowPreInstallationTrendLine] =
+    useState<boolean>(false);
 
   const chartMetricToggleMap: Record<string, AllMetricKey> = {
     electricitykWh: 'electricityCost',
@@ -136,9 +138,18 @@ export default function Building() {
     }
   }
 
+  async function fetchBenchmarks() {
+    const res = await fetch(`/api/benchmarkData?buildingId=${id}`);
+    if (res.ok) {
+      const data = await res.json();
+      setBenchmarks(data);
+    }
+  }
+
   async function refreshEstimates() {
     fetchBuildingCurrentData();
     requestNewEstimates();
+    fetchBenchmarks();
   }
 
   useEffect(() => {
@@ -171,6 +182,28 @@ export default function Building() {
       'electricityCost',
     ];
 
+    const benchmarkMap = new Map<string, Record<string, number>>();
+
+    benchmarks.forEach(b => {
+      const key = `${b.type}-${b.energyType}`;
+      benchmarkMap.set(key, b);
+    });
+
+    const months = [
+      'january',
+      'february',
+      'march',
+      'april',
+      'may',
+      'june',
+      'july',
+      'august',
+      'september',
+      'october',
+      'november',
+      'december',
+    ];
+
     return allDates.map(date => {
       const estimate = estimateMap[date] ?? null;
       const actual = actualMap[date] ?? null;
@@ -195,11 +228,34 @@ export default function Building() {
         merged[`${key}Actual`] = actualValue;
         merged[`${key}Diff`] = diff;
         merged[`${key}RelativeError`] = relativeError;
+
+        const energyType = key
+          .replace('totalEnergy', 'TOTAL')
+          .replace('spaceHeating', 'SPACE_HEATING')
+          .replace('waterHeating', 'WATER_HEATING')
+          .replace('electricity', 'ELECTRICITY')
+          .replace('totalWaterM3', 'WATER_USAGE')
+          .replace(/(kWh|Cost)$/, '');
+
+        const dateObj = new Date(Number(date));
+        const monthIndex = dateObj.getUTCMonth();
+        const monthKey = months[monthIndex];
+
+        const normalized = benchmarkMap.get(`NORMALIZED-${energyType}`);
+        const preAction = benchmarkMap.get(`PRE_ACTION-${energyType}`);
+
+        if (normalized && monthKey in normalized) {
+          merged[`${key}Normalized`] = normalized[monthKey];
+        }
+
+        if (preAction && monthKey in preAction) {
+          merged[`${key}PreAction`] = preAction[monthKey];
+        }
       });
 
       return merged;
     });
-  }, [data]);
+  }, [data, benchmarks]);
 
   const estimateColor = '#6ee7b7';
   const actualColor = '#16a34a';
@@ -242,32 +298,33 @@ export default function Building() {
               )}
             </CardDescription>
             <Button onClick={refreshEstimates}>Förnya skattningar</Button>
-          </div>          
+          </div>
           <div className="flex flex-col gap-1 px-6 py-5 sm:py-6">
-                
-                  <span className="text-xs">Visa verkliga linjen</span>
-                  <Switch
-                    checked={showActualLine}
-                    onCheckedChange={()=>setShowActualLine(!showActualLine)}
-                  />
-                        
-                  <span className="text-xs">Visa skattningslinjen</span>
-                  <Switch
-                    checked={showEstimateLine}
-                    onCheckedChange={()=>setShowEstimateLine(!showEstimateLine)}
-                  />
-                         
-                  <span className="text-xs">Visa normaliserad linje</span>
-                  <Switch
-                    checked={showNormalizedLine}
-                    onCheckedChange={()=>setShowNormalizedLine(!showNormalizedLine)}
-                  />
-                                 
-                  <span className="text-xs">Visa trend-linje</span>
-                  <Switch
-                    checked={showPreInstallationTrendLine}
-                    onCheckedChange={()=>setShowPreInstallationTrendLine(!showPreInstallationTrendLine)}
-                  />
+            <span className="text-xs">Visa verkliga linjen</span>
+            <Switch
+              checked={showActualLine}
+              onCheckedChange={() => setShowActualLine(!showActualLine)}
+            />
+
+            <span className="text-xs">Visa skattningslinjen</span>
+            <Switch
+              checked={showEstimateLine}
+              onCheckedChange={() => setShowEstimateLine(!showEstimateLine)}
+            />
+
+            <span className="text-xs">Visa normaliserad linje</span>
+            <Switch
+              checked={showNormalizedLine}
+              onCheckedChange={() => setShowNormalizedLine(!showNormalizedLine)}
+            />
+
+            <span className="text-xs">Visa trend-linje</span>
+            <Switch
+              checked={showPreInstallationTrendLine}
+              onCheckedChange={() =>
+                setShowPreInstallationTrendLine(!showPreInstallationTrendLine)
+              }
+            />
           </div>
 
           <div className="grid grid-cols-3 px-6 lg:flex">
@@ -324,20 +381,44 @@ export default function Building() {
                   <ChartTooltipContent className="w-[150px]" hideLabel />
                 }
               />
-              {showEstimateLine&&(<Line
-                dataKey={`${activeChart}Estimate`}
-                stroke={estimateColor}
-                strokeWidth={2}
-                name="Estimate"
-                strokeDasharray="4 2"
-              ></Line>)}
+              {showEstimateLine && (
+                <Line
+                  dataKey={`${activeChart}Estimate`}
+                  stroke={estimateColor}
+                  strokeWidth={2}
+                  name="Estimate"
+                  strokeDasharray="4 2"
+                ></Line>
+              )}
 
-              {showActualLine&&(<Line
-                dataKey={`${activeChart}Actual`}
-                stroke={actualColor}
-                strokeWidth={2}
-                name="Actual"
-              />)}
+              {showActualLine && (
+                <Line
+                  dataKey={`${activeChart}Actual`}
+                  stroke={actualColor}
+                  strokeWidth={2}
+                  name="Actual"
+                />
+              )}
+
+              {showNormalizedLine && (
+                <Line
+                  dataKey={`${activeChart}Normalized`}
+                  stroke="#3b82f6"
+                  strokeWidth={2}
+                  name="Normalår"
+                  strokeDasharray="2 2"
+                />
+              )}
+
+              {showPreInstallationTrendLine && (
+                <Line
+                  dataKey={`${activeChart}PreAction`}
+                  stroke="#facc15"
+                  strokeWidth={2}
+                  name="Före åtgärd"
+                  strokeDasharray="2 2"
+                />
+              )}
 
               {data?.installedAt && (
                 <ReferenceLine

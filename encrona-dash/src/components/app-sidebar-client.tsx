@@ -14,6 +14,7 @@ import {
   MessageSquareQuoteIcon,
   Leaf,
   Unplug,
+  Ruler,
 } from 'lucide-react';
 
 import {
@@ -78,7 +79,12 @@ const sidebar = {
       icon: HistoryIcon,
     },
     {
-      title: 'Extern Data',
+      title: 'Benchmark Data',
+      url: '/benchmark-data',
+      icon: Ruler,
+    },
+    {
+      title: 'API Data',
       url: '/devices',
       icon: Unplug,
     },
