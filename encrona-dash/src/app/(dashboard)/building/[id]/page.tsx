@@ -386,7 +386,7 @@ export default function Building() {
                   dataKey={`${activeChart}Estimate`}
                   stroke={estimateColor}
                   strokeWidth={2}
-                  name="Estimate"
+                  name="Prognos"
                   strokeDasharray="4 2"
                 ></Line>
               )}
@@ -396,7 +396,7 @@ export default function Building() {
                   dataKey={`${activeChart}Actual`}
                   stroke={actualColor}
                   strokeWidth={2}
-                  name="Actual"
+                  name="Faktisk"
                 />
               )}
 
