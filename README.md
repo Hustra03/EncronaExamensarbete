@@ -4,6 +4,8 @@ This project is a system, developed for Encrona El & Automation, for the purpose
 
 It was started as a bachelor level thesis project, by Erik Paulinder and Emanuel Wilches Brandt. 
 
+The final commit from this part of the project development was done on 06/07/2025.
+
 Developers:
 Hustra03: Erik Paulinder, 
 mdih16: Emanuel Wilches Brandt, 
